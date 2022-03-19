@@ -1,16 +1,3 @@
-<!--
-title: 'Serverless Framework Python Flask API on AWS'
-description: 'This template demonstrates how to develop and deploy a simple Python Flask API running on AWS Lambda using the traditional Serverless Framework.'
-layout: Doc
-framework: v3
-platform: AWS
-language: Python
-priority: 2
-authorLink: 'https://github.com/serverless'
-authorName: 'Serverless, inc.'
-authorAvatar: 'https://avatars1.githubusercontent.com/u/13742415?s=200&v=4'
--->
-
 # Serverless Airtable API
 
 ### Deploy
@@ -18,9 +5,7 @@ authorAvatar: 'https://avatars1.githubusercontent.com/u/13742415?s=200&v=4'
 Before deploying:
 
 1. Create a .env file locally from `.env.example`
-2. Set `GOOGLE_WORKSPACE_SERVICE_ACCOUNT_CREDENTIALS` with the service credentials JSON
-3. Set `GOOGLE_WORKSPACE_SERVICE_ACCOUNT_DELEGATED_USER` with the admin user acting as delegate
-4. Set `GOOGLE_WORKSPACE_CUSTOMER_ID` with the Google Workspace Customer ID
+2. Set `AIRTABLE_API_KEY` with a read+write Wildflower Airtable API key
 5. Deploy:
 
 
