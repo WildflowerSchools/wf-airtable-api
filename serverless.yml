@@ -1,0 +1,32 @@
+org: wildflowerschools
+app: wf-airtable-api
+service: aws-python-flask-api
+
+frameworkVersion: '3'
+
+useDotenv: true
+
+provider:
+  name: aws
+  runtime: python3.9
+  stage: ${opt:stage, 'dev'}
+  environment:
+    AIRTABLE_API_KEY: ${env:AIRTABLE_API_KEY}
+    AUTH0_AUDIENCE: ${env:AUTH0_AUDIENCE}
+    AUTH0_DOMAIN: ${env:AUTH0_DOMAIN}
+    STAGE: ${self:provider.stage}
+
+functions:
+  api:
+    handler: app.main.handler
+    events:
+      - http:
+          path: /
+          method: ANY
+      - http:
+          path: /{proxy+}
+          method: ANY
+
+plugins:
+  - serverless-offline
+  - serverless-python-requirements

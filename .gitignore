@@ -1,0 +1,10 @@
+.idea
+.serverless
+
+node_modules
+notepad
+
+.env
+.env.dev
+.env.test
+.env.production
