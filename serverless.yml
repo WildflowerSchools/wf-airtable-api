@@ -1,10 +1,15 @@
 org: wildflowerschools
 app: wf-airtable-api
-service: aws-python-flask-api
+service: aws-python-fastapi
 
 frameworkVersion: '3'
 
 useDotenv: true
+
+#custom:
+#  pythonRequirements:
+#    dockerImage: mlupin/docker-lambda:python3.9-build
+#    dockerizePip: true
 
 provider:
   name: aws
