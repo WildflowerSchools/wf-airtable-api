@@ -23,5 +23,5 @@ class AirtableMontessoriCertificationResponse(AirtableResponse):
     fields: AirtableMontessoriCertificationFields
 
 
-class ListAirtableHubResponse(BaseModel):
+class ListAirtableMontessoriCertificationResponse(BaseModel):
     __root__: list[AirtableMontessoriCertificationResponse]

@@ -10,7 +10,7 @@ from .validators import get_first_or_default_none
 class AirtableEducatorsSchoolsFields(BaseModel):
     educator_id: Optional[str] = Field(alias="Educator")
     school_id: Optional[str] = Field(alias="School")
-    educator_name: Optional[str] = Field(alias="Educator Name")
+    educator_name: Optional[str] = Field(alias="Educator Full Name")
     school_name: Optional[str] = Field(alias="School Name")
     role: Optional[list[str]] = Field(alias="Role")
     currently_active: Optional[bool] = Field(alias="Currently Active")

@@ -7,27 +7,35 @@ class APILinks(BaseModel):
     links: Optional[dict[str, Optional[str]]]
 
 
-class APIData(BaseModel):
+class APIDataBase(BaseModel):
     id: str
     type: str
-    meta: Optional[dict]
+
+
+class APIDataWithFields(BaseModel):
+    id: str
+    type: str
+    fields: dict
 
 
 class APILinksAndData(APILinks):
-    data: Optional[Union[str, APIData, list[Union[str, APIData]]]]
+    data: Optional[Union[str, APIDataWithFields, APIDataBase, list[Union[str, APIDataWithFields, APIDataBase]]]]
 
 
 class APIRelationships(BaseModel):
     __root__: dict[str, Union[APILinksAndData, APILinks]]
 
 
-class APIResponse(BaseModel):
-    id: str
-    type: str
+class APIData(APIDataWithFields):
     fields: dict
     relationships: APIRelationships
     links: dict[str, Optional[str]]
 
 
-class ListAPIResponse(BaseModel):
-    __root__: list[APIResponse]
+class APIResponse(APILinks):
+    data: APIData
+    meta: Optional[dict]
+
+
+class ListAPIResponse(APIResponse):
+    data: list[APIData]

@@ -2,7 +2,7 @@ from typing import Optional
 
 from pydantic import BaseModel, Field
 
-from .response import AirtableResponse
+from .response import AirtableResponse, ListAirtableResponse
 
 
 class AirtableHubFields(BaseModel):
@@ -16,5 +16,5 @@ class AirtableHubResponse(AirtableResponse):
     fields: AirtableHubFields
 
 
-class ListAirtableHubResponse(BaseModel):
+class ListAirtableHubResponse(ListAirtableResponse):
     __root__: list[AirtableHubResponse]

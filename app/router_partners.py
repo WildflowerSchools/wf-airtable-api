@@ -1,4 +1,6 @@
 import requests
+from urllib.parse import urlencode
+
 from fastapi import APIRouter, Depends, HTTPException, Request
 
 from .airtable.client import AirtableClient
@@ -33,13 +35,23 @@ def fetch_and_validate_partner(partner_id, airtable_client: AirtableClient):
 # Dupe the root route to solve this issue: https://github.com/tiangolo/fastapi/issues/2060
 @router.get("/", response_model=response_models.ListAPIResponse, include_in_schema=False)
 @router.get("", response_model=response_models.ListAPIResponse)
-async def list_partners(request: Request):
+async def list_partners(request: Request, page_size: str = 100, offset: str = ''):
     airtable_client = request.state.airtable_client
-    airtable_partners = airtable_client.list_partners()
+    airtable_partners, next_offset = airtable_client.list_partners(page_size=page_size, offset=offset)
 
-    return partner_models.ListAPIPartnerResponse.from_airtable_partners(
+    data = partner_models.ListAPIPartnerData.from_airtable_partners(
         airtable_partners=airtable_partners,
-        url_path_for=request.app.url_path_for)
+        url_path_for=request.app.url_path_for).__root__
+
+    links = {
+        'self': f'{request.app.url_path_for("list_partners")}?{urlencode({"page_size": page_size, "offset": offset})}'}
+    if next_offset != '' and next_offset is not None:
+        links['next'] = f'{request.app.url_path_for("list_partners")}?{urlencode({"page_size": page_size, "offset": next_offset})}'
+
+    return response_models.ListAPIResponse(
+        data=data,
+        links=links,
+        meta={"offset": next_offset})
 
 
 @router.get("/{partner_id}", response_model=response_models.APIResponse)
@@ -47,9 +59,13 @@ async def get_partner(partner_id, request: Request):
     airtable_client = request.state.airtable_client
     airtable_partner = fetch_and_validate_partner(partner_id, airtable_client)
 
-    return partner_models.APIPartnerResponse.from_airtable_partner(
+    data = partner_models.APIPartnerData.from_airtable_partner(
         airtable_partner=airtable_partner,
         url_path_for=request.app.url_path_for)
+
+    return response_models.APIResponse(
+        data=data,
+        links={'self': request.app.url_path_for("get_partner", partner_id=partner_id)})
 
 
 @router.get("/{partner_id}/hubs_as_entrepreneur", response_model=response_models.ListAPIResponse)
@@ -58,9 +74,13 @@ async def get_partner_hubs_as_entrepreneur(partner_id, request: Request):
     fetch_and_validate_partner(partner_id, airtable_client)
     airtable_hubs = airtable_client.get_hubs_by_entrepreneur_id(partner_id)
 
-    return hub_models.ListAPIHubResponse.from_airtable_hubs(
+    data = hub_models.ListAPIHubData.from_airtable_hubs(
         airtable_hubs=airtable_hubs,
-        url_path_for=request.app.url_path_for)
+        url_path_for=request.app.url_path_for).__root__
+
+    return response_models.ListAPIResponse(
+        data=data,
+        links={'self': request.app.url_path_for("get_partner_hubs_as_entrepreneur", partner_id=partner_id)})
 
 
 @router.get("/{partner_id}/pods_as_contact", response_model=response_models.ListAPIResponse)
@@ -69,9 +89,13 @@ async def get_partner_pods_as_contact(partner_id, request: Request):
     fetch_and_validate_partner(partner_id, airtable_client)
     airtable_pods = airtable_client.get_pods_by_contact_id(partner_id)
 
-    return pod_models.ListAPIPodResponse.from_airtable_pods(
+    data = pod_models.ListAPIPodData.from_airtable_pods(
         airtable_pods=airtable_pods,
-        url_path_for=request.app.url_path_for)
+        url_path_for=request.app.url_path_for).__root__
+
+    return response_models.ListAPIResponse(
+        data=data,
+        links={'self': request.app.url_path_for("get_partner_pods_as_contact", partner_id=partner_id)})
 
 
 @router.get("/{partner_id}/schools_guiding", response_model=response_models.ListAPIResponse)
@@ -80,9 +104,13 @@ async def get_guides_schools(partner_id, request: Request):
     fetch_and_validate_partner(partner_id, airtable_client)
     airtable_schools = airtable_client.get_schools_by_guide_id(partner_id)
 
-    return school_models.ListAPISchoolResponse.from_airtable_schools(
+    data = school_models.ListAPISchoolData.from_airtable_schools(
         airtable_schools=airtable_schools,
-        url_path_for=request.app.url_path_for)
+        url_path_for=request.app.url_path_for).__root__
+
+    return response_models.ListAPIResponse(
+        data=data,
+        links={'self': request.app.url_path_for("get_guides_schools", partner_id=partner_id)})
 
 
 @router.get("/{partner_id}/educators_guiding", response_model=response_models.ListAPIResponse)
@@ -91,6 +119,10 @@ async def get_guides_educators(partner_id, request: Request):
     fetch_and_validate_partner(partner_id, airtable_client)
     airtable_educators = airtable_client.get_educators_by_guide_id(partner_id)
 
-    return educator_models.ListAPIEducatorResponse.from_airtable_educators(
+    data = educator_models.ListAPIEducatorData.from_airtable_educators(
         airtable_educators=airtable_educators,
-        url_path_for=request.app.url_path_for)
+        url_path_for=request.app.url_path_for).__root__
+
+    return response_models.ListAPIResponse(
+        data=data,
+        links={'self': request.app.url_path_for("get_guides_educators", partner_id=partner_id)})

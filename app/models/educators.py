@@ -6,7 +6,6 @@ from . import response as response_models
 from . import educators_schools as educators_schools_models
 from . import languages as languages_models
 from . import montessori_certifications as montessori_certifications_models
-from .response import APIData
 from ..airtable import educators as airtable_educator_models
 from ..airtable import educators_schools as airtable_educators_schools_models
 from ..airtable import languages as airtable_languages_models
@@ -46,7 +45,7 @@ class APIEducatorRelationships(BaseModel):
     montessori_certifications: Optional[response_models.APILinksAndData] = None
 
 
-class APIEducatorResponse(response_models.APIResponse):
+class APIEducatorData(response_models.APIData):
     fields: APIEducatorFields
 
     @classmethod
@@ -81,10 +80,10 @@ class APIEducatorResponse(response_models.APIResponse):
         if airtable_educator.fields.educators_schools is not None:
             for d in airtable_educator.fields.educators_schools:
                 if isinstance(d, airtable_educators_schools_models.AirtableEducatorsSchoolsResponse):
-                    educators_schools_data.append(APIData(
+                    educators_schools_data.append(response_models.APIDataWithFields(
                         id=d.id,
                         type=educators_schools_models.MODEL_TYPE,
-                        meta=educators_schools_models.APIEducatorsSchoolsFields(
+                        fields=educators_schools_models.APIEducatorsSchoolsFields(
                             educator_name=d.fields.educator_name,
                             school_name=d.fields.school_name,
                             role=d.fields.role,
@@ -99,10 +98,10 @@ class APIEducatorResponse(response_models.APIResponse):
         if airtable_educator.fields.languages is not None:
             for d in airtable_educator.fields.languages:
                 if isinstance(d, airtable_languages_models.AirtableLanguageResponse):
-                    educators_languages_data.append(APIData(
+                    educators_languages_data.append(response_models.APIDataWithFields(
                         id=d.id,
                         type=languages_models.MODEL_TYPE,
-                        meta=languages_models.APILanguagesFields(
+                        fields=languages_models.APILanguagesFields(
                             full_name=d.fields.full_name,
                             language=d.fields.language,
                             language_dropdown=d.fields.language_dropdown,
@@ -116,10 +115,10 @@ class APIEducatorResponse(response_models.APIResponse):
         if airtable_educator.fields.montessori_certifications is not None:
             for d in airtable_educator.fields.montessori_certifications:
                 if isinstance(d, airtable_montessori_certifications_models.AirtableMontessoriCertificationResponse):
-                    educators_montessori_certifications_data.append(APIData(
+                    educators_montessori_certifications_data.append(response_models.APIDataWithFields(
                         id=d.id,
                         type=montessori_certifications_models.MODEL_TYPE,
-                        meta=montessori_certifications_models.APIMontessoriCertificationsFields(
+                        fields=montessori_certifications_models.APIMontessoriCertificationsFields(
                             full_name=d.fields.full_name,
                             year_certified=d.fields.year_certified,
                             certification_levels=d.fields.certification_levels,
@@ -146,7 +145,7 @@ class APIEducatorResponse(response_models.APIResponse):
         links = response_models.APILinks(
             links={'self': url_path_for("get_educator", educator_id=airtable_educator.id)}
         )
-        return response_models.APIResponse(
+        return response_models.APIData(
             id=airtable_educator.id,
             type=MODEL_TYPE,
             fields=fields,
@@ -155,8 +154,8 @@ class APIEducatorResponse(response_models.APIResponse):
         )
 
 
-class ListAPIEducatorResponse(BaseModel):
-    __root__: list[APIEducatorResponse]
+class ListAPIEducatorData(BaseModel):
+    __root__: list[APIEducatorData]
 
     @classmethod
     def from_airtable_educators(cls,
@@ -165,8 +164,8 @@ class ListAPIEducatorResponse(BaseModel):
         educator_responses = []
         for e in airtable_educators.__root__:
             educator_responses.append(
-                APIEducatorResponse.from_airtable_educator(
+                APIEducatorData.from_airtable_educator(
                     airtable_educator=e,
                     url_path_for=url_path_for))
 
-        return educator_responses
+        return cls(__root__=educator_responses)

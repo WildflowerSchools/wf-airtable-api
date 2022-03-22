@@ -3,7 +3,7 @@ from typing import Callable, Optional
 from pydantic import BaseModel
 
 from . import response as response_models
-from .response import APIData
+from .response import APIDataBase
 from ..airtable import hubs as airtable_hub_models
 from . import partners as partner_models
 from . import pods as pod_models
@@ -22,7 +22,7 @@ class APIHubRelationships(BaseModel):
     schools: Optional[response_models.APILinksAndData] = None
 
 
-class APIHubResponse(response_models.APIResponse):
+class APIHubData(response_models.APIData):
     fields: APIHubFields
 
     @classmethod
@@ -32,21 +32,21 @@ class APIHubResponse(response_models.APIResponse):
         regional_site_entrepreneurs_data = []
         if airtable_hub.fields.regional_site_entrepreneurs is not None:
             for rs_id in airtable_hub.fields.regional_site_entrepreneurs:
-                regional_site_entrepreneurs_data.append(APIData(
+                regional_site_entrepreneurs_data.append(APIDataBase(
                     id=rs_id,
                     type=partner_models.MODEL_TYPE))
 
         pods_data = []
         if airtable_hub.fields.pods is not None:
             for p_id in airtable_hub.fields.pods:
-                pods_data.append(APIData(
+                pods_data.append(APIDataBase(
                     id=p_id,
                     type=pod_models.MODEL_TYPE))
 
         schools_data = []
         if airtable_hub.fields.schools is not None:
             for s_id in airtable_hub.fields.schools:
-                schools_data.append(APIData(
+                schools_data.append(APIDataBase(
                     id=s_id,
                     type=school_models.MODEL_TYPE))
 
@@ -64,7 +64,7 @@ class APIHubResponse(response_models.APIResponse):
         links = response_models.APILinks(
             links={'self': url_path_for("get_hub", hub_id=airtable_hub.id)}
         )
-        return response_models.APIResponse(
+        return response_models.APIData(
             id=airtable_hub.id,
             type=MODEL_TYPE,
             fields=fields,
@@ -73,8 +73,8 @@ class APIHubResponse(response_models.APIResponse):
         )
 
 
-class ListAPIHubResponse(BaseModel):
-    __root__: list[APIHubResponse]
+class ListAPIHubData(BaseModel):
+    __root__: list[APIHubData]
 
     @classmethod
     def from_airtable_hubs(cls,
@@ -83,8 +83,8 @@ class ListAPIHubResponse(BaseModel):
         hub_responses = []
         for h in airtable_hubs.__root__:
             hub_responses.append(
-                APIHubResponse.from_airtable_hub(
+                APIHubData.from_airtable_hub(
                     airtable_hub=h,
                     url_path_for=url_path_for))
 
-        return hub_responses
+        return cls(__root__=hub_responses)

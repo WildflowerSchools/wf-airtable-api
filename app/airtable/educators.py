@@ -2,8 +2,10 @@ from typing import Optional, Union
 
 from pydantic import BaseModel, Field, validator
 
+from . import educators_schools as airtable_educators_schools_models
+from . import languages as airtable_languages_models
+from . import montessori_certifications as airtable_montessori_certifications_models
 from .attachment import AirtableAttachment
-from .educators_schools import AirtableEducatorsSchoolsResponse
 from .languages import AirtableLanguageResponse
 from .montessori_certifications import AirtableMontessoriCertificationResponse
 from .response import AirtableResponse
@@ -19,7 +21,7 @@ class AirtableEducatorFields(BaseModel):
     home_address: Optional[str] = Field(alias="Home Address")
 
     educators_schools: Optional[list[
-        Union[str, AirtableEducatorsSchoolsResponse]]] = Field(alias="Educators at Schools")
+        Union[str, airtable_educators_schools_models.AirtableEducatorsSchoolsResponse]]] = Field(alias="Educators at Schools")
     montessori_certifications: Optional[list[
         Union[str, AirtableMontessoriCertificationResponse]]] = Field(alias="Montessori Certifications")
     languages: Optional[list[
@@ -65,39 +67,58 @@ class AirtableEducatorFields(BaseModel):
         from .client import AirtableClient
         airtable_client = AirtableClient()
 
-        loaded_educators_schools = value.copy()
-        for ii, educator_school in enumerate(loaded_educators_schools):
-            if isinstance(educator_school, str):
-                raw = airtable_client.get_educator_school_by_id(educator_school)
-                loaded_educators_schools[ii] = AirtableEducatorsSchoolsResponse.parse_obj(raw)
+        educators_schools = value.copy()
+        _ids = []
+        _records = []
+        for id_or_record in educators_schools:
+            if isinstance(id_or_record, airtable_educators_schools_models.AirtableEducatorsSchoolsResponse):
+                _records.append(id_or_record)
+            elif isinstance(id_or_record, str):
+                _ids.append(id_or_record)
 
-        return loaded_educators_schools
+        list_airtable_guides_schools = airtable_client.list_educator_schools_by_ids(educator_school_ids=_ids)
+        _records += list_airtable_guides_schools.__root__
+
+        return _records
 
     @validator("montessori_certifications")
     def load_montessori_certifications_relationship(cls, value):
         from .client import AirtableClient
         airtable_client = AirtableClient()
 
-        loaded_montessori_certifications = value.copy()
-        for ii, montessori_certification in enumerate(loaded_montessori_certifications):
-            if isinstance(montessori_certification, str):
-                raw = airtable_client.get_montessori_education_by_id(montessori_certification)
-                loaded_montessori_certifications[ii] = AirtableMontessoriCertificationResponse.parse_obj(raw)
+        montessori_certifications = value.copy()
+        _ids = []
+        _records = []
+        for id_or_record in montessori_certifications:
+            if isinstance(id_or_record, airtable_montessori_certifications_models.AirtableMontessoriCertificationResponse):
+                _records.append(id_or_record)
+            elif isinstance(id_or_record, str):
+                _ids.append(id_or_record)
 
-        return loaded_montessori_certifications
+        list_airtable_montessori_certifications = airtable_client.list_montessori_certifications_by_ids(
+            montessori_certification_ids=_ids)
+        _records += list_airtable_montessori_certifications.__root__
+
+        return _records
 
     @validator("languages")
     def load_languages_relationship(cls, value):
         from .client import AirtableClient
         airtable_client = AirtableClient()
 
-        loaded_languages = value.copy()
-        for ii, language in enumerate(loaded_languages):
-            if isinstance(language, str):
-                raw = airtable_client.get_language_by_id(language)
-                loaded_languages[ii] = AirtableLanguageResponse.parse_obj(raw)
+        languages = value.copy()
+        _ids = []
+        _records = []
+        for id_or_record in languages:
+            if isinstance(id_or_record, airtable_languages_models.AirtableLanguageResponse):
+                _records.append(id_or_record)
+            elif isinstance(id_or_record, str):
+                _ids.append(id_or_record)
 
-        return loaded_languages
+        list_language_certifications = airtable_client.list_languages_by_ids(language_ids=_ids)
+        _records += list_language_certifications.__root__
+
+        return _records
 
 
 class AirtableEducatorResponse(AirtableResponse):

@@ -1,3 +1,5 @@
+from urllib.parse import urlencode
+
 import requests
 
 from fastapi import APIRouter, Depends, HTTPException, Request
@@ -35,14 +37,23 @@ def fetch_and_validate_school(school_id, airtable_client: AirtableClient):
 # Dupe the root route to solve this issue: https://github.com/tiangolo/fastapi/issues/2060
 @router.get("/", response_model=response_models.ListAPIResponse, include_in_schema=False)
 @router.get("", response_model=response_models.ListAPIResponse)
-async def list_schools(request: Request):
+async def list_schools(request: Request, page_size: str = 100, offset: str = ''):
     airtable_client = request.state.airtable_client
-    airtable_schools = airtable_client.list_schools()
+    airtable_schools, next_offset = airtable_client.list_schools(page_size=page_size, offset=offset)
 
-    return school_models.ListAPISchoolResponse.from_airtable_schools(
+    data = school_models.ListAPISchoolData.from_airtable_schools(
         airtable_schools=airtable_schools,
-        url_path_for=request.app.url_path_for
-    )
+        url_path_for=request.app.url_path_for).__root__
+
+    links = {
+        'self': f'{request.app.url_path_for("list_schools")}?{urlencode({"page_size": page_size, "offset": offset})}'}
+    if next_offset != '' and next_offset is not None:
+        links['next'] = f'{request.app.url_path_for("list_schools")}?{urlencode({"page_size": page_size, "offset": next_offset})}'
+
+    return response_models.ListAPIResponse(
+        data=data,
+        links=links,
+        meta={"offset": next_offset})
 
 
 @router.get("/{school_id}", response_model=response_models.APIResponse)
@@ -53,9 +64,13 @@ async def get_school(school_id, request: Request):
     if airtable_school is None:
         raise HTTPException(status_code=404, detail="School not found")
 
-    return school_models.APISchoolResponse.from_airtable_school(
+    data = school_models.APISchoolData.from_airtable_school(
         airtable_school=airtable_school,
         url_path_for=request.app.url_path_for)
+
+    return response_models.APIResponse(
+        data=data,
+        links={'self': request.app.url_path_for("get_school", school_id=school_id)})
 
 
 @router.get("/{school_id}/hub", response_model=response_models.APIResponse)
@@ -67,9 +82,13 @@ async def get_school_hub(school_id, request: Request):
     if airtable_hub is None:
         raise HTTPException(status_code=404, detail="School Hub not found")
 
-    return hub_models.APIHubResponse.from_airtable_hub(
+    data = hub_models.APIHubData.from_airtable_hub(
         airtable_hub=airtable_hub,
         url_path_for=request.app.url_path_for)
+
+    return response_models.APIResponse(
+        data=data,
+        links={'self': request.app.url_path_for("get_school_hub", school_id=school_id)})
 
 
 @router.get("/{school_id}/pod", response_model=response_models.APIResponse)
@@ -81,9 +100,13 @@ async def get_school_pod(school_id, request: Request):
     if airtable_pod is None:
         raise HTTPException(status_code=404, detail="School Pod not found")
 
-    return pod_models.APIPodResponse.from_airtable_pod(
+    data = pod_models.APIPodData.from_airtable_pod(
         airtable_pod=airtable_pod,
         url_path_for=request.app.url_path_for)
+
+    return response_models.APIResponse(
+        data=data,
+        links={'self': request.app.url_path_for("get_school_pod", school_id=school_id)})
 
 
 @router.get("/{school_id}/guides_and_entrepreneurs", response_model=response_models.ListAPIResponse)
@@ -92,9 +115,13 @@ async def get_school_guides_and_entrepreneurs(school_id, request: Request):
     fetch_and_validate_school(school_id, airtable_client)
     airtable_partners = airtable_client.get_guides_by_school_id(school_id)
 
-    return partner_models.ListAPIPartnerResponse.from_airtable_partners(
+    data = partner_models.ListAPIPartnerData.from_airtable_partners(
         airtable_partners=airtable_partners,
-        url_path_for=request.app.url_path_for)
+        url_path_for=request.app.url_path_for).__root__
+
+    return response_models.ListAPIResponse(
+        data=data,
+        links={'self': request.app.url_path_for("get_school_guides_and_entrepreneurs", school_id=school_id)})
 
 
 @router.get("/{school_id}/primary_contacts", response_model=response_models.ListAPIResponse)
@@ -103,9 +130,13 @@ async def get_school_primary_contacts(school_id, request: Request):
     fetch_and_validate_school(school_id, airtable_client)
     airtable_educators = airtable_client.get_primary_contacts_by_school_id(school_id)
 
-    return educator_models.ListAPIEducatorResponse.from_airtable_educators(
+    data = educator_models.ListAPIEducatorData.from_airtable_educators(
         airtable_educators=airtable_educators,
-        url_path_for=request.app.url_path_for)
+        url_path_for=request.app.url_path_for).__root__
+
+    return response_models.ListAPIResponse(
+        data=data,
+        links={'self': request.app.url_path_for("get_school_primary_contacts", school_id=school_id)})
 
 
 @router.get("/{school_id}/educators", response_model=response_models.ListAPIResponse)
@@ -114,9 +145,13 @@ async def get_school_educators(school_id, request: Request):
     fetch_and_validate_school(school_id, airtable_client)
     airtable_educators = airtable_client.get_all_educators_by_school_id(school_id)
 
-    return educator_models.ListAPIEducatorResponse.from_airtable_educators(
+    data = educator_models.ListAPIEducatorData.from_airtable_educators(
         airtable_educators=airtable_educators,
-        url_path_for=request.app.url_path_for)
+        url_path_for=request.app.url_path_for).__root__
+
+    return response_models.ListAPIResponse(
+        data=data,
+        links={'self': request.app.url_path_for("get_school_educators", school_id=school_id)})
 
 
 @router.get("/{school_id}/current_educators", response_model=response_models.ListAPIResponse)
@@ -125,9 +160,13 @@ async def get_school_current_educators(school_id, request: Request):
     fetch_and_validate_school(school_id, airtable_client)
     airtable_educators = airtable_client.get_current_educators_by_school_id(school_id)
 
-    return educator_models.ListAPIEducatorResponse.from_airtable_educators(
+    data = educator_models.ListAPIEducatorData.from_airtable_educators(
         airtable_educators=airtable_educators,
-        url_path_for=request.app.url_path_for)
+        url_path_for=request.app.url_path_for).__root__
+
+    return response_models.ListAPIResponse(
+        data=data,
+        links={'self': request.app.url_path_for("get_school_current_educators", school_id=school_id)})
 
 
 @router.get("/{school_id}/current_tls", response_model=response_models.ListAPIResponse)
@@ -136,9 +175,13 @@ async def get_school_current_tls(school_id, request: Request):
     fetch_and_validate_school(school_id, airtable_client)
     airtable_educators = airtable_client.get_current_tls_by_school_id(school_id)
 
-    return educator_models.ListAPIEducatorResponse.from_airtable_educators(
+    data = educator_models.ListAPIEducatorData.from_airtable_educators(
         airtable_educators=airtable_educators,
-        url_path_for=request.app.url_path_for)
+        url_path_for=request.app.url_path_for).__root__
+
+    return response_models.ListAPIResponse(
+        data=data,
+        links={'self': request.app.url_path_for("get_school_current_tls", school_id=school_id)})
 
 
 @router.get("/{school_id}/founders", response_model=response_models.ListAPIResponse)
@@ -147,6 +190,10 @@ async def get_school_founders(school_id, request: Request):
     fetch_and_validate_school(school_id, airtable_client)
     airtable_educators = airtable_client.get_founders_by_school_id(school_id)
 
-    return educator_models.ListAPIEducatorResponse.from_airtable_educators(
+    data = educator_models.ListAPIEducatorData.from_airtable_educators(
         airtable_educators=airtable_educators,
-        url_path_for=request.app.url_path_for)
+        url_path_for=request.app.url_path_for).__root__
+
+    return response_models.ListAPIResponse(
+        data=data,
+        links={'self': request.app.url_path_for("get_school_founders", school_id=school_id)})

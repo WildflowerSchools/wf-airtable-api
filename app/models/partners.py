@@ -6,7 +6,6 @@ from . import response as response_models
 from . import guides_schools as guides_schools_models
 from . import hubs as hubs_model
 from . import pods as pods_model
-from .response import APIData
 from ..airtable import partners as airtable_partner_models
 from ..airtable import guides_schools as airtable_guides_schools_models
 
@@ -28,7 +27,7 @@ class APIPartnerRelationships(BaseModel):
     educators_partner_guiding: Optional[response_models.APILinksAndData] = None
 
 
-class APIPartnerResponse(response_models.APIResponse):
+class APIPartnerData(response_models.APIData):
     fields: APIPartnerFields
 
     @classmethod
@@ -45,14 +44,14 @@ class APIPartnerResponse(response_models.APIResponse):
         hubs_data = []
         if airtable_partner.fields.hubs is not None:
             for p_id in airtable_partner.fields.hubs:
-                hubs_data.append(APIData(
+                hubs_data.append(response_models.APIDataBase(
                     id=p_id,
                     type=hubs_model.MODEL_TYPE))
 
         pods_data = []
         if airtable_partner.fields.pods is not None:
             for p_id in airtable_partner.fields.pods:
-                pods_data.append(APIData(
+                pods_data.append(response_models.APIDataBase(
                     id=p_id,
                     type=pods_model.MODEL_TYPE))
 
@@ -60,10 +59,10 @@ class APIPartnerResponse(response_models.APIResponse):
         if airtable_partner.fields.schools_partner_guiding is not None:
             for d in airtable_partner.fields.schools_partner_guiding:
                 if isinstance(d, airtable_guides_schools_models.AirtableGuidesSchoolsResponse):
-                    guides_schools_data.append(APIData(
+                    guides_schools_data.append(response_models.APIDataWithFields(
                         id=d.id,
                         type=guides_schools_models.MODEL_TYPE,
-                        meta=guides_schools_models.APIGuidesSchoolsFields(
+                        fields=guides_schools_models.APIGuidesSchoolsFields(
                             start_date=d.fields.start_date,
                             end_date=d.fields.end_date,
                             type=d.fields.type,
@@ -77,7 +76,7 @@ class APIPartnerResponse(response_models.APIResponse):
         educators_partner_guiding_data = []
         if airtable_partner.fields.educators_partner_guiding is not None:
             for e_id in airtable_partner.fields.educators_partner_guiding:
-                educators_partner_guiding_data.append(APIData(
+                educators_partner_guiding_data.append(response_models.APIDataBase(
                     id=e_id,
                     type='educators'))
 
@@ -98,7 +97,7 @@ class APIPartnerResponse(response_models.APIResponse):
         links = response_models.APILinks(
             links={'self': url_path_for("get_partner", partner_id=airtable_partner.id)}
         )
-        return response_models.APIResponse(
+        return response_models.APIData(
             id=airtable_partner.id,
             type=MODEL_TYPE,
             fields=fields,
@@ -107,8 +106,8 @@ class APIPartnerResponse(response_models.APIResponse):
         )
 
 
-class ListAPIPartnerResponse(BaseModel):
-    __root__: list[APIPartnerResponse]
+class ListAPIPartnerData(BaseModel):
+    __root__: list[APIPartnerData]
 
     @classmethod
     def from_airtable_partners(cls,
@@ -117,8 +116,8 @@ class ListAPIPartnerResponse(BaseModel):
         partner_responses = []
         for p in airtable_partners.__root__:
             partner_responses.append(
-                APIPartnerResponse.from_airtable_partner(
+                APIPartnerData.from_airtable_partner(
                     airtable_partner=p,
                     url_path_for=url_path_for))
 
-        return partner_responses
+        return cls(__root__=partner_responses)

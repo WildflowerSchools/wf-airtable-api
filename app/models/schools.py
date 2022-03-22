@@ -4,7 +4,6 @@ from typing import Callable, Optional
 from pydantic import BaseModel, HttpUrl
 
 from . import response as response_models
-from .response import APIData
 from ..airtable import schools as airtable_school_models
 from . import educators as educator_models
 from . import hubs as hub_models
@@ -55,11 +54,12 @@ class APISchoolRelationships(BaseModel):
     primary_contacts: Optional[response_models.APILinksAndData] = None
 
 
-class APISchoolResponse(response_models.APIResponse):
+class APISchoolData(response_models.APIData):
     fields: APISchoolFields
 
     @classmethod
-    def from_airtable_school(cls, airtable_school: airtable_school_models.AirtableSchoolResponse,
+    def from_airtable_school(cls,
+                             airtable_school: airtable_school_models.AirtableSchoolResponse,
                              url_path_for: Callable):
         fields = APISchoolFields(
             name=airtable_school.fields.name,
@@ -95,55 +95,55 @@ class APISchoolResponse(response_models.APIResponse):
 
         hub_data = None
         if airtable_school.fields.hub:
-            hub_data = APIData(
+            hub_data = response_models.APIDataBase(
                 id=airtable_school.fields.hub,
                 type=hub_models.MODEL_TYPE)
 
         pod_data = None
         if airtable_school.fields.pod:
-            pod_data = APIData(
+            pod_data = response_models.APIDataBase(
                 id=airtable_school.fields.pod,
                 type=pod_models.MODEL_TYPE)
 
         guides_and_entrepreneurs_data = []
         if airtable_school.fields.guides_entrepreneurs is not None:
             for ge_id in airtable_school.fields.guides_entrepreneurs:
-                guides_and_entrepreneurs_data.append(APIData(
+                guides_and_entrepreneurs_data.append(response_models.APIDataBase(
                     id=ge_id,
                     type=partner_models.MODEL_TYPE))
 
         primary_contacts_data = []
         if airtable_school.fields.primary_contacts is not None:
             for e_id in airtable_school.fields.primary_contacts:
-                primary_contacts_data.append(APIData(
+                primary_contacts_data.append(response_models.APIDataBase(
                     id=e_id,
                     type=educator_models.MODEL_TYPE))
 
         all_educators_data = []
         if airtable_school.fields.all_educators is not None:
             for e_id in airtable_school.fields.all_educators:
-                all_educators_data.append(APIData(
+                all_educators_data.append(response_models.APIDataBase(
                     id=e_id,
                     type=educator_models.MODEL_TYPE))
 
         current_educators_data = []
         if airtable_school.fields.current_educators is not None:
             for e_id in airtable_school.fields.current_educators:
-                current_educators_data.append(APIData(
+                current_educators_data.append(response_models.APIDataBase(
                     id=e_id,
                     type=educator_models.MODEL_TYPE))
 
         current_tls_data = []
         if airtable_school.fields.current_tls is not None:
             for e_id in airtable_school.fields.current_tls:
-                current_tls_data.append(APIData(
+                current_tls_data.append(response_models.APIDataBase(
                     id=e_id,
                     type=educator_models.MODEL_TYPE))
 
         founders_data = []
         if airtable_school.fields.founders is not None:
             for e_id in airtable_school.fields.founders:
-                founders_data.append(APIData(
+                founders_data.append(response_models.APIDataBase(
                     id=e_id,
                     type=educator_models.MODEL_TYPE))
 
@@ -176,7 +176,7 @@ class APISchoolResponse(response_models.APIResponse):
         links = response_models.APILinks(
             links={'self': url_path_for("get_school", school_id=airtable_school.id)}
         )
-        return response_models.APIResponse(
+        return response_models.APIData(
             id=airtable_school.id,
             type=MODEL_TYPE,
             fields=fields,
@@ -185,8 +185,8 @@ class APISchoolResponse(response_models.APIResponse):
         )
 
 
-class ListAPISchoolResponse(BaseModel):
-    __root__: list[APISchoolResponse]
+class ListAPISchoolData(BaseModel):
+    __root__: list[APISchoolData]
 
     @classmethod
     def from_airtable_schools(cls,
@@ -196,8 +196,8 @@ class ListAPISchoolResponse(BaseModel):
         school_responses = []
         for s in airtable_schools.__root__:
             school_responses.append(
-                APISchoolResponse.from_airtable_school(
+                APISchoolData.from_airtable_school(
                     airtable_school=s,
                     url_path_for=url_path_for))
 
-        return school_responses
+        return cls(__root__=school_responses)

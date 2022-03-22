@@ -25,5 +25,5 @@ class AirtableLanguageResponse(AirtableResponse):
     fields: AirtableLanguageFields
 
 
-class ListAirtableHubResponse(BaseModel):
+class ListAirtableLanguageResponse(BaseModel):
     __root__: list[AirtableLanguageResponse]

@@ -3,7 +3,7 @@ from typing import Callable, Optional
 from pydantic import BaseModel
 
 from . import response as response_models
-from .response import APIData
+from .response import APIDataBase
 from ..airtable import pods as airtable_pod_models
 from . import hubs as hub_models
 from . import partners as partner_models
@@ -22,7 +22,7 @@ class APIPodRelationships(BaseModel):
     schools: Optional[response_models.APILinksAndData] = None
 
 
-class APIPodResponse(response_models.APIResponse):
+class APIPodData(response_models.APIData):
     fields: APIPodFields
 
     @classmethod
@@ -31,21 +31,21 @@ class APIPodResponse(response_models.APIResponse):
 
         hub_data = None
         if airtable_pod.fields.hub:
-            hub_data = APIData(
+            hub_data = APIDataBase(
                 id=airtable_pod.fields.hub,
                 type=hub_models.MODEL_TYPE)
 
         pod_contacts_data = []
         if airtable_pod.fields.pod_contacts is not None:
             for pc_id in airtable_pod.fields.pod_contacts:
-                pod_contacts_data.append(APIData(
+                pod_contacts_data.append(APIDataBase(
                     id=pc_id,
                     type=partner_models.MODEL_TYPE))
 
         schools_data = []
         if airtable_pod.fields.schools is not None:
             for s_id in airtable_pod.fields.schools:
-                schools_data.append(APIData(
+                schools_data.append(APIDataBase(
                     id=s_id,
                     type=school_models.MODEL_TYPE))
 
@@ -63,7 +63,7 @@ class APIPodResponse(response_models.APIResponse):
         links = response_models.APILinks(
             links={'self': url_path_for("get_pod", pod_id=airtable_pod.id)}
         )
-        return response_models.APIResponse(
+        return response_models.APIData(
             id=airtable_pod.id,
             type=MODEL_TYPE,
             fields=fields,
@@ -72,16 +72,18 @@ class APIPodResponse(response_models.APIResponse):
         )
 
 
-class ListAPIPodResponse(BaseModel):
-    __root__: list[APIPodResponse]
+class ListAPIPodData(BaseModel):
+    __root__: list[APIPodData]
 
     @classmethod
-    def from_airtable_pods(cls, airtable_pods: airtable_pod_models.ListAirtablePodResponse, url_path_for: Callable):
+    def from_airtable_pods(cls,
+                           airtable_pods: airtable_pod_models.ListAirtablePodResponse,
+                           url_path_for: Callable):
         pod_responses = []
         for p in airtable_pods.__root__:
             pod_responses.append(
-                APIPodResponse.from_airtable_pod(
+                APIPodData.from_airtable_pod(
                     airtable_pod=p,
                     url_path_for=url_path_for))
 
-        return pod_responses
+        return cls(__root__=pod_responses)
