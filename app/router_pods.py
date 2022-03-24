@@ -10,6 +10,10 @@ from .models import schools as school_models
 from . import auth
 from .utils.utils import get_airtable_client
 
+OPENAPI_TAG_METADATA = {
+    "name": pod_models.MODEL_TYPE, "description": "Pods data"
+}
+
 router = APIRouter(
     prefix="/pods",
     tags=[pod_models.MODEL_TYPE],

@@ -4,7 +4,7 @@ from typing import Callable, Optional
 from pydantic import BaseModel, HttpUrl
 
 from . import response as response_models
-from ..airtable import schools as airtable_school_models
+from ..airtable.base_school_db import schools as airtable_school_models
 from . import educators as educator_models
 from . import hubs as hub_models
 from . import partners as partner_models

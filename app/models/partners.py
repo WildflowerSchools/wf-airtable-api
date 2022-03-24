@@ -6,8 +6,7 @@ from . import response as response_models
 from . import guides_schools as guides_schools_models
 from . import hubs as hubs_model
 from . import pods as pods_model
-from ..airtable import partners as airtable_partner_models
-from ..airtable import guides_schools as airtable_guides_schools_models
+from ..airtable.base_school_db import guides_schools as airtable_guides_schools_models, partners as airtable_partner_models
 
 MODEL_TYPE = 'partner'
 

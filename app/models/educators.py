@@ -6,10 +6,9 @@ from . import response as response_models
 from . import educators_schools as educators_schools_models
 from . import languages as languages_models
 from . import montessori_certifications as montessori_certifications_models
-from ..airtable import educators as airtable_educator_models
-from ..airtable import educators_schools as airtable_educators_schools_models
-from ..airtable import languages as airtable_languages_models
-from ..airtable import montessori_certifications as airtable_montessori_certifications_models
+from ..airtable.base_school_db import montessori_certifications as airtable_montessori_certifications_models, \
+    languages as airtable_languages_models, educators as airtable_educator_models, \
+    educators_schools as airtable_educators_schools_models
 
 MODEL_TYPE = 'educator'
 

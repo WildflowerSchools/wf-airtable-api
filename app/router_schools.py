@@ -14,6 +14,10 @@ from .models import pods as pod_models
 from .models import schools as school_models
 from . import auth
 
+OPENAPI_TAG_METADATA = {
+    "name": school_models.MODEL_TYPE, "description": "Schools data"
+}
+
 router = APIRouter(
     prefix="/schools",
     tags=[school_models.MODEL_TYPE],

@@ -10,6 +10,10 @@ from .models import partners as partner_models
 from .models import schools as school_models
 from . import auth
 
+OPENAPI_TAG_METADATA = {
+    "name": educator_models.MODEL_TYPE, "description": "Educators data, including E/TLs and staff"
+}
+
 router = APIRouter(
     prefix="/educators",
     tags=[educator_models.MODEL_TYPE],

@@ -3,8 +3,8 @@ from typing import Optional
 
 from pydantic import BaseModel, Field, validator
 
-from .response import AirtableResponse
-from .validators import get_first_or_default_none
+from app.airtable.response import AirtableResponse
+from app.airtable.validators import get_first_or_default_none
 
 
 class AirtableEducatorsSchoolsFields(BaseModel):

@@ -6,12 +6,22 @@ from fastapi.responses import JSONResponse
 from fastapi.security import HTTPBearer
 from mangum import Mangum
 
-from . import auth, const, router_hubs, router_pods, router_schools, router_partners, router_educators
+from . import auth, const, router_hubs, router_pods, router_schools, router_partners, router_educators, router_location_contacts
 from .airtable.client import AirtableClient
 
 stage = const.STAGE
 root_path = f"/{stage}" if stage else "/"
-app = FastAPI(title="WF Airtable API", root_path=root_path)
+app = FastAPI(
+    title="WF Airtable API",
+    root_path=root_path,
+    openapi_tags=[
+        router_hubs.OPENAPI_TAG_METADATA,
+        router_pods.OPENAPI_TAG_METADATA,
+        router_schools.OPENAPI_TAG_METADATA,
+        router_educators.OPENAPI_TAG_METADATA,
+        router_partners.OPENAPI_TAG_METADATA,
+        router_location_contacts.OPENAPI_TAG_METADATA
+    ])
 
 token_auth_scheme = HTTPBearer()
 
@@ -34,6 +44,7 @@ app.include_router(router_pods.router)
 app.include_router(router_schools.router)
 app.include_router(router_partners.router)
 app.include_router(router_educators.router)
+app.include_router(router_location_contacts.router)
 airtable_client = AirtableClient()
 
 

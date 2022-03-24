@@ -2,10 +2,11 @@ from typing import Optional, Union
 
 from pydantic import BaseModel, Field, validator
 
-from . import guides_schools as airtable_guides_schools_models
-from .response import AirtableResponse
+from app.airtable.base_school_db import guides_schools as airtable_guides_schools_models
+from app.airtable.response import AirtableResponse
 
 
+# noinspection PyMethodParameters
 class AirtablePartnerFields(BaseModel):
     name: Optional[str] = Field(alias="Name")
     email: Optional[str] = Field(alias="Email")
@@ -20,7 +21,7 @@ class AirtablePartnerFields(BaseModel):
 
     @validator("schools_partner_guiding")
     def load_schools_guides_relationship(cls, value):
-        from .client import AirtableClient
+        from ..client import AirtableClient
         airtable_client = AirtableClient()
 
         schools_guides = value.copy()

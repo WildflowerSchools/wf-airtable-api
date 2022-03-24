@@ -5,7 +5,8 @@ def INCLUDE(what: str, where: FIELD, start_position=0) -> str:
     """
     Creates an FIND statement
 
-    >>> FIND(STR(2021), FIELD('DatetimeCol'))
+    >>> # noinspection PyUnresolvedReferences
+    FIND(STR(2021), FIELD('DatetimeCol'))
     'FIND('2021', {DatetimeCol})'
 
     Args:

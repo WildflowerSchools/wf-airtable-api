@@ -4,7 +4,7 @@ from pydantic import BaseModel
 
 from . import response as response_models
 from .response import APIDataBase
-from ..airtable import hubs as airtable_hub_models
+from ..airtable.base_school_db import hubs as airtable_hub_models
 from . import partners as partner_models
 from . import pods as pod_models
 from . import schools as school_models

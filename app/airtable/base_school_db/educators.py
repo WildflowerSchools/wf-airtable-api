@@ -2,14 +2,13 @@ from typing import Optional, Union
 
 from pydantic import BaseModel, Field, validator
 
-from . import educators_schools as airtable_educators_schools_models
-from . import languages as airtable_languages_models
-from . import montessori_certifications as airtable_montessori_certifications_models
-from .attachment import AirtableAttachment
+from . import montessori_certifications as airtable_montessori_certifications_models, \
+    languages as airtable_languages_models, educators_schools as airtable_educators_schools_models
+from app.airtable.attachment import AirtableAttachment
 from .languages import AirtableLanguageResponse
 from .montessori_certifications import AirtableMontessoriCertificationResponse
-from .response import AirtableResponse
-from .validators import get_first_or_default_none, get_first_or_default_dict
+from app.airtable.response import AirtableResponse
+from app.airtable.validators import get_first_or_default_none, get_first_or_default_dict
 
 
 class AirtableEducatorFields(BaseModel):
@@ -58,13 +57,15 @@ class AirtableEducatorFields(BaseModel):
         pre=True,
         allow_reuse=True)(get_first_or_default_dict)
 
+    # noinspection PyMethodParameters
     @validator("lgbtqia_identifying", pre=True)
     def normalize_lgbtqia(cls, v):
         return v == "TRUE"
 
+    # noinspection PyMethodParameters
     @validator("educators_schools")
     def load_educators_schools_relationship(cls, value):
-        from .client import AirtableClient
+        from ..client import AirtableClient
         airtable_client = AirtableClient()
 
         educators_schools = value.copy()
@@ -81,9 +82,10 @@ class AirtableEducatorFields(BaseModel):
 
         return _records
 
+    # noinspection PyMethodParameters
     @validator("montessori_certifications")
     def load_montessori_certifications_relationship(cls, value):
-        from .client import AirtableClient
+        from ..client import AirtableClient
         airtable_client = AirtableClient()
 
         montessori_certifications = value.copy()
@@ -101,9 +103,10 @@ class AirtableEducatorFields(BaseModel):
 
         return _records
 
+    # noinspection PyMethodParameters
     @validator("languages")
     def load_languages_relationship(cls, value):
-        from .client import AirtableClient
+        from ..client import AirtableClient
         airtable_client = AirtableClient()
 
         languages = value.copy()

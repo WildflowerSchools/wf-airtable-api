@@ -3,9 +3,9 @@ from typing import Optional
 
 from pydantic import AnyUrl, BaseModel, Field, validator
 
-from .attachment import AirtableAttachment
-from .response import AirtableResponse
-from .validators import get_first_or_default_none, get_first_or_default_dict
+from app.airtable.attachment import AirtableAttachment
+from app.airtable.response import AirtableResponse
+from app.airtable.validators import get_first_or_default_none, get_first_or_default_dict
 
 
 class AirtableSchoolFields(BaseModel):
