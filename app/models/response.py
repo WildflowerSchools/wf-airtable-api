@@ -38,4 +38,4 @@ class APIResponse(APILinks):
 
 
 class ListAPIResponse(APIResponse):
-    data: list[APIData]
+    data: list[Union[APIData, dict]]

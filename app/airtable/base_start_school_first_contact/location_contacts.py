@@ -6,10 +6,19 @@ from app.airtable.response import AirtableResponse, ListAirtableResponse
 from app.airtable.validators import get_first_or_default_none
 
 
+class AirtableLocationLocationTypes:
+    LOCATION_TYPE_CITY = 'City'
+    LOCATION_TYPE_REGION = 'Region'
+    LOCATION_TYPE_STATE = 'State'
+    LOCATION_TYPE_COUNTRY = 'Country'
+    LOCATION_TYPE_DEFAULT_US = 'Default (US)'
+    LOCATION_TYPE_DEFAULT_INTERNATIONAL = 'Default (International)'
+
+
 class AirtableLocationContactFields(BaseModel):
     location: Optional[str] = Field(alias="Location")
     location_type: Optional[str] = Field(alias="Location Type")
-    city_radius: Optional[int] = Field(alias="City Radius")
+    city_radius: Optional[int] = Field(alias="City Radius", default=30)
     first_contact_email: Optional[str] = Field(alias="First Contact Email")
     assigned_rse: Optional[str] = Field(alias="Assigned RSE")
     assigned_rse_name: Optional[str] = Field(alias="Assigned RSE Name")

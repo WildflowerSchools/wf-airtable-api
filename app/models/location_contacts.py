@@ -1,3 +1,5 @@
+import time
+
 from typing import Callable, Optional
 
 from pydantic import BaseModel
@@ -7,6 +9,7 @@ from .response import APIDataBase
 from ..airtable.base_start_school_first_contact import location_contacts as airtable_location_contacts_models
 from . import hubs as hub_models
 from . import partners as partner_models
+from ..geocode.google_maps_client import GoogleMapsAPI
 
 MODEL_TYPE = 'location_contacts'
 
@@ -14,7 +17,7 @@ MODEL_TYPE = 'location_contacts'
 class APILocationContactFields(BaseModel):
     location: Optional[str] = None
     location_type: Optional[str] = None
-    city_radius: Optional[int] = None
+    city_radius: Optional[int] = 20
     first_contact_email: Optional[str] = None
     assigned_rse_name: Optional[str] = None
     hub_name: Optional[str] = None
@@ -74,6 +77,9 @@ class APILocationContactData(response_models.APIData):
             relationships=relationships,
             links=links.links
         )
+
+    def geocode(self):
+        return GoogleMapsAPI().geocode_address(self.fields.location)
 
 
 class ListAPILocationContactData(BaseModel):

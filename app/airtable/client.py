@@ -250,7 +250,10 @@ class AirtableClient(metaclass=Singleton):
 
     @cached(cache=TTLCache(maxsize=1024, ttl=600))
     def get_educator_school_by_id(self, educator_school_id):
-        raw = self.client_api.get(school_db_base.BASE_ID, school_db_base.EDUCATORS_SCHOOLS_TABLE_NAME, educator_school_id)
+        raw = self.client_api.get(
+            school_db_base.BASE_ID,
+            school_db_base.EDUCATORS_SCHOOLS_TABLE_NAME,
+            educator_school_id)
         return educators_schools_models.AirtableEducatorsSchoolsResponse.parse_obj(raw)
 
     def list_educator_schools_by_ids(self, educator_school_ids):
@@ -264,7 +267,10 @@ class AirtableClient(metaclass=Singleton):
 
     @cached(cache=TTLCache(maxsize=1024, ttl=600))
     def get_montessori_education_by_id(self, montessori_certification_id):
-        raw = self.client_api.get(school_db_base.BASE_ID, school_db_base.MONTESSORI_CERTIFICATIONS_TABLE_NAME, montessori_certification_id)
+        raw = self.client_api.get(
+            school_db_base.BASE_ID,
+            school_db_base.MONTESSORI_CERTIFICATIONS_TABLE_NAME,
+            montessori_certification_id)
         return montessori_certifications_models.AirtableMontessoriCertificationResponse.parse_obj(raw)
 
     def list_montessori_certifications_by_ids(self, montessori_certification_ids):
@@ -273,7 +279,10 @@ class AirtableClient(metaclass=Singleton):
             match_formulas.append(formulas.EQUAL(formulas.STR_VALUE(m_id), formulas.FIELD("Record ID")))
 
         formula = formulas.OR(*match_formulas)
-        raw = self.client_api.all(school_db_base.BASE_ID, school_db_base.MONTESSORI_CERTIFICATIONS_TABLE_NAME, formula=formula)
+        raw = self.client_api.all(
+            school_db_base.BASE_ID,
+            school_db_base.MONTESSORI_CERTIFICATIONS_TABLE_NAME,
+            formula=formula)
         return montessori_certifications_models.ListAirtableMontessoriCertificationResponse.parse_obj(raw)
 
     @cached(cache=TTLCache(maxsize=1024, ttl=600))
@@ -292,12 +301,17 @@ class AirtableClient(metaclass=Singleton):
 
     @cached(cache=TTLCache(maxsize=1, ttl=600))
     def list_location_contacts(self):
-        raw = self.client_api.all(start_school_first_contact_base.BASE_ID, start_school_first_contact_base.LOCATION_CONTACT_TABLE_NAME)
+        raw = self.client_api.all(
+            start_school_first_contact_base.BASE_ID,
+            start_school_first_contact_base.LOCATION_CONTACT_TABLE_NAME)
         return location_contacts_models.ListAirtableLocationContactResponse.parse_obj(raw)
 
     @cached(cache=TTLCache(maxsize=64, ttl=600))
     def get_location_contact_by_id(self, location_contact_id):
-        raw = self.client_api.get(start_school_first_contact_base.BASE_ID, start_school_first_contact_base.LOCATION_CONTACT_TABLE_NAME, location_contact_id)
+        raw = self.client_api.get(
+            start_school_first_contact_base.BASE_ID,
+            start_school_first_contact_base.LOCATION_CONTACT_TABLE_NAME,
+            location_contact_id)
         return location_contacts_models.AirtableLocationContactResponse.parse_obj(raw)
 
 

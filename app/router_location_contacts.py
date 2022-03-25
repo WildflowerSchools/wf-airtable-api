@@ -2,6 +2,9 @@ import requests
 from fastapi import APIRouter, Depends, HTTPException, Request
 
 from .airtable.client import AirtableClient
+from .airtable.base_start_school_first_contact.location_contacts import AirtableLocationLocationTypes
+from .geocode.google_maps_client import GoogleMapsAPI
+from .geocode import utils as geocode_utils
 from .models import response as response_models
 from .models import location_contacts as location_contacts_models
 from . import auth
@@ -34,7 +37,7 @@ def fetch_and_validate_location_contact(location_contact_id, airtable_client: Ai
 # Dupe the root route to solve this issue: https://github.com/tiangolo/fastapi/issues/2060
 @router.get("/", response_model=response_models.ListAPIResponse, include_in_schema=False)
 @router.get("", response_model=response_models.ListAPIResponse)
-async def list_location_contacts(request: Request):
+async def list_location_contacts(request: Request) -> response_models.ListAPIResponse:
     airtable_client = get_airtable_client(request)
     airtable_location_contacts = airtable_client.list_location_contacts()
 
@@ -45,6 +48,76 @@ async def list_location_contacts(request: Request):
     return response_models.ListAPIResponse(
         data=data,
         links={'self': request.app.url_path_for("list_location_contacts")}
+    )
+
+
+@router.get("/contact_for_address", response_model=response_models.APIResponse)
+async def get_location_contact_given_address(request: Request, address: str):
+    gmaps_client = GoogleMapsAPI()
+    place = gmaps_client.geocode_address(address)
+
+    if place is None:
+        raise HTTPException(status_code=404, detail="Address not found")
+
+    location_contacts = await list_location_contacts(request)
+
+    default_location_contact = None
+    default_international_location_contact = None
+    city_location_contacts = []
+    region_location_contacts = []
+    state_location_contacts = []
+    country_location_contacts = []
+    for lc in location_contacts.data:
+        if lc.fields.location_type == AirtableLocationLocationTypes.LOCATION_TYPE_DEFAULT_US:
+            default_location_contact = lc
+
+        elif lc.fields.location_type == AirtableLocationLocationTypes.LOCATION_TYPE_DEFAULT_INTERNATIONAL:
+            default_international_location_contact = lc
+
+        elif lc.fields.location_type == AirtableLocationLocationTypes.LOCATION_TYPE_CITY:
+            city_location_contacts.append(lc)
+
+        elif lc.fields.location_type == AirtableLocationLocationTypes.LOCATION_TYPE_REGION:
+            region_location_contacts.append(lc)
+
+        elif lc.fields.location_type == AirtableLocationLocationTypes.LOCATION_TYPE_STATE:
+            state_location_contacts.append(lc)
+
+        elif lc.fields.location_type == AirtableLocationLocationTypes.LOCATION_TYPE_COUNTRY:
+            country_location_contacts.append(lc)
+
+    location_contact = None
+    for lc in city_location_contacts:
+        if (geocode_utils.is_place_within_radius(place, lc.geocode(), lc.fields.city_radius)):
+            location_contact = lc
+            break
+
+    if location_contact is None:
+        for lc in region_location_contacts:
+            if (geocode_utils.is_place_contained_within(place, lc.geocode())):
+                location_contact = lc
+                break
+
+    if location_contact is None:
+        for lc in state_location_contacts:
+            if (geocode_utils.is_place_within_state(place, lc.geocode())):
+                location_contact = lc
+                break
+
+    if location_contact is None:
+        for lc in country_location_contacts:
+            if (geocode_utils.is_place_within_country(place, lc.geocode())):
+                location_contact = lc
+                break
+
+    if location_contact is None:
+        if place.get_country_component().short_name == "US":
+            location_contact = default_location_contact
+        else:
+            location_contact = default_international_location_contact
+
+    return response_models.APIResponse(
+        data=location_contact
     )
 
 
