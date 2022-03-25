@@ -12,8 +12,7 @@ def distance_between_places(a: Place, b: Place):
 
 
 def is_place_contained_within(a: Place, b: Place):
-    return a.geometry.viewport.northeast.lat >= b.geometry.location.lat >= a.geometry.viewport.southwest.lat and \
-        a.geometry.viewport.northeast.lng >= b.geometry.location.lng >= a.geometry.viewport.southwest.lng
+    return b.geometry.viewport.northeast.lat >= a.geometry.location.lat >= b.geometry.viewport.southwest.lat and b.geometry.viewport.northeast.lng >= a.geometry.location.lng >= b.geometry.viewport.southwest.lng
 
 
 def is_place_within_radius(a: Place, b: Place, radius: int):
