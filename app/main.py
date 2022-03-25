@@ -10,7 +10,7 @@ from . import auth, const, router_hubs, router_pods, router_schools, router_part
 from .airtable.client import AirtableClient
 
 stage = const.STAGE
-root_path = f"/{stage}" if stage else "/"
+root_path = f"/{stage}" if stage != "production" else "/"
 app = FastAPI(
     title="WF Airtable API",
     root_path=root_path,
