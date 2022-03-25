@@ -3,3 +3,30 @@ max_line_length = 120
 in-place = true
 recursive = true
 aggressive = 1
+
+[tool.poetry]
+name = "wf-airtable-api"
+version = "1.2.4"
+description = "Wildflower API serving to simplify Airtable interface"
+authors = ["Benjamin Jaffe-Talberg <ben.talberg@gmail.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+cachetools = ">=5.0.0"
+fastapi = ">=0.75.0"
+googlemaps = ">=4.6.0"
+haversine = ">=2.5.1"
+pyAirtable = '>=1.1.0'
+pyjwt = {extras = ["crypto"], version = ">=2.3.0"}
+python-jose = ">=3.3.0"
+mangum = ">=0.14.1"
+uvicorn = ">=0.17.5"
+
+[tool.poetry.dev-dependencies]
+autopep8 = '>=1.5.5'
+pytest = '>=6.2.2'
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
