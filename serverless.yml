@@ -19,6 +19,7 @@ provider:
     AIRTABLE_API_KEY: ${env:AIRTABLE_API_KEY}
     AUTH0_AUDIENCE: ${env:AUTH0_AUDIENCE}
     AUTH0_DOMAIN: ${env:AUTH0_DOMAIN}
+    GOOGLE_CLOUD_API_KEY: ${env:GOOGLE_CLOUD_API_KEY}
     STAGE: ${self:provider.stage}
 
 functions:
