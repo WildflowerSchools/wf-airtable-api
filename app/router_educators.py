@@ -35,8 +35,8 @@ def fetch_and_validate_educator(educator_id, airtable_client: AirtableClient):
 
 
 # Dupe the root route to solve this issue: https://github.com/tiangolo/fastapi/issues/2060
-@router.get("/", response_model=response_models.ListAPIResponse, include_in_schema=False)
-@router.get("", response_model=response_models.ListAPIResponse)
+@router.get("/", response_model=educator_models.ListAPIEducatorResponse, include_in_schema=False)
+@router.get("", response_model=educator_models.ListAPIEducatorResponse)
 async def list_educators(request: Request, page_size: str = 100, offset: str = ''):
     airtable_client = request.state.airtable_client
     airtable_educators, next_offset = airtable_client.list_educators(page_size=page_size, offset=offset)
@@ -56,7 +56,7 @@ async def list_educators(request: Request, page_size: str = 100, offset: str = '
         meta={"offset": next_offset})
 
 
-@router.get("/{educator_id}", response_model=response_models.APIResponse)
+@router.get("/{educator_id}", response_model=educator_models.ListAPIEducatorResponse)
 async def get_educator(educator_id, request: Request):
     airtable_client = request.state.airtable_client
     airtable_educator = fetch_and_validate_educator(educator_id, airtable_client)
@@ -70,7 +70,7 @@ async def get_educator(educator_id, request: Request):
         links={'self': request.app.url_path_for("get_educator", educator_id=educator_id)})
 
 
-@router.get("/{educator_id}/schools", response_model=response_models.ListAPIResponse)
+@router.get("/{educator_id}/schools", response_model=school_models.ListAPISchoolResponse)
 async def get_educator_schools(educator_id, request: Request):
     airtable_client = request.state.airtable_client
     fetch_and_validate_educator(educator_id, airtable_client)
@@ -85,7 +85,7 @@ async def get_educator_schools(educator_id, request: Request):
         links={'self': request.app.url_path_for("get_educator_schools", educator_id=educator_id)})
 
 
-@router.get("/{educator_id}/guides", response_model=response_models.ListAPIResponse)
+@router.get("/{educator_id}/guides", response_model=partner_models.ListAPIPartnerResponse)
 async def get_educator_guides(educator_id, request: Request):
     airtable_client = request.state.airtable_client
     fetch_and_validate_educator(educator_id, airtable_client)

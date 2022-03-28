@@ -100,11 +100,11 @@ unicode_backport = ["unicodedata2"]
 
 [[package]]
 name = "click"
-version = "8.0.4"
+version = "8.1.0"
 description = "Composable command line interface toolkit"
 category = "main"
 optional = false
-python-versions = ">=3.6"
+python-versions = ">=3.7"
 
 [package.dependencies]
 colorama = {version = "*", markers = "platform_system == \"Windows\""}
@@ -483,10 +483,21 @@ h11 = ">=0.8"
 [package.extras]
 standard = ["websockets (>=10.0)", "httptools (>=0.4.0)", "watchgod (>=0.6)", "python-dotenv (>=0.13)", "PyYAML (>=5.1)", "uvloop (>=0.14.0,!=0.15.0,!=0.15.1)", "colorama (>=0.4)"]
 
+[[package]]
+name = "wf-airtable-api-schema"
+version = "0.1.5"
+description = "Simple package defining a schema translation layer between the client and Airtable bases"
+category = "main"
+optional = false
+python-versions = ">=3.9,<4.0"
+
+[package.dependencies]
+pydantic = ">=1.9.0,<2.0.0"
+
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "a33ef31d061723de71845b4fa3e29c070b283733b32e0e6382ac58e1577d4063"
+content-hash = "e2fded09a1356932920a41c9c8d94ec15d39527382fe818292f347f8609a6bdf"
 
 [metadata.files]
 anyio = [
@@ -574,8 +585,8 @@ charset-normalizer = [
     {file = "charset_normalizer-2.0.12-py3-none-any.whl", hash = "sha256:6881edbebdb17b39b4eaaa821b438bf6eddffb4468cf344f09f89def34a8b1df"},
 ]
 click = [
-    {file = "click-8.0.4-py3-none-any.whl", hash = "sha256:6a7a62563bbfabfda3a38f3023a1db4a35978c0abd76f6c9605ecd6554d6d9b1"},
-    {file = "click-8.0.4.tar.gz", hash = "sha256:8458d7b1287c5fb128c90e23381cf99dcde74beaf6c7ff6384ce84d6fe090adb"},
+    {file = "click-8.1.0-py3-none-any.whl", hash = "sha256:19a4baa64da924c5e0cd889aba8e947f280309f1a2ce0947a3e3a7bcb7cc72d6"},
+    {file = "click-8.1.0.tar.gz", hash = "sha256:977c213473c7665d3aa092b41ff12063227751c41d7b17165013e10069cc5cd2"},
 ]
 colorama = [
     {file = "colorama-0.4.4-py2.py3-none-any.whl", hash = "sha256:9f47eda37229f68eee03b24b9748937c7dc3868f906e8ba69fbcbdd3bc5dc3e2"},
@@ -765,4 +776,8 @@ urllib3 = [
 uvicorn = [
     {file = "uvicorn-0.17.6-py3-none-any.whl", hash = "sha256:19e2a0e96c9ac5581c01eb1a79a7d2f72bb479691acd2b8921fce48ed5b961a6"},
     {file = "uvicorn-0.17.6.tar.gz", hash = "sha256:5180f9d059611747d841a4a4c4ab675edf54c8489e97f96d0583ee90ac3bfc23"},
+]
+wf-airtable-api-schema = [
+    {file = "wf-airtable-api-schema-0.1.5.tar.gz", hash = "sha256:4add83dd858da328c076a22d656950cb7efd405a63fb9b3c2e3c7e6419736ebd"},
+    {file = "wf_airtable_api_schema-0.1.5-py3-none-any.whl", hash = "sha256:6f508529019a9b72c11817eae5882f914564609f17f56578857827b76b370883"},
 ]

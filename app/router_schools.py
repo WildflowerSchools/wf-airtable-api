@@ -39,8 +39,8 @@ def fetch_and_validate_school(school_id, airtable_client: AirtableClient):
 
 
 # Dupe the root route to solve this issue: https://github.com/tiangolo/fastapi/issues/2060
-@router.get("/", response_model=response_models.ListAPIResponse, include_in_schema=False)
-@router.get("", response_model=response_models.ListAPIResponse)
+@router.get("/", response_model=school_models.ListAPISchoolResponse, include_in_schema=False)
+@router.get("", response_model=school_models.ListAPISchoolResponse)
 async def list_schools(request: Request, page_size: str = 100, offset: str = ''):
     airtable_client = request.state.airtable_client
     airtable_schools, next_offset = airtable_client.list_schools(page_size=page_size, offset=offset)
@@ -54,13 +54,13 @@ async def list_schools(request: Request, page_size: str = 100, offset: str = '')
     if next_offset != '' and next_offset is not None:
         links['next'] = f'{request.app.url_path_for("list_schools")}?{urlencode({"page_size": page_size, "offset": next_offset})}'
 
-    return response_models.ListAPIResponse(
+    return school_models.ListAPISchoolResponse(
         data=data,
         links=links,
         meta={"offset": next_offset})
 
 
-@router.get("/{school_id}", response_model=response_models.APIResponse)
+@router.get("/{school_id}", response_model=school_models.APISchoolResponse)
 async def get_school(school_id, request: Request):
     airtable_client = request.state.airtable_client
     airtable_school = fetch_and_validate_school(school_id, airtable_client)
@@ -72,12 +72,12 @@ async def get_school(school_id, request: Request):
         airtable_school=airtable_school,
         url_path_for=request.app.url_path_for)
 
-    return response_models.APIResponse(
+    return school_models.APISchoolResponse(
         data=data,
         links={'self': request.app.url_path_for("get_school", school_id=school_id)})
 
 
-@router.get("/{school_id}/hub", response_model=response_models.APIResponse)
+@router.get("/{school_id}/hub", response_model=hub_models.APIHubResponse)
 async def get_school_hub(school_id, request: Request):
     airtable_client = request.state.airtable_client
     fetch_and_validate_school(school_id, airtable_client)
@@ -90,12 +90,12 @@ async def get_school_hub(school_id, request: Request):
         airtable_hub=airtable_hub,
         url_path_for=request.app.url_path_for)
 
-    return response_models.APIResponse(
+    return hub_models.APIHubResponse(
         data=data,
         links={'self': request.app.url_path_for("get_school_hub", school_id=school_id)})
 
 
-@router.get("/{school_id}/pod", response_model=response_models.APIResponse)
+@router.get("/{school_id}/pod", response_model=pod_models.APIPodResponse)
 async def get_school_pod(school_id, request: Request):
     airtable_client = request.state.airtable_client
     fetch_and_validate_school(school_id, airtable_client)
@@ -108,12 +108,12 @@ async def get_school_pod(school_id, request: Request):
         airtable_pod=airtable_pod,
         url_path_for=request.app.url_path_for)
 
-    return response_models.APIResponse(
+    return pod_models.APIPodResponse(
         data=data,
         links={'self': request.app.url_path_for("get_school_pod", school_id=school_id)})
 
 
-@router.get("/{school_id}/guides_and_entrepreneurs", response_model=response_models.ListAPIResponse)
+@router.get("/{school_id}/guides_and_entrepreneurs", response_model=partner_models.ListAPIPartnerResponse)
 async def get_school_guides_and_entrepreneurs(school_id, request: Request):
     airtable_client = request.state.airtable_client
     fetch_and_validate_school(school_id, airtable_client)
@@ -123,12 +123,12 @@ async def get_school_guides_and_entrepreneurs(school_id, request: Request):
         airtable_partners=airtable_partners,
         url_path_for=request.app.url_path_for).__root__
 
-    return response_models.ListAPIResponse(
+    return partner_models.ListAPIPartnerResponse(
         data=data,
         links={'self': request.app.url_path_for("get_school_guides_and_entrepreneurs", school_id=school_id)})
 
 
-@router.get("/{school_id}/primary_contacts", response_model=response_models.ListAPIResponse)
+@router.get("/{school_id}/primary_contacts", response_model=educator_models.ListAPIEducatorResponse)
 async def get_school_primary_contacts(school_id, request: Request):
     airtable_client = request.state.airtable_client
     fetch_and_validate_school(school_id, airtable_client)
@@ -138,12 +138,12 @@ async def get_school_primary_contacts(school_id, request: Request):
         airtable_educators=airtable_educators,
         url_path_for=request.app.url_path_for).__root__
 
-    return response_models.ListAPIResponse(
+    return educator_models.ListAPIEducatorResponse(
         data=data,
         links={'self': request.app.url_path_for("get_school_primary_contacts", school_id=school_id)})
 
 
-@router.get("/{school_id}/educators", response_model=response_models.ListAPIResponse)
+@router.get("/{school_id}/educators", response_model=educator_models.ListAPIEducatorResponse)
 async def get_school_educators(school_id, request: Request):
     airtable_client = request.state.airtable_client
     fetch_and_validate_school(school_id, airtable_client)
@@ -153,12 +153,12 @@ async def get_school_educators(school_id, request: Request):
         airtable_educators=airtable_educators,
         url_path_for=request.app.url_path_for).__root__
 
-    return response_models.ListAPIResponse(
+    return educator_models.ListAPIEducatorResponse(
         data=data,
         links={'self': request.app.url_path_for("get_school_educators", school_id=school_id)})
 
 
-@router.get("/{school_id}/current_educators", response_model=response_models.ListAPIResponse)
+@router.get("/{school_id}/current_educators", response_model=educator_models.ListAPIEducatorResponse)
 async def get_school_current_educators(school_id, request: Request):
     airtable_client = request.state.airtable_client
     fetch_and_validate_school(school_id, airtable_client)
@@ -168,12 +168,12 @@ async def get_school_current_educators(school_id, request: Request):
         airtable_educators=airtable_educators,
         url_path_for=request.app.url_path_for).__root__
 
-    return response_models.ListAPIResponse(
+    return educator_models.ListAPIEducatorResponse(
         data=data,
         links={'self': request.app.url_path_for("get_school_current_educators", school_id=school_id)})
 
 
-@router.get("/{school_id}/current_tls", response_model=response_models.ListAPIResponse)
+@router.get("/{school_id}/current_tls", response_model=educator_models.ListAPIEducatorResponse)
 async def get_school_current_tls(school_id, request: Request):
     airtable_client = request.state.airtable_client
     fetch_and_validate_school(school_id, airtable_client)
@@ -183,12 +183,12 @@ async def get_school_current_tls(school_id, request: Request):
         airtable_educators=airtable_educators,
         url_path_for=request.app.url_path_for).__root__
 
-    return response_models.ListAPIResponse(
+    return educator_models.ListAPIEducatorResponse(
         data=data,
         links={'self': request.app.url_path_for("get_school_current_tls", school_id=school_id)})
 
 
-@router.get("/{school_id}/founders", response_model=response_models.ListAPIResponse)
+@router.get("/{school_id}/founders", response_model=educator_models.ListAPIEducatorResponse)
 async def get_school_founders(school_id, request: Request):
     airtable_client = request.state.airtable_client
     fetch_and_validate_school(school_id, airtable_client)
@@ -198,6 +198,6 @@ async def get_school_founders(school_id, request: Request):
         airtable_educators=airtable_educators,
         url_path_for=request.app.url_path_for).__root__
 
-    return response_models.ListAPIResponse(
+    return educator_models.ListAPIEducatorResponse(
         data=data,
         links={'self': request.app.url_path_for("get_school_founders", school_id=school_id)})

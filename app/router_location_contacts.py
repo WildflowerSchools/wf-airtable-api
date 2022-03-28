@@ -35,8 +35,8 @@ def fetch_and_validate_location_contact(location_contact_id, airtable_client: Ai
 
 
 # Dupe the root route to solve this issue: https://github.com/tiangolo/fastapi/issues/2060
-@router.get("/", response_model=response_models.ListAPIResponse, include_in_schema=False)
-@router.get("", response_model=response_models.ListAPIResponse)
+@router.get("/", response_model=location_contacts_models.ListAPILocationContactResponse, include_in_schema=False)
+@router.get("", response_model=location_contacts_models.ListAPILocationContactResponse)
 async def list_location_contacts(request: Request) -> response_models.ListAPIResponse:
     airtable_client = get_airtable_client(request)
     airtable_location_contacts = airtable_client.list_location_contacts()
@@ -45,13 +45,13 @@ async def list_location_contacts(request: Request) -> response_models.ListAPIRes
         airtable_location_contacts=airtable_location_contacts,
         url_path_for=request.app.url_path_for).__root__
 
-    return response_models.ListAPIResponse(
+    return location_contacts_models.ListAPILocationContactResponse(
         data=data,
         links={'self': request.app.url_path_for("list_location_contacts")}
     )
 
 
-@router.get("/contact_for_address", response_model=response_models.APIResponse)
+@router.get("/contact_for_address", response_model=location_contacts_models.APILocationContactResponse)
 async def get_location_contact_given_address(request: Request, address: str):
     gmaps_client = GoogleMapsAPI()
     place = gmaps_client.geocode_address(address)
@@ -116,12 +116,12 @@ async def get_location_contact_given_address(request: Request, address: str):
         else:
             location_contact = default_international_location_contact
 
-    return response_models.APIResponse(
+    return location_contacts_models.APILocationContactResponse(
         data=location_contact
     )
 
 
-@router.get("/{location_contact_id}", response_model=response_models.APIResponse)
+@router.get("/{location_contact_id}", response_model=location_contacts_models.APILocationContactResponse)
 async def get_location_contact(location_contact_id, request: Request):
     airtable_client = get_airtable_client(request)
     airtable_location_contact = fetch_and_validate_location_contact(location_contact_id, airtable_client)
@@ -130,7 +130,7 @@ async def get_location_contact(location_contact_id, request: Request):
         airtable_location_contact=airtable_location_contact,
         url_path_for=request.app.url_path_for)
 
-    return response_models.APIResponse(
+    return location_contacts_models.APILocationContactResponse(
         data=data,
         links={'self': request.app.url_path_for("get_location_contact", location_contact_id=location_contact_id)}
     )

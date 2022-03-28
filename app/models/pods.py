@@ -1,6 +1,7 @@
-from typing import Callable, Optional
+from typing import Callable
 
-from pydantic import BaseModel
+from wf_airtable_api_schema.models.pods import *
+from wf_airtable_api_schema.models import pods
 
 from . import response as response_models
 from .response import APIDataBase
@@ -9,22 +10,8 @@ from . import hubs as hub_models
 from . import partners as partner_models
 from . import schools as school_models
 
-MODEL_TYPE = 'pod'
 
-
-class APIPodFields(BaseModel):
-    name: Optional[str] = None
-
-
-class APIPodRelationships(BaseModel):
-    hub: Optional[response_models.APILinksAndData] = None
-    pod_contacts: Optional[response_models.APILinksAndData] = None
-    schools: Optional[response_models.APILinksAndData] = None
-
-
-class APIPodData(response_models.APIData):
-    fields: APIPodFields
-
+class APIPodData(pods.APIPodData):
     @classmethod
     def from_airtable_pod(cls, airtable_pod: airtable_pod_models.AirtablePodResponse, url_path_for: Callable):
         fields = APIPodFields(name=airtable_pod.fields.name)
@@ -63,7 +50,7 @@ class APIPodData(response_models.APIData):
         links = response_models.APILinks(
             links={'self': url_path_for("get_pod", pod_id=airtable_pod.id)}
         )
-        return response_models.APIData(
+        return cls(
             id=airtable_pod.id,
             type=MODEL_TYPE,
             fields=fields,
@@ -72,9 +59,7 @@ class APIPodData(response_models.APIData):
         )
 
 
-class ListAPIPodData(BaseModel):
-    __root__: list[APIPodData]
-
+class ListAPIPodData(pods.ListAPIPodData):
     @classmethod
     def from_airtable_pods(cls,
                            airtable_pods: airtable_pod_models.ListAirtablePodResponse,

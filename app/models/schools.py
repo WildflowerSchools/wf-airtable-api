@@ -1,7 +1,7 @@
-from datetime import date
-from typing import Callable, Optional
+from typing import Callable
 
-from pydantic import BaseModel, HttpUrl
+from wf_airtable_api_schema.models.schools import *
+from wf_airtable_api_schema.models import schools
 
 from . import response as response_models
 from ..airtable.base_school_db import schools as airtable_school_models
@@ -10,53 +10,8 @@ from . import hubs as hub_models
 from . import partners as partner_models
 from . import pods as pod_models
 
-MODEL_TYPE = 'school'
 
-
-class APISchoolFields(BaseModel):
-    name: Optional[str] = None
-    short_name: Optional[str] = None
-    details: Optional[str] = None
-    logo_url: Optional[HttpUrl] = None
-    domain_name: Optional[str] = None
-    address: Optional[str] = None
-    latitude: Optional[float] = None
-    longitude: Optional[float] = None
-
-    ages_served: Optional[list[str]] = []
-    school_calendar: Optional[str] = None
-    school_schedule: Optional[list[str]] = []
-    school_phone: Optional[str] = None
-    school_email: Optional[str] = None
-    website: Optional[HttpUrl] = None
-
-    status: Optional[str] = None
-    ssj_stage: Optional[str] = None
-    began_ssj_at: Optional[date] = None
-    entered_planning_at: Optional[date] = None
-    entered_startup_at: Optional[date] = None
-    opened_at: Optional[date] = None
-    projected_open: Optional[date] = None
-    affiliation_status: Optional[str] = None
-    affiliated_at: Optional[date] = None
-    affiliation_agreement_url: Optional[HttpUrl] = None
-    nonprofit_status: Optional[str] = None
-    left_network_reason: Optional[str] = None
-    left_network_date: Optional[date] = None
-
-
-class APISchoolRelationships(BaseModel):
-    hub: Optional[response_models.APILinksAndData] = None
-    pod: Optional[response_models.APILinksAndData] = None
-    guides_and_entrepreneurs: Optional[response_models.APILinksAndData] = None
-    educators: Optional[response_models.APILinksAndData] = None
-    current_educators: Optional[response_models.APILinksAndData] = None
-    primary_contacts: Optional[response_models.APILinksAndData] = None
-
-
-class APISchoolData(response_models.APIData):
-    fields: APISchoolFields
-
+class APISchoolData(schools.APISchoolData):
     @classmethod
     def from_airtable_school(cls,
                              airtable_school: airtable_school_models.AirtableSchoolResponse,
@@ -176,7 +131,7 @@ class APISchoolData(response_models.APIData):
         links = response_models.APILinks(
             links={'self': url_path_for("get_school", school_id=airtable_school.id)}
         )
-        return response_models.APIData(
+        return cls(
             id=airtable_school.id,
             type=MODEL_TYPE,
             fields=fields,
@@ -185,9 +140,7 @@ class APISchoolData(response_models.APIData):
         )
 
 
-class ListAPISchoolData(BaseModel):
-    __root__: list[APISchoolData]
-
+class ListAPISchoolData(schools.ListAPISchoolData):
     @classmethod
     def from_airtable_schools(cls,
                               airtable_schools: airtable_school_models.ListAirtableSchoolResponse,

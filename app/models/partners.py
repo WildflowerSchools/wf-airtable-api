@@ -1,6 +1,7 @@
-from typing import Callable, Optional
+from typing import Callable
 
-from pydantic import BaseModel
+from wf_airtable_api_schema.models.partners import *
+from wf_airtable_api_schema.models import partners
 
 from . import response as response_models
 from . import guides_schools as guides_schools_models
@@ -8,27 +9,8 @@ from . import hubs as hubs_model
 from . import pods as pods_model
 from ..airtable.base_school_db import guides_schools as airtable_guides_schools_models, partners as airtable_partner_models
 
-MODEL_TYPE = 'partner'
 
-
-class APIPartnerFields(BaseModel):
-    name: Optional[str] = None
-    email: Optional[str] = None
-    active: Optional[str] = None
-    active_stint: Optional[list[str]] = None
-    roles: Optional[list[str]] = None
-
-
-class APIPartnerRelationships(BaseModel):
-    hubs_as_entrepreneur: Optional[response_models.APILinks] = None
-    pods_as_contact: Optional[response_models.APILinks] = None
-    schools_partner_guiding: Optional[response_models.APILinksAndData] = None
-    educators_partner_guiding: Optional[response_models.APILinksAndData] = None
-
-
-class APIPartnerData(response_models.APIData):
-    fields: APIPartnerFields
-
+class APIPartnerData(partners.APIPartnerData):
     @classmethod
     def from_airtable_partner(
             cls, airtable_partner: airtable_partner_models.AirtablePartnerResponse, url_path_for: Callable):
@@ -96,7 +78,7 @@ class APIPartnerData(response_models.APIData):
         links = response_models.APILinks(
             links={'self': url_path_for("get_partner", partner_id=airtable_partner.id)}
         )
-        return response_models.APIData(
+        return cls(
             id=airtable_partner.id,
             type=MODEL_TYPE,
             fields=fields,
@@ -105,9 +87,7 @@ class APIPartnerData(response_models.APIData):
         )
 
 
-class ListAPIPartnerData(BaseModel):
-    __root__: list[APIPartnerData]
-
+class ListAPIPartnerData(partners.ListAPIPartnerData):
     @classmethod
     def from_airtable_partners(cls,
                                airtable_partners: airtable_partner_models.ListAirtablePartnerResponse,

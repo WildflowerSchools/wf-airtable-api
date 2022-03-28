@@ -35,8 +35,8 @@ def fetch_and_validate_pod(pod_id, airtable_client: AirtableClient):
 
 
 # Dupe the root route to solve this issue: https://github.com/tiangolo/fastapi/issues/2060
-@router.get("/", response_model=response_models.ListAPIResponse, include_in_schema=False)
-@router.get("", response_model=response_models.ListAPIResponse)
+@router.get("/", response_model=pod_models.ListAPIPodResponse, include_in_schema=False)
+@router.get("", response_model=pod_models.ListAPIPodResponse)
 async def list_pods(request: Request):
     airtable_client = get_airtable_client(request)
     airtable_pods = airtable_client.list_pods()
@@ -51,7 +51,7 @@ async def list_pods(request: Request):
     )
 
 
-@router.get("/{pod_id}", response_model=response_models.APIResponse)
+@router.get("/{pod_id}", response_model=pod_models.APIPodResponse)
 async def get_pod(pod_id, request: Request):
     airtable_client = get_airtable_client(request)
     airtable_pod = fetch_and_validate_pod(pod_id, airtable_client)
@@ -66,7 +66,7 @@ async def get_pod(pod_id, request: Request):
     )
 
 
-@router.get("/{pod_id}/hub", response_model=response_models.APIResponse)
+@router.get("/{pod_id}/hub", response_model=hub_models.APIHubResponse)
 async def get_pod_hub(pod_id, request: Request):
     airtable_client = get_airtable_client(request)
     fetch_and_validate_pod(pod_id, airtable_client)
@@ -79,13 +79,13 @@ async def get_pod_hub(pod_id, request: Request):
         airtable_hub=airtable_hub,
         url_path_for=request.app.url_path_for)
 
-    return response_models.APIResponse(
+    return hub_models.APIHubResponse(
         data=data,
         links={'self': request.app.url_path_for("get_pod_hub", pod_id=pod_id)}
     )
 
 
-@router.get("/{pod_id}/contacts", response_model=response_models.ListAPIResponse)
+@router.get("/{pod_id}/contacts", response_model=partner_models.ListAPIPartnerResponse)
 async def get_pod_contacts(pod_id, request: Request):
     airtable_client = get_airtable_client(request)
     fetch_and_validate_pod(pod_id, airtable_client)
@@ -95,13 +95,13 @@ async def get_pod_contacts(pod_id, request: Request):
         airtable_partners=airtable_partners,
         url_path_for=request.app.url_path_for).__root__
 
-    return response_models.ListAPIResponse(
+    return partner_models.ListAPIPartnerResponse(
         data=data,
         links={'self': request.app.url_path_for("get_pod_contacts", pod_id=pod_id)}
     )
 
 
-@router.get("/{pod_id}/schools", response_model=response_models.ListAPIResponse)
+@router.get("/{pod_id}/schools", response_model=school_models.ListAPISchoolResponse)
 async def get_pod_schools(pod_id, request: Request):
     airtable_client = get_airtable_client(request)
     fetch_and_validate_pod(pod_id, airtable_client)
@@ -111,7 +111,7 @@ async def get_pod_schools(pod_id, request: Request):
         airtable_schools=airtable_schools,
         url_path_for=request.app.url_path_for).__root__
 
-    return response_models.ListAPIResponse(
+    return school_models.ListAPISchoolResponse(
         data=data,
         links={'self': request.app.url_path_for("get_pod_schools", pod_id=pod_id)}
     )

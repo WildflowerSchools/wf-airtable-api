@@ -4,6 +4,9 @@ from typing import Callable, Optional
 
 from pydantic import BaseModel
 
+from wf_airtable_api_schema.models.location_contacts import *
+from wf_airtable_api_schema.models import location_contacts
+
 from . import response as response_models
 from .response import APIDataBase
 from ..airtable.base_start_school_first_contact import location_contacts as airtable_location_contacts_models
@@ -11,28 +14,8 @@ from . import hubs as hub_models
 from . import partners as partner_models
 from ..geocode.google_maps_client import GoogleMapsAPI
 
-MODEL_TYPE = 'location_contacts'
 
-
-class APILocationContactFields(BaseModel):
-    location: Optional[str] = None
-    location_type: Optional[str] = None
-    city_radius: Optional[int] = 20
-    first_contact_email: Optional[str] = None
-    assigned_rse_name: Optional[str] = None
-    hub_name: Optional[str] = None
-    latitude: Optional[float] = None
-    longitude: Optional[float] = None
-
-
-class APILocationContactRelationships(BaseModel):
-    hub: Optional[response_models.APILinksAndData] = None
-    assigned_rse: Optional[response_models.APILinksAndData] = None
-
-
-class APILocationContactData(response_models.APIData):
-    fields: APILocationContactFields
-
+class APILocationContactData(location_contacts.APILocationContactData):
     @classmethod
     def from_airtable_location_contact(cls,
                                        airtable_location_contact: airtable_location_contacts_models.AirtableLocationContactResponse,
@@ -70,7 +53,7 @@ class APILocationContactData(response_models.APIData):
         links = response_models.APILinks(
             links={'self': url_path_for("get_location_contact", location_contact_id=airtable_location_contact.id)}
         )
-        return response_models.APIData(
+        return cls(
             id=airtable_location_contact.id,
             type=MODEL_TYPE,
             fields=fields,
@@ -82,9 +65,7 @@ class APILocationContactData(response_models.APIData):
         return GoogleMapsAPI().geocode_address(self.fields.location)
 
 
-class ListAPILocationContactData(BaseModel):
-    __root__: list[APILocationContactData]
-
+class ListAPILocationContactData(location_contacts.ListAPILocationContactData):
     @classmethod
     def from_airtable_location_contacts(cls,
                                         airtable_location_contacts: airtable_location_contacts_models.ListAirtableLocationContactResponse,

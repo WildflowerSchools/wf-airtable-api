@@ -1,6 +1,8 @@
-from typing import Callable, Optional
+from typing import Callable
 
-from pydantic import BaseModel
+from wf_airtable_api_schema.models.hubs import *
+from wf_airtable_api_schema.models import hubs
+
 
 from . import response as response_models
 from .response import APIDataBase
@@ -9,22 +11,8 @@ from . import partners as partner_models
 from . import pods as pod_models
 from . import schools as school_models
 
-MODEL_TYPE = 'hub'
 
-
-class APIHubFields(BaseModel):
-    name: Optional[str] = None
-
-
-class APIHubRelationships(BaseModel):
-    regional_site_entrepreneurs: Optional[response_models.APILinksAndData] = None
-    pods: Optional[response_models.APILinksAndData] = None
-    schools: Optional[response_models.APILinksAndData] = None
-
-
-class APIHubData(response_models.APIData):
-    fields: APIHubFields
-
+class APIHubData(hubs.APIHubData):
     @classmethod
     def from_airtable_hub(cls, airtable_hub: airtable_hub_models.AirtableHubResponse, url_path_for: Callable):
         fields = APIHubFields(name=airtable_hub.fields.name)
@@ -64,7 +52,7 @@ class APIHubData(response_models.APIData):
         links = response_models.APILinks(
             links={'self': url_path_for("get_hub", hub_id=airtable_hub.id)}
         )
-        return response_models.APIData(
+        return cls(
             id=airtable_hub.id,
             type=MODEL_TYPE,
             fields=fields,
@@ -73,9 +61,7 @@ class APIHubData(response_models.APIData):
         )
 
 
-class ListAPIHubData(BaseModel):
-    __root__: list[APIHubData]
-
+class ListAPIHubData(hubs.ListAPIHubData):
     @classmethod
     def from_airtable_hubs(cls,
                            airtable_hubs: airtable_hub_models.ListAirtableHubResponse,
