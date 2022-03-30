@@ -3,7 +3,7 @@ region := "us-east-1"
 
 install:
     npm install
-    pipenv install --dev
+    poetry install
 
 fmt:
     autopep8 app
