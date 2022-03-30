@@ -3,7 +3,8 @@ from typing import Optional, Union
 from pydantic import BaseModel, Field, validator
 
 from . import montessori_certifications as airtable_montessori_certifications_models, \
-    languages as airtable_languages_models, educators_schools as airtable_educators_schools_models
+    languages as airtable_languages_models, \
+    educators_schools as airtable_educators_schools_models
 from app.airtable.attachment import AirtableAttachment
 from .languages import AirtableLanguageResponse
 from .montessori_certifications import AirtableMontessoriCertificationResponse
@@ -11,13 +12,38 @@ from app.airtable.response import AirtableResponse
 from app.airtable.validators import get_first_or_default_none, get_first_or_default_dict
 
 
-class AirtableEducatorFields(BaseModel):
-    full_name: Optional[str] = Field(alias="Full Name")
+class CreateAirtableEducatorFields(BaseModel):
     first_name: Optional[str] = Field(alias="First Name")
     last_name: Optional[str] = Field(alias="Last Name")
-    email: Optional[list[str]] = Field(alias="Contact Email")
     details: Optional[str] = Field(alias="Details")
     home_address: Optional[str] = Field(alias="Home Address")
+
+    stage: Optional[str] = Field(alias="Stage")
+    assigned_partner: Optional[list[str]] = Field(alias="Assigned Partner")
+    source: Optional[list[str]] = Field(alias="Source")
+    source_other: Optional[str] = Field(alias="Source - Other")
+
+    class Config:
+        allow_population_by_field_name = True
+
+
+class AirtableEducatorFields(CreateAirtableEducatorFields):
+    full_name: Optional[str] = Field(alias="Full Name")
+    email: Optional[list[str]] = Field(alias="Contact Email")
+    current_roles: Optional[list[str]] = Field(alias="Current Role")
+    montessori_certified: Optional[bool] = Field(alias="Montessori Certified", default=False)
+    target_community: Optional[str] = Field(alias="Target Community Name")
+    race_and_ethnicity: Optional[list[str]] = Field(alias="Race & Ethnicity")
+    race_and_ethnicity_other: Optional[str] = Field(alias="Race & Ethnicity - Other")
+    educational_attainment: Optional[str] = Field(alias="Educational Attainment")
+    income_background: Optional[str] = Field(alias="Income Background")
+    gender: Optional[str] = Field(alias="Gender")
+    gender_other: Optional[str] = Field(alias="Gender - Other")
+    lgbtqia_identifying: Optional[bool] = Field(alias="LGBTQIA", default=False)
+    pronouns: Optional[str] = Field(alias="Pronouns")
+    pronouns_other: Optional[str] = Field(alias="Pronouns - Other")
+    visioning_album_complete: Optional[bool] = Field(alias="Visioning album complete", default=False)
+    visioning_album: Optional[AirtableAttachment] = Field(alias="Visioning album", default={})
 
     educators_schools: Optional[list[
         Union[str, airtable_educators_schools_models.AirtableEducatorsSchoolsResponse]]] = Field(alias="Educators at Schools")
@@ -26,22 +52,8 @@ class AirtableEducatorFields(BaseModel):
     languages: Optional[list[
         Union[str, AirtableLanguageResponse]]] = Field(alias="Language Record IDs")
 
-    target_community: Optional[list[str]] = Field(alias="Target Community Name")
-    stage: Optional[str] = Field(alias="Stage")
-    assigned_partner_id: Optional[list[str]] = Field(alias="Assigned Partner")
-    visioning_album_complete: Optional[bool] = Field(alias="Visioning album complete")
-    visioning_album: Optional[AirtableAttachment] = Field(alias="Visioning album", default={})
-    current_roles: Optional[list[str]] = Field(alias="Current Role")
-    source: Optional[list[str]] = Field(alias="Source")
-    source_other: Optional[str] = Field(alias="Source - Other")
-    race_and_ethnicity: Optional[list[str]] = Field(alias="Race & Ethnicity")
-    race_and_ethnicity_other: Optional[str] = Field(alias="Race & Ethnicity - Other")
-    educational_attainment: Optional[str] = Field(alias="Educational Attainment")
-    income_background: Optional[str] = Field(alias="Income Background")
-    gender: Optional[str] = Field(alias="Gender")
-    lgbtqia_identifying: Optional[bool] = Field(alias="LGBTQIA")
-    pronouns: Optional[str] = Field(alias="Pronouns")
-    montessori_certified: Optional[bool] = Field(alias="Montessori Certified")
+    class Config:
+        allow_population_by_field_name = True
 
     _get_first_or_default_none = validator(
         "income_background",

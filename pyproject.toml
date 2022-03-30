@@ -6,7 +6,7 @@ aggressive = 1
 
 [tool.poetry]
 name = "wf-airtable-api"
-version = "1.3.0"
+version = "1.4.0"
 description = "Wildflower API serving to simplify Airtable interface"
 authors = ["Benjamin Jaffe-Talberg <ben.talberg@gmail.com>"]
 license = "MIT"
@@ -22,7 +22,7 @@ pyjwt = {extras = ["crypto"], version = ">=2.3.0"}
 python-jose = ">=3.3.0"
 mangum = ">=0.14.1"
 uvicorn = ">=0.17.5"
-wf-airtable-api-schema = "^0.1.5"
+wf-airtable-api-schema = "^0.1.6"
 
 [tool.poetry.dev-dependencies]
 autopep8 = '>=1.5.5'

@@ -1,12 +1,10 @@
-from urllib.parse import urlencode
-
 import requests
+from urllib.parse import urlencode
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 
 from .airtable.client import AirtableClient
 
-from .models import response as response_models
 from .models import educators as educator_models
 from .models import hubs as hub_models
 from .models import partners as partner_models

@@ -6,7 +6,7 @@ from fastapi.responses import JSONResponse
 from fastapi.security import HTTPBearer
 from mangum import Mangum
 
-from . import auth, const, router_hubs, router_pods, router_schools, router_partners, router_educators, router_location_contacts
+from . import auth, const, router_hubs, router_pods, router_schools, router_partners, router_educators, router_location_contacts, router_ssj_typeforms
 from .airtable.client import AirtableClient
 
 stage = const.STAGE
@@ -45,6 +45,7 @@ app.include_router(router_schools.router)
 app.include_router(router_partners.router)
 app.include_router(router_educators.router)
 app.include_router(router_location_contacts.router)
+app.include_router(router_ssj_typeforms.router)
 airtable_client = AirtableClient()
 
 

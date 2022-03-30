@@ -9,6 +9,7 @@ from .models import educators as educator_models
 from .models import partners as partner_models
 from .models import schools as school_models
 from . import auth
+from .utils.utils import get_airtable_client
 
 OPENAPI_TAG_METADATA = {
     "name": educator_models.MODEL_TYPE, "description": "Educators data, including E/TLs and staff"
@@ -38,7 +39,7 @@ def fetch_and_validate_educator(educator_id, airtable_client: AirtableClient):
 @router.get("/", response_model=educator_models.ListAPIEducatorResponse, include_in_schema=False)
 @router.get("", response_model=educator_models.ListAPIEducatorResponse)
 async def list_educators(request: Request, page_size: str = 100, offset: str = ''):
-    airtable_client = request.state.airtable_client
+    airtable_client = get_airtable_client(request)
     airtable_educators, next_offset = airtable_client.list_educators(page_size=page_size, offset=offset)
 
     data = educator_models.ListAPIEducatorData.from_airtable_educators(
@@ -56,9 +57,49 @@ async def list_educators(request: Request, page_size: str = 100, offset: str = '
         meta={"offset": next_offset})
 
 
+@router.post("/")
+async def create_educator(
+        payload: educator_models.CreateAPIEducatorFields,
+        request: Request):
+    airtable_client = get_airtable_client(request)
+
+    if payload.email is None:
+        raise HTTPException(status_code=400, detail="Educator email required")
+
+    # Is educator pre-existing?
+    pre_exists = len(airtable_client.get_educators_by_email(payload.email).__root__) > 0
+    if pre_exists:
+        raise HTTPException(status_code=409, detail="Educator already exists")
+
+    # 1. Create the Educator
+    airtable_educator_payload = payload.to_airtable_educator()
+    airtable_educator_response = airtable_client.create_educator(payload=airtable_educator_payload)
+
+    # 2. Create the Contact Info record (linked to educator)
+    airtable_contact_info_payload = payload.to_airtable_contact_info(airtable_educator_response.id)
+    airtable_client.create_contact_info(airtable_contact_info_payload)
+
+    # 3. Create the Socio-economic record (linked to educator)
+    airtable_socio_economic_payload = payload.to_airtable_socio_economic(airtable_educator_response.id)
+    airtable_socio_economic_response = airtable_client.create_socio_economic(airtable_socio_economic_payload)
+
+    # 4. Create the Language records (linked to socio-economic record)
+    airtable_language_payloads = payload.to_airtable_languages(airtable_socio_economic_response.id)
+    for l in airtable_language_payloads:
+        airtable_client.create_language(l)
+
+    # 5. Create the Montessori Certification records (linked to educator)
+    airtable_montessori_certifications_payload = payload.to_airtable_montessori_certifications(
+        airtable_educator_response.id)
+    for m in airtable_montessori_certifications_payload:
+        airtable_client.create_montessori_certification(m)
+
+    return await get_educator(educator_id=airtable_educator_response.id, request=request)
+
+
 @router.get("/{educator_id}", response_model=educator_models.ListAPIEducatorResponse)
 async def get_educator(educator_id, request: Request):
-    airtable_client = request.state.airtable_client
+    airtable_client = get_airtable_client(request)
     airtable_educator = fetch_and_validate_educator(educator_id, airtable_client)
 
     data = educator_models.APIEducatorData.from_airtable_educator(
@@ -72,7 +113,7 @@ async def get_educator(educator_id, request: Request):
 
 @router.get("/{educator_id}/schools", response_model=school_models.ListAPISchoolResponse)
 async def get_educator_schools(educator_id, request: Request):
-    airtable_client = request.state.airtable_client
+    airtable_client = get_airtable_client(request)
     fetch_and_validate_educator(educator_id, airtable_client)
     airtable_schools = airtable_client.get_schools_by_educator_id(educator_id)
 
@@ -87,7 +128,7 @@ async def get_educator_schools(educator_id, request: Request):
 
 @router.get("/{educator_id}/guides", response_model=partner_models.ListAPIPartnerResponse)
 async def get_educator_guides(educator_id, request: Request):
-    airtable_client = request.state.airtable_client
+    airtable_client = get_airtable_client(request)
     fetch_and_validate_educator(educator_id, airtable_client)
     airtable_partners = airtable_client.get_partners_by_educator_id(educator_id)
 
