@@ -1,3 +1,0 @@
-BASE_ID = 'appKaEO8xzjecYfg6'
-
-SSJ_TYPEFORM_RESPONSES_TABLE_NAME = 'Start a School'

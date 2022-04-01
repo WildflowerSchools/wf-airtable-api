@@ -1,3 +1,4 @@
+import logging
 import requests
 
 from fastapi import FastAPI, Request
@@ -8,6 +9,8 @@ from mangum import Mangum
 
 from . import auth, const, router_hubs, router_pods, router_schools, router_partners, router_educators, router_location_contacts, router_ssj_typeforms
 from .airtable.client import AirtableClient
+
+logger = logging.getLogger(__name__)
 
 stage = const.STAGE
 root_path = f"/{stage}" if stage else "/"
@@ -71,16 +74,19 @@ async def airtable_resource_not_found(request, ex):
     if ex.response.status_code == 404:
         return JSONResponse(status_code=404, content={"error": "Airtable resource not found"})
     else:
+        logger.exception(ex)
         return JSONResponse(status_code=ex.response.status_code, content=None)
 
 
 @app.exception_handler(auth.AuthError)
 async def handle_auth_error(request, ex):
+    logger.exception(ex)
     return JSONResponse(status_code=ex.status_code, content=ex.error)
 
 
 @app.exception_handler(Exception)
 async def handle_general_exception(request, ex):
+    logger.exception(ex)
     return JSONResponse(status_code=500, content="Unexpected server error")
 
 

@@ -100,7 +100,7 @@ unicode_backport = ["unicodedata2"]
 
 [[package]]
 name = "click"
-version = "8.1.0"
+version = "8.1.2"
 description = "Composable command line interface toolkit"
 category = "main"
 optional = false
@@ -485,7 +485,7 @@ standard = ["websockets (>=10.0)", "httptools (>=0.4.0)", "watchgod (>=0.6)", "p
 
 [[package]]
 name = "wf-airtable-api-schema"
-version = "0.1.6"
+version = "0.1.8"
 description = "Simple package defining a schema translation layer between the client and Airtable bases"
 category = "main"
 optional = false
@@ -497,7 +497,7 @@ pydantic = ">=1.9.0,<2.0.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "2534601011191aab3ac4c31c7b3f8cd7d09b74de6f789624478cded955bfe90d"
+content-hash = "6602a2180eaff0707e62e4a5d0b05f4e95c097143c116d61a22af8c33c84ee7a"
 
 [metadata.files]
 anyio = [
@@ -585,8 +585,8 @@ charset-normalizer = [
     {file = "charset_normalizer-2.0.12-py3-none-any.whl", hash = "sha256:6881edbebdb17b39b4eaaa821b438bf6eddffb4468cf344f09f89def34a8b1df"},
 ]
 click = [
-    {file = "click-8.1.0-py3-none-any.whl", hash = "sha256:19a4baa64da924c5e0cd889aba8e947f280309f1a2ce0947a3e3a7bcb7cc72d6"},
-    {file = "click-8.1.0.tar.gz", hash = "sha256:977c213473c7665d3aa092b41ff12063227751c41d7b17165013e10069cc5cd2"},
+    {file = "click-8.1.2-py3-none-any.whl", hash = "sha256:24e1a4a9ec5bf6299411369b208c1df2188d9eb8d916302fe6bf03faed227f1e"},
+    {file = "click-8.1.2.tar.gz", hash = "sha256:479707fe14d9ec9a0757618b7a100a0ae4c4e236fac5b7f80ca68028141a1a72"},
 ]
 colorama = [
     {file = "colorama-0.4.4-py2.py3-none-any.whl", hash = "sha256:9f47eda37229f68eee03b24b9748937c7dc3868f906e8ba69fbcbdd3bc5dc3e2"},
@@ -778,6 +778,6 @@ uvicorn = [
     {file = "uvicorn-0.17.6.tar.gz", hash = "sha256:5180f9d059611747d841a4a4c4ab675edf54c8489e97f96d0583ee90ac3bfc23"},
 ]
 wf-airtable-api-schema = [
-    {file = "wf-airtable-api-schema-0.1.6.tar.gz", hash = "sha256:d7160d9bd5365ab4b104ea5c0b998a940f54ee0e1f4369d6aed75eaf4ff1c4a9"},
-    {file = "wf_airtable_api_schema-0.1.6-py3-none-any.whl", hash = "sha256:f6736786a72941e18e488cb22dc58e5b58096a3539d40f1bc7330508fe2049c4"},
+    {file = "wf-airtable-api-schema-0.1.8.tar.gz", hash = "sha256:c3ffaeee9a1434291f7d64c07f5ba496abfb1cc643f750717d14f5afdd70cf41"},
+    {file = "wf_airtable_api_schema-0.1.8-py3-none-any.whl", hash = "sha256:39d20103a9a8eab17f0102a553fdbb957255ebfab695bb65076e639fa7f477b5"},
 ]

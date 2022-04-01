@@ -57,7 +57,8 @@ async def list_educators(request: Request, page_size: str = 100, offset: str = '
         meta={"offset": next_offset})
 
 
-@router.post("/")
+@router.post("/", response_model=educator_models.APIEducatorResponse, include_in_schema=False)
+@router.post("", response_model=educator_models.APIEducatorResponse)
 async def create_educator(
         payload: educator_models.CreateAPIEducatorFields,
         request: Request):
@@ -97,7 +98,7 @@ async def create_educator(
     return await get_educator(educator_id=airtable_educator_response.id, request=request)
 
 
-@router.get("/{educator_id}", response_model=educator_models.ListAPIEducatorResponse)
+@router.get("/{educator_id}", response_model=educator_models.APIEducatorResponse)
 async def get_educator(educator_id, request: Request):
     airtable_client = get_airtable_client(request)
     airtable_educator = fetch_and_validate_educator(educator_id, airtable_client)

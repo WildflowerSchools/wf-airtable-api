@@ -20,12 +20,11 @@ from .base_school_db import \
     socio_economic_backgrounds as socio_economic_models, \
     partners as partner_models, \
     field_categories as field_category_models, \
-    field_mapping as field_mapping_models
+    field_mapping as field_mapping_models, \
+    typeform_start_a_school as typeform_start_a_school_models
 from .base_start_school_first_contact import \
     const as start_school_first_contact_base, \
     location_contacts as location_contacts_models
-from .base_ssj_typeform_responses import const as start_a_school_base, \
-    start_a_school as start_a_school_models
 
 
 class AirtableClient(metaclass=Singleton):
@@ -219,6 +218,16 @@ class AirtableClient(metaclass=Singleton):
             base_id=school_db_base.BASE_ID,
             table_name=school_db_base.PARTNERS_TABLE_NAME,
             record_id=school_id)
+        return partner_models.AirtablePartnerResponse.parse_obj(raw)
+
+    @cached(cache=TTLCache(maxsize=32, ttl=600))
+    def get_partner_by_synced_record_id(self, synced_record_id):
+        formula = formulas.INCLUDE(formulas.STR_VALUE(synced_record_id), formulas.FIELD("Synced Record ID"))
+
+        raw = self.client_api.first(
+            base_id=school_db_base.BASE_ID,
+            table_name=school_db_base.PARTNERS_TABLE_NAME,
+            formula=formula)
         return partner_models.AirtablePartnerResponse.parse_obj(raw)
 
     @cached(cache=TTLCache(maxsize=32, ttl=600))
@@ -443,13 +452,14 @@ class AirtableClient(metaclass=Singleton):
             record_id=location_contact_id)
         return location_contacts_models.AirtableLocationContactResponse.parse_obj(raw)
 
-    def create_start_a_school_response(self, payload: start_a_school_models.CreateAirtableSSJTypeformStartASchool):
+    def create_start_a_school_response(
+            self, payload: typeform_start_a_school_models.CreateAirtableSSJTypeformStartASchool):
         raw = self.client_api.create(
-            base_id=start_a_school_base.BASE_ID,
-            table_name=start_a_school_base.SSJ_TYPEFORM_RESPONSES_TABLE_NAME,
+            base_id=school_db_base.BASE_ID,
+            table_name=school_db_base.SSJ_TYPEFORM_RESPONSES_TABLE_NAME,
             fields=payload.dict(by_alias=True)
         )
-        return start_a_school_models.AirtableSSJTypeformStartASchoolResponse.parse_obj(raw)
+        return typeform_start_a_school_models.AirtableSSJTypeformStartASchoolResponse.parse_obj(raw)
 
     def create_contact_info(self, payload: contact_info_models.CreateAirtableContactInfoFields):
         raw = self.client_api.create(
@@ -481,7 +491,11 @@ class AirtableClient(metaclass=Singleton):
             table_name=school_db_base.FIELD_MAPPING_TABLE_NAME)
         return field_mapping_models.ListAirtableFieldMappingResponse.parse_obj(raw)
 
-    def map_response_to_field_category_values(self, field_category_type: FieldCategoryType, response_value: Union[str, list[str]]) -> (list[str], bool):
+    def map_response_to_field_category_values(
+            self, field_category_type: FieldCategoryType, response_value: Union[str, list[str]]) -> (list[str], bool):
+        if response_value is None:
+            return [], False
+
         field_categories = self.list_field_categories()
         field_mappings = self.list_field_mappings()
 
@@ -489,13 +503,15 @@ class AirtableClient(metaclass=Singleton):
             all_categories = []
             includes_non_specific_category = False
             for v in response_value:
-                categories, _includes_non_specific_category = self.map_response_to_field_category_values(field_category_type, v)
+                categories, _includes_non_specific_category = self.map_response_to_field_category_values(
+                    field_category_type, v)
                 if includes_non_specific_category is False and _includes_non_specific_category is True:
                     includes_non_specific_category = True
 
                 all_categories.extend(categories)
 
-            # Return a unique list of category values and a boolean denoting whether any category is a 'non_specific_category' type
+            # Return a unique list of category values and a boolean denoting whether
+            # any category is a 'non_specific_category' type
             return list(set(all_categories)), includes_non_specific_category
 
         mapping = field_mappings.map_response_value(field_category_type, response_value)
@@ -503,13 +519,18 @@ class AirtableClient(metaclass=Singleton):
             # If response_value isn't found, try to return the 'Other' option for the given field_category_type
             mapping = field_mappings.map_response_value(field_category_type, 'Other')
         if mapping is None:
-            # If response_value is still None, return empty category list and a True flag denoting the 'otherness' of the given response_value
+            # If response_value is still None, return empty category list and a True
+            # flag denoting the 'otherness' of the given response_value
             return [], True
 
         # Convert the mapping record to it's associated categories
         category_matches = field_categories.get_records_for_field_category_ids(mapping.fields.field_categories)
         # Check if any of the matching categories are a 'non_specific_category' type
-        includes_non_specific_category = len(list(filter(lambda c: c.fields.non_specific_category, category_matches.__root__))) > 0
+        includes_non_specific_category = len(
+            list(
+                filter(
+                    lambda c: c.fields.non_specific_category,
+                    category_matches.__root__))) > 0
         return list(map(lambda c: c.fields.value, category_matches.__root__)), includes_non_specific_category
 
 

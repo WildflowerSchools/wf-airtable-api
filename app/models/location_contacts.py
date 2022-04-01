@@ -20,6 +20,9 @@ class APILocationContactData(location_contacts.APILocationContactData):
     def from_airtable_location_contact(cls,
                                        airtable_location_contact: airtable_location_contacts_models.AirtableLocationContactResponse,
                                        url_path_for: Callable):
+        from ..airtable.client import AirtableClient
+        airtable_client = AirtableClient()
+
         fields = APILocationContactFields(
             location=airtable_location_contact.fields.location,
             location_type=airtable_location_contact.fields.location_type,
@@ -31,15 +34,21 @@ class APILocationContactData(location_contacts.APILocationContactData):
             longitude=airtable_location_contact.fields.longitude)
 
         hub_data = None
-        if airtable_location_contact.fields.hub:
+        if airtable_location_contact.fields.hub_synced_record_id:
             hub_data = APIDataBase(
-                id=airtable_location_contact.fields.hub,
+                id=airtable_location_contact.fields.hub_synced_record_id,
                 type=hub_models.MODEL_TYPE)
 
         rse_data = None
-        if airtable_location_contact.fields.hub:
+        if airtable_location_contact.fields.assigned_rse_synced_record_id:
+            # The Partner table is in its own base and it's referenced by multiple other bases
+            # However, the Record IDs are unique to each base. So lookup needs to be performed to
+            # translate Record IDs between bases
+            partner_record = airtable_client.get_partner_by_synced_record_id(
+                airtable_location_contact.fields.assigned_rse_synced_record_id)
+
             rse_data = APIDataBase(
-                id=airtable_location_contact.fields.assigned_rse,
+                id=partner_record.id,
                 type=partner_models.MODEL_TYPE)
 
         relationships = APILocationContactRelationships(

@@ -8,6 +8,7 @@ from app.airtable.response import AirtableResponse
 
 # noinspection PyMethodParameters
 class AirtablePartnerFields(BaseModel):
+    synced_record_id: Optional[str] = Field(alias="Synced Record ID")
     name: Optional[str] = Field(alias="Name")
     email: Optional[str] = Field(alias="Email")
     active: Optional[str] = Field(alias="Currently active")

@@ -28,6 +28,9 @@ class ListAirtableFieldMappingResponse(ListAirtableResponse):
 
     def map_response_value(self, field_category_type: FieldCategoryType,
                            response_value) -> Optional[AirtableFieldMappingResponse]:
+        if response_value is None:
+            return None
+
         def filter_mappings(mapping):
             return \
                 mapping.fields.field_category_type.strip().lower() == field_category_type.strip().lower() and \

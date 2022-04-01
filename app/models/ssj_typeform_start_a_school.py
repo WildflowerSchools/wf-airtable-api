@@ -3,7 +3,7 @@ from typing import Callable
 from wf_airtable_api_schema.models.ssj_typeform_start_a_school import *
 from wf_airtable_api_schema.models import ssj_typeform_start_a_school
 
-from ..airtable.base_ssj_typeform_responses import start_a_school as airtable_start_a_school_models
+from ..airtable.base_school_db import typeform_start_a_school as airtable_start_a_school_models
 
 
 class CreateApiSSJTypeformStartASchoolFields(ssj_typeform_start_a_school.CreateApiSSJTypeformStartASchoolFields):

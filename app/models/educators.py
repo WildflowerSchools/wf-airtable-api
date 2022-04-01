@@ -24,7 +24,8 @@ class CreateAPIEducatorFields(educators.CreateAPIEducatorFields):
             details=self.details,
             stage=self.stage,
             home_address=self.home_address,
-            assigned_partner=[self.assigned_partner_id]
+            assigned_partner=[self.assigned_partner_id],
+            ssj_typeforms_start_a_school=[self.start_a_school_response_id]
         )
 
     def to_airtable_contact_info(self, educator_id) -> airtable_contact_info_models.CreateAirtableContactInfoFields:
@@ -41,22 +42,26 @@ class CreateAPIEducatorFields(educators.CreateAPIEducatorFields):
         from ..airtable.base_school_db.field_categories import FieldCategoryType
         airtable_client = AirtableClient()
 
-        race_and_ethnicity, race_and_ethnicity_includes_non_specific_category = airtable_client.map_response_to_field_category_values(FieldCategoryType.race_ethnicity, self.race_and_ethnicity)
+        race_and_ethnicity, race_and_ethnicity_includes_non_specific_category = airtable_client.map_response_to_field_category_values(
+            FieldCategoryType.race_ethnicity, self.race_and_ethnicity)
         race_and_ethnicity_other = None
         if race_and_ethnicity_includes_non_specific_category:
             race_and_ethnicity_other = ';'.join(self.race_and_ethnicity)
 
-        education_categories, _ = airtable_client.map_response_to_field_category_values(FieldCategoryType.educational_attainment, str(self.educational_attainment))
+        education_categories, _ = airtable_client.map_response_to_field_category_values(
+            FieldCategoryType.educational_attainment, str(self.educational_attainment))
         educational_attainment = None
         if len(education_categories) > 0:
             educational_attainment = education_categories[0]
 
-        income_categories, _ = airtable_client.map_response_to_field_category_values(FieldCategoryType.income_background, str(self.income_background))
+        income_categories, _ = airtable_client.map_response_to_field_category_values(
+            FieldCategoryType.income_background, str(self.income_background))
         income_background = None
         if len(income_categories) > 0:
             income_background = income_categories[0]
 
-        genders, gender_includes_non_specific_category = airtable_client.map_response_to_field_category_values(FieldCategoryType.gender, self.gender)
+        genders, gender_includes_non_specific_category = airtable_client.map_response_to_field_category_values(
+            FieldCategoryType.gender, self.gender)
         gender = None
         if len(genders) > 0:
             gender = genders[0]
@@ -64,12 +69,14 @@ class CreateAPIEducatorFields(educators.CreateAPIEducatorFields):
         if gender_includes_non_specific_category:
             gender_other = self.gender
 
-        lgbtqia_categories, _ = airtable_client.map_response_to_field_category_values(FieldCategoryType.lgbtqia, str(self.lgbtqia_identifying))
+        lgbtqia_categories, _ = airtable_client.map_response_to_field_category_values(
+            FieldCategoryType.lgbtqia, str(self.lgbtqia_identifying))
         lgbtqia = None
         if len(lgbtqia_categories) > 0:
             lgbtqia = lgbtqia_categories[0]
 
-        pronouns, pronouns_includes_non_specific_category = airtable_client.map_response_to_field_category_values(FieldCategoryType.pronouns, self.pronouns)
+        pronouns, pronouns_includes_non_specific_category = airtable_client.map_response_to_field_category_values(
+            FieldCategoryType.pronouns, self.pronouns)
         pronoun = None
         if len(pronouns) > 0:
             pronoun = pronouns[0]
@@ -97,7 +104,8 @@ class CreateAPIEducatorFields(educators.CreateAPIEducatorFields):
 
         airtable_languages = []
         for l in self.languages:
-            languages, language_includes_non_specific_category = airtable_client.map_response_to_field_category_values(FieldCategoryType.languages, l.language)
+            languages, language_includes_non_specific_category = airtable_client.map_response_to_field_category_values(
+                FieldCategoryType.languages, l.language)
             language = None
             if len(languages) > 0:
                 language = languages[0]
@@ -122,9 +130,11 @@ class CreateAPIEducatorFields(educators.CreateAPIEducatorFields):
 
         airtable_montessori_certifications = []
         for m in self.montessori_certifications:
-            certification_levels, _ = airtable_client.map_response_to_field_category_values(FieldCategoryType.montessori_certification_levels, m.certification_levels)
+            certification_levels, _ = airtable_client.map_response_to_field_category_values(
+                FieldCategoryType.montessori_certification_levels, m.certification_levels)
 
-            certifiers, certifier_includes_non_specific_category = airtable_client.map_response_to_field_category_values(FieldCategoryType.montessori_certifiers, m.certifier)
+            certifiers, certifier_includes_non_specific_category = airtable_client.map_response_to_field_category_values(
+                FieldCategoryType.montessori_certifiers, m.certifier)
             certifier = None
             if len(certifiers) > 0:
                 certifier = certifiers[0]
@@ -132,7 +142,8 @@ class CreateAPIEducatorFields(educators.CreateAPIEducatorFields):
             if certifier_includes_non_specific_category:
                 certifier_other = m.certifier
 
-            certification_statuses, _ = airtable_client.map_response_to_field_category_values(FieldCategoryType.montessori_certification_status, m.certification_status)
+            certification_statuses, _ = airtable_client.map_response_to_field_category_values(
+                FieldCategoryType.montessori_certification_status, m.certification_status)
             certification_status = None
             if len(certification_statuses) > 0:
                 certification_status = certification_statuses[0]

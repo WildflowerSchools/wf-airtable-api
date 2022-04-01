@@ -23,6 +23,8 @@ class CreateAirtableEducatorFields(BaseModel):
     source: Optional[list[str]] = Field(alias="Source")
     source_other: Optional[str] = Field(alias="Source - Other")
 
+    ssj_typeforms_start_a_school: Optional[list[str]] = Field(alias="SSJ Typeforms: Start a School")
+
     class Config:
         allow_population_by_field_name = True
 
