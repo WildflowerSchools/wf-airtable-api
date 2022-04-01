@@ -1,3 +1,5 @@
-BASE_ID = 'appoXMtqc5TYmH0ai'
+from app import const
+
+BASE_ID = const.AIRTABLE_START_SCHOOL_FIRST_CONTACT_BASE_ID
 
 LOCATION_CONTACT_TABLE_NAME = 'Location Contacts'

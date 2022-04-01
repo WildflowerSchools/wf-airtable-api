@@ -1,4 +1,6 @@
-BASE_ID = 'appJBT9a4f3b7hWQ2'
+from app import const
+
+BASE_ID = const.AIRTABLE_SCHOOL_DB_BASE_ID
 
 HUBS_TABLE_NAME = 'Hubs'
 PODS_TABLE_NAME = 'Pods'

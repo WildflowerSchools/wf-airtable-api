@@ -26,6 +26,7 @@ class AirtableLocationContactFields(BaseModel):
     hub: Optional[str] = Field(alias="Hub")
     hub_synced_record_id: Optional[str] = Field(alias="Hub Synced Record ID")
     hub_name: Optional[str] = Field(alias="Hub Name")
+    sendgrid_template_id: Optional[str] = Field(alias="Sendgrid Template ID")
     latitude: Optional[float] = Field(alias="Latitude")
     longitude: Optional[float] = Field(alias="Longitude")
 

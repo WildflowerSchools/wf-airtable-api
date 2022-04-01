@@ -30,6 +30,7 @@ class APILocationContactData(location_contacts.APILocationContactData):
             first_contact_email=airtable_location_contact.fields.first_contact_email,
             assigned_rse_name=airtable_location_contact.fields.assigned_rse_name,
             hub_name=airtable_location_contact.fields.hub_name,
+            sendgrid_template_id=airtable_location_contact.fields.sendgrid_template_id,
             latitude=airtable_location_contact.fields.latitude,
             longitude=airtable_location_contact.fields.longitude)
 
