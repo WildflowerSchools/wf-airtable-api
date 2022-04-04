@@ -9,7 +9,8 @@ from app.airtable.response import AirtableResponse, ListAirtableResponse
 class FieldCategoryType(str, Enum):
     race_ethnicity = 'Race & Ethnicity'
     gender = 'Gender'
-    income_background = 'Income Background'
+    income_background = 'Income Background As Child'
+    household_income = 'Household Income'
     educational_attainment = 'Educational Attainment'
     pronouns = 'Pronouns'
     languages = 'Languages'

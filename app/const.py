@@ -4,7 +4,7 @@ AIRTABLE_API_KEY = os.getenv(
     "AIRTABLE_API_KEY", None)
 
 AIRTABLE_SCHOOL_DB_BASE_ID = os.getenv(
-    "AIRTABLE_SCHOOL_DB_BASE_ID", 'applW7mdeeXKW9UJR'  # Defaults to the STAGING instance
+    "AIRTABLE_SCHOOL_DB_BASE_ID", 'appldwtPcWL8zl3OP'  # Defaults to the STAGING instance
 )
 
 AIRTABLE_START_SCHOOL_FIRST_CONTACT_BASE_ID = os.getenv(

@@ -70,6 +70,10 @@ async def create_educator(
     # Is educator pre-existing?
     pre_exists = len(airtable_client.get_educators_by_email(payload.email).__root__) > 0
     if pre_exists:
+        if len(airtable_client.get_educators_by_email(payload.email).__root__) == 1:
+            educator = airtable_client.get_educators_by_email(payload.email).__root__[0]
+            airtable_client.add_typeform_start_a_school_response_to_educator(educator_id=educator.id,
+                                                                             typeform_start_a_school_response_id=payload.start_a_school_response_id)
         raise HTTPException(status_code=409, detail="Educator already exists")
 
     # 1. Create the Educator

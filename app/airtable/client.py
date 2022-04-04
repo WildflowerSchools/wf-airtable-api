@@ -1,5 +1,5 @@
 from cachetools import cached, TTLCache
-from typing import Generator, Union
+from typing import Generator, Union, Optional
 
 from .base_school_db.field_categories import FieldCategoryType
 from .. import const
@@ -32,12 +32,12 @@ class AirtableClient(metaclass=Singleton):
         self.client_api = Api(api_key)
 
     @cached(cache=TTLCache(maxsize=32, ttl=600))
-    def list_hubs(self):
+    def list_hubs(self) -> hub_models.ListAirtableHubResponse:
         raw = self.client_api.all(base_id=school_db_base.BASE_ID, table_name=school_db_base.HUBS_TABLE_NAME)
         return hub_models.ListAirtableHubResponse.parse_obj(raw)
 
     @cached(cache=TTLCache(maxsize=1024, ttl=600))
-    def get_hub_by_id(self, hub_id):
+    def get_hub_by_id(self, hub_id) -> hub_models.AirtableHubResponse:
         raw = self.client_api.get(
             base_id=school_db_base.BASE_ID,
             table_name=school_db_base.HUBS_TABLE_NAME,
@@ -45,7 +45,7 @@ class AirtableClient(metaclass=Singleton):
         return hub_models.AirtableHubResponse.parse_obj(raw)
 
     @cached(cache=TTLCache(maxsize=1024, ttl=600))
-    def get_hub_by_school_id(self, school_id):
+    def get_hub_by_school_id(self, school_id) -> hub_models.AirtableHubResponse:
         formula = formulas.INCLUDE(formulas.STR_VALUE(school_id), formulas.FIELD("School Record IDs"))
 
         raw = self.client_api.all(
@@ -60,7 +60,7 @@ class AirtableClient(metaclass=Singleton):
         return hub_models.AirtableHubResponse.parse_obj(raw_item)
 
     @cached(cache=TTLCache(maxsize=1024, ttl=600))
-    def get_hub_by_pod_id(self, pod_id):
+    def get_hub_by_pod_id(self, pod_id) -> hub_models.AirtableHubResponse:
         formula = formulas.INCLUDE(formulas.STR_VALUE(pod_id), formulas.FIELD("Pod Record IDs"))
 
         raw = self.client_api.all(
@@ -75,7 +75,7 @@ class AirtableClient(metaclass=Singleton):
         return hub_models.AirtableHubResponse.parse_obj(raw_item)
 
     @cached(cache=TTLCache(maxsize=1024, ttl=600))
-    def get_hubs_by_entrepreneur_id(self, partner_id):
+    def get_hubs_by_entrepreneur_id(self, partner_id) -> hub_models.ListAirtableHubResponse:
         formula = formulas.INCLUDE(formulas.STR_VALUE(partner_id), formulas.FIELD("Regional Entrepreneur Record ID"))
 
         raw = self.client_api.all(
@@ -85,12 +85,12 @@ class AirtableClient(metaclass=Singleton):
         return hub_models.ListAirtableHubResponse.parse_obj(raw)
 
     @cached(cache=TTLCache(maxsize=32, ttl=600))
-    def list_pods(self):
+    def list_pods(self) -> pod_models.ListAirtablePodResponse:
         raw = self.client_api.all(base_id=school_db_base.BASE_ID, table_name=school_db_base.PODS_TABLE_NAME)
         return pod_models.ListAirtablePodResponse.parse_obj(raw)
 
     @cached(cache=TTLCache(maxsize=1024, ttl=600))
-    def get_pod_by_id(self, pod_id):
+    def get_pod_by_id(self, pod_id) -> pod_models.AirtablePodResponse:
         raw = self.client_api.get(
             base_id=school_db_base.BASE_ID,
             table_name=school_db_base.PODS_TABLE_NAME,
@@ -98,7 +98,7 @@ class AirtableClient(metaclass=Singleton):
         return pod_models.AirtablePodResponse.parse_obj(raw)
 
     @cached(cache=TTLCache(maxsize=1024, ttl=600))
-    def get_pod_by_school_id(self, school_id):
+    def get_pod_by_school_id(self, school_id) -> pod_models.AirtablePodResponse:
         formula = formulas.INCLUDE(formulas.STR_VALUE(school_id), formulas.FIELD("School Record IDs"))
 
         raw = self.client_api.all(
@@ -113,7 +113,7 @@ class AirtableClient(metaclass=Singleton):
         return None
 
     @cached(cache=TTLCache(maxsize=32, ttl=600))
-    def get_pods_by_hub_id(self, hub_id):
+    def get_pods_by_hub_id(self, hub_id) -> pod_models.ListAirtablePodResponse:
         formula = formulas.INCLUDE(formulas.STR_VALUE(hub_id), formulas.FIELD("Hub Record ID"))
 
         raw = self.client_api.all(
@@ -123,7 +123,7 @@ class AirtableClient(metaclass=Singleton):
         return pod_models.ListAirtablePodResponse.parse_obj(raw)
 
     @cached(cache=TTLCache(maxsize=1024, ttl=600))
-    def get_pods_by_contact_id(self, partner_id):
+    def get_pods_by_contact_id(self, partner_id) -> pod_models.ListAirtablePodResponse:
         formula = formulas.INCLUDE(formulas.STR_VALUE(partner_id), formulas.FIELD("Pod Contact Record ID"))
 
         raw = self.client_api.all(
@@ -133,13 +133,13 @@ class AirtableClient(metaclass=Singleton):
         return pod_models.ListAirtablePodResponse.parse_obj(raw)
 
     @cached(cache=TTLCache(maxsize=32, ttl=600))
-    def list_schools(self, page_size=100, offset=None):
+    def list_schools(self, page_size=100, offset=None) -> school_models.ListAirtableSchoolResponse:
         raw, res_offset = self.client_api.paginate(
             school_db_base.BASE_ID, table_name=school_db_base.SCHOOLS_TABLE_NAME, offset=offset, page_size=page_size)
         return school_models.ListAirtableSchoolResponse.parse_obj(raw), res_offset
 
     @cached(cache=TTLCache(maxsize=1024, ttl=600))
-    def get_school_by_id(self, school_id):
+    def get_school_by_id(self, school_id) -> school_models.AirtableSchoolResponse:
         raw = self.client_api.get(
             base_id=school_db_base.BASE_ID,
             table_name=school_db_base.SCHOOLS_TABLE_NAME,
@@ -147,7 +147,7 @@ class AirtableClient(metaclass=Singleton):
         return school_models.AirtableSchoolResponse.parse_obj(raw)
 
     @cached(cache=TTLCache(maxsize=32, ttl=600))
-    def get_schools_by_hub_id(self, hub_id):
+    def get_schools_by_hub_id(self, hub_id) -> school_models.ListAirtableSchoolResponse:
         formula = formulas.INCLUDE(formulas.STR_VALUE(hub_id), formulas.FIELD("Hub Record ID"))
 
         raw = self.client_api.all(
@@ -157,7 +157,7 @@ class AirtableClient(metaclass=Singleton):
         return school_models.ListAirtableSchoolResponse.parse_obj(raw)
 
     @cached(cache=TTLCache(maxsize=32, ttl=600))
-    def get_schools_by_pod_id(self, pod_id):
+    def get_schools_by_pod_id(self, pod_id) -> school_models.ListAirtableSchoolResponse:
         formula = formulas.INCLUDE(formulas.STR_VALUE(pod_id), formulas.FIELD("Pod Record ID"))
 
         raw = self.client_api.all(
@@ -167,7 +167,7 @@ class AirtableClient(metaclass=Singleton):
         return school_models.ListAirtableSchoolResponse.parse_obj(raw)
 
     @cached(cache=TTLCache(maxsize=1024, ttl=600))
-    def get_schools_by_educator_id(self, educator_id):
+    def get_schools_by_educator_id(self, educator_id) -> school_models.ListAirtableSchoolResponse:
         formula = formulas.INCLUDE(formulas.STR_VALUE(educator_id), formulas.FIELD("All Educator Record IDs"))
 
         raw = self.client_api.all(
@@ -177,7 +177,7 @@ class AirtableClient(metaclass=Singleton):
         return school_models.ListAirtableSchoolResponse.parse_obj(raw)
 
     @cached(cache=TTLCache(maxsize=1024, ttl=600))
-    def get_schools_by_guide_id(self, partner_id):
+    def get_schools_by_guide_id(self, partner_id) -> school_models.ListAirtableSchoolResponse:
         formula = formulas.INCLUDE(formulas.STR_VALUE(partner_id), formulas.FIELD("Guide Record IDs"))
 
         raw = self.client_api.all(
@@ -187,14 +187,14 @@ class AirtableClient(metaclass=Singleton):
         return school_models.ListAirtableSchoolResponse.parse_obj(raw)
 
     @cached(cache=TTLCache(maxsize=1024, ttl=600))
-    def get_guide_school_by_id(self, guide_school_id):
+    def get_guide_school_by_id(self, guide_school_id) -> guides_schools_models.AirtableGuidesSchoolsResponse:
         raw = self.client_api.get(
             base_id=school_db_base.BASE_ID,
             table_name=school_db_base.GUIDES_SCHOOLS_TABLE_NAME,
             record_id=guide_school_id)
         return guides_schools_models.AirtableGuidesSchoolsResponse.parse_obj(raw)
 
-    def list_guide_schools_by_ids(self, guide_school_ids=[]):
+    def list_guide_schools_by_ids(self, guide_school_ids=[]) -> guides_schools_models.ListAirtableGuidesSchoolsResponse:
         match_formulas = []
         for gs_id in guide_school_ids:
             match_formulas.append(formulas.EQUAL(formulas.STR_VALUE(gs_id), formulas.FIELD("Record ID")))
@@ -207,13 +207,13 @@ class AirtableClient(metaclass=Singleton):
         return guides_schools_models.ListAirtableGuidesSchoolsResponse.parse_obj(raw)
 
     @cached(cache=TTLCache(maxsize=32, ttl=600))
-    def list_partners(self, page_size=100, offset=None):
+    def list_partners(self, page_size=100, offset=None) -> partner_models.ListAirtablePartnerResponse:
         raw, res_offset = self.client_api.paginate(
             school_db_base.BASE_ID, table_name=school_db_base.PARTNERS_TABLE_NAME, offset=offset, page_size=page_size)
         return partner_models.ListAirtablePartnerResponse.parse_obj(raw), res_offset
 
     @cached(cache=TTLCache(maxsize=1024, ttl=600))
-    def get_partner_by_id(self, school_id):
+    def get_partner_by_id(self, school_id) -> partner_models.AirtablePartnerResponse:
         raw = self.client_api.get(
             base_id=school_db_base.BASE_ID,
             table_name=school_db_base.PARTNERS_TABLE_NAME,
@@ -221,7 +221,7 @@ class AirtableClient(metaclass=Singleton):
         return partner_models.AirtablePartnerResponse.parse_obj(raw)
 
     @cached(cache=TTLCache(maxsize=32, ttl=600))
-    def get_partner_by_synced_record_id(self, synced_record_id):
+    def get_partner_by_synced_record_id(self, synced_record_id) -> partner_models.AirtablePartnerResponse:
         formula = formulas.INCLUDE(formulas.STR_VALUE(synced_record_id), formulas.FIELD("Synced Record ID"))
 
         raw = self.client_api.first(
@@ -231,7 +231,7 @@ class AirtableClient(metaclass=Singleton):
         return partner_models.AirtablePartnerResponse.parse_obj(raw)
 
     @cached(cache=TTLCache(maxsize=32, ttl=600))
-    def get_partners_by_hub_id(self, hub_id):
+    def get_partners_by_hub_id(self, hub_id) -> partner_models.ListAirtablePartnerResponse:
         formula = formulas.INCLUDE(formulas.STR_VALUE(hub_id), formulas.FIELD("Hub Record ID"))
 
         raw = self.client_api.all(
@@ -241,7 +241,7 @@ class AirtableClient(metaclass=Singleton):
         return partner_models.ListAirtablePartnerResponse.parse_obj(raw)
 
     @cached(cache=TTLCache(maxsize=32, ttl=600))
-    def get_partners_by_pod_id(self, pod_id):
+    def get_partners_by_pod_id(self, pod_id) -> partner_models.ListAirtablePartnerResponse:
         formula = formulas.INCLUDE(formulas.STR_VALUE(pod_id), formulas.FIELD("Pod Record ID"))
 
         raw = self.client_api.all(
@@ -251,7 +251,7 @@ class AirtableClient(metaclass=Singleton):
         return partner_models.ListAirtablePartnerResponse.parse_obj(raw)
 
     @cached(cache=TTLCache(maxsize=1024, ttl=600))
-    def get_partners_by_educator_id(self, educator_id):
+    def get_partners_by_educator_id(self, educator_id) -> partner_models.ListAirtablePartnerResponse:
         formula = formulas.INCLUDE(formulas.STR_VALUE(educator_id), formulas.FIELD("Educator Record IDs"))
 
         raw = self.client_api.all(
@@ -261,7 +261,7 @@ class AirtableClient(metaclass=Singleton):
         return partner_models.ListAirtablePartnerResponse.parse_obj(raw)
 
     @cached(cache=TTLCache(maxsize=1024, ttl=600))
-    def get_guides_by_school_id(self, school_id):
+    def get_guides_by_school_id(self, school_id) -> partner_models.ListAirtablePartnerResponse:
         formula = formulas.INCLUDE(formulas.STR_VALUE(school_id), formulas.FIELD("Guided School Record ID"))
 
         raw = self.client_api.all(
@@ -271,20 +271,20 @@ class AirtableClient(metaclass=Singleton):
         return partner_models.ListAirtablePartnerResponse.parse_obj(raw)
 
     @cached(cache=TTLCache(maxsize=32, ttl=600))
-    def list_educators(self, page_size=100, offset=None):
+    def list_educators(self, page_size=100, offset=None) -> (educator_models.ListAirtableEducatorResponse, str):
         raw, res_offset = self.client_api.paginate(
             school_db_base.BASE_ID, table_name=school_db_base.EDUCATORS_TABLE_NAME, offset=offset, page_size=page_size)
         return educator_models.ListAirtableEducatorResponse.parse_obj(raw), res_offset
 
     @cached(cache=TTLCache(maxsize=1024, ttl=600))
-    def get_educator_by_id(self, educator_id):
+    def get_educator_by_id(self, educator_id) -> educator_models.AirtableEducatorResponse:
         raw = self.client_api.get(
             base_id=school_db_base.BASE_ID,
             table_name=school_db_base.EDUCATORS_TABLE_NAME,
             record_id=educator_id)
         return educator_models.AirtableEducatorResponse.parse_obj(raw)
 
-    def get_educators_by_email(self, educator_email):
+    def get_educators_by_email(self, educator_email) -> educator_models.ListAirtableEducatorResponse:
         formula = formulas.INCLUDE(formulas.STR_VALUE(educator_email), formulas.FIELD("Contact Email"))
 
         raw = self.client_api.all(
@@ -293,7 +293,8 @@ class AirtableClient(metaclass=Singleton):
             formula=formula)
         return educator_models.ListAirtableEducatorResponse.parse_obj(raw)
 
-    def create_educator(self, payload: educator_models.CreateAirtableEducatorFields):
+    def create_educator(
+            self, payload: educator_models.CreateAirtableEducatorFields) -> educator_models.AirtableEducatorResponse:
         raw = self.client_api.create(
             base_id=school_db_base.BASE_ID,
             table_name=school_db_base.EDUCATORS_TABLE_NAME,
@@ -301,8 +302,27 @@ class AirtableClient(metaclass=Singleton):
         )
         return educator_models.AirtableEducatorResponse.parse_obj(raw)
 
+    def add_typeform_start_a_school_response_to_educator(
+            self, educator_id, typeform_start_a_school_response_id) -> educator_models.AirtableEducatorResponse:
+        educator = self.get_educator_by_id(educator_id)
+        start_school_typeforms = educator.fields.ssj_typeforms_start_a_school
+
+        if typeform_start_a_school_response_id in start_school_typeforms:
+            return educator
+
+        start_school_typeforms.append(typeform_start_a_school_response_id)
+
+        raw = self.client_api.update(
+            base_id=school_db_base.BASE_ID,
+            table_name=school_db_base.EDUCATORS_TABLE_NAME,
+            record_id=educator_id,
+            fields={educator_models.AirtableEducatorFields.__fields__[
+                'ssj_typeforms_start_a_school'].alias: start_school_typeforms}
+        )
+        return educator_models.AirtableEducatorResponse.parse_obj(raw)
+
     @cached(cache=TTLCache(maxsize=1024, ttl=600))
-    def get_educators_by_guide_id(self, partner_id):
+    def get_educators_by_guide_id(self, partner_id) -> educator_models.ListAirtableEducatorResponse:
         formula = formulas.INCLUDE(formulas.STR_VALUE(partner_id), formulas.FIELD("Assigned Partner Record ID"))
 
         raw = self.client_api.all(
@@ -312,7 +332,7 @@ class AirtableClient(metaclass=Singleton):
         return educator_models.ListAirtableEducatorResponse.parse_obj(raw)
 
     @cached(cache=TTLCache(maxsize=1024, ttl=600))
-    def get_primary_contacts_by_school_id(self, school_id):
+    def get_primary_contacts_by_school_id(self, school_id) -> educator_models.ListAirtableEducatorResponse:
         formula = formulas.INCLUDE(formulas.STR_VALUE(school_id), formulas.FIELD("Primary Contact School Record IDs"))
 
         raw = self.client_api.all(
@@ -322,7 +342,7 @@ class AirtableClient(metaclass=Singleton):
         return educator_models.ListAirtableEducatorResponse.parse_obj(raw)
 
     @cached(cache=TTLCache(maxsize=1024, ttl=600))
-    def get_all_educators_by_school_id(self, school_id):
+    def get_all_educators_by_school_id(self, school_id) -> educator_models.ListAirtableEducatorResponse:
         formula = formulas.INCLUDE(formulas.STR_VALUE(school_id), formulas.FIELD("School Record IDs"))
 
         raw = self.client_api.all(
@@ -332,7 +352,7 @@ class AirtableClient(metaclass=Singleton):
         return educator_models.ListAirtableEducatorResponse.parse_obj(raw)
 
     @cached(cache=TTLCache(maxsize=1024, ttl=600))
-    def get_current_educators_by_school_id(self, school_id):
+    def get_current_educators_by_school_id(self, school_id) -> educator_models.ListAirtableEducatorResponse:
         formula = formulas.INCLUDE(formulas.STR_VALUE(school_id), formulas.FIELD("Current Educator School Record IDs"))
 
         raw = self.client_api.all(
@@ -342,7 +362,7 @@ class AirtableClient(metaclass=Singleton):
         return educator_models.ListAirtableEducatorResponse.parse_obj(raw)
 
     @cached(cache=TTLCache(maxsize=1024, ttl=600))
-    def get_current_tls_by_school_id(self, school_id):
+    def get_current_tls_by_school_id(self, school_id) -> educator_models.ListAirtableEducatorResponse:
         formula = formulas.INCLUDE(formulas.STR_VALUE(school_id), formulas.FIELD("Current TL School Records IDs"))
 
         raw = self.client_api.all(
@@ -352,7 +372,7 @@ class AirtableClient(metaclass=Singleton):
         return educator_models.ListAirtableEducatorResponse.parse_obj(raw)
 
     @cached(cache=TTLCache(maxsize=1024, ttl=600))
-    def get_founders_by_school_id(self, school_id):
+    def get_founders_by_school_id(self, school_id) -> educator_models.ListAirtableEducatorResponse:
         formula = formulas.INCLUDE(formulas.STR_VALUE(school_id), formulas.FIELD("Founder School Records IDs"))
 
         raw = self.client_api.all(
@@ -362,14 +382,16 @@ class AirtableClient(metaclass=Singleton):
         return educator_models.ListAirtableEducatorResponse.parse_obj(raw)
 
     @cached(cache=TTLCache(maxsize=1024, ttl=600))
-    def get_educator_school_by_id(self, educator_school_id):
+    def get_educator_school_by_id(
+            self, educator_school_id) -> educators_schools_models.AirtableEducatorsSchoolsResponse:
         raw = self.client_api.get(
             base_id=school_db_base.BASE_ID,
             table_name=school_db_base.EDUCATORS_SCHOOLS_TABLE_NAME,
             record_id=educator_school_id)
         return educators_schools_models.AirtableEducatorsSchoolsResponse.parse_obj(raw)
 
-    def list_educator_schools_by_ids(self, educator_school_ids):
+    def list_educator_schools_by_ids(
+            self, educator_school_ids) -> educators_schools_models.ListAirtableEducatorsSchoolsResponse:
         match_formulas = []
         for es_id in educator_school_ids:
             match_formulas.append(formulas.EQUAL(formulas.STR_VALUE(es_id), formulas.FIELD("Record ID")))
@@ -382,7 +404,8 @@ class AirtableClient(metaclass=Singleton):
         return educators_schools_models.ListAirtableEducatorsSchoolsResponse.parse_obj(raw)
 
     @cached(cache=TTLCache(maxsize=1024, ttl=600))
-    def get_montessori_education_by_id(self, montessori_certification_id):
+    def get_montessori_education_by_id(
+            self, montessori_certification_id) -> montessori_certifications_models.AirtableMontessoriCertificationResponse:
         raw = self.client_api.get(
             base_id=school_db_base.BASE_ID,
             table_name=school_db_base.MONTESSORI_CERTIFICATIONS_TABLE_NAME,
@@ -390,14 +413,15 @@ class AirtableClient(metaclass=Singleton):
         return montessori_certifications_models.AirtableMontessoriCertificationResponse.parse_obj(raw)
 
     def create_montessori_certification(
-            self, payload: montessori_certifications_models.CreateAirtableMontessoriCertificationFields):
+            self, payload: montessori_certifications_models.CreateAirtableMontessoriCertificationFields) -> montessori_certifications_models.AirtableMontessoriCertificationResponse:
         raw = self.client_api.create(
             base_id=school_db_base.BASE_ID,
             table_name=school_db_base.MONTESSORI_CERTIFICATIONS_TABLE_NAME,
             fields=payload.dict(by_alias=True))
         return montessori_certifications_models.AirtableMontessoriCertificationResponse.parse_obj(raw)
 
-    def list_montessori_certifications_by_ids(self, montessori_certification_ids):
+    def list_montessori_certifications_by_ids(
+            self, montessori_certification_ids) -> montessori_certifications_models.ListAirtableMontessoriCertificationResponse:
         match_formulas = []
         for m_id in montessori_certification_ids:
             match_formulas.append(formulas.EQUAL(formulas.STR_VALUE(m_id), formulas.FIELD("Record ID")))
@@ -410,14 +434,15 @@ class AirtableClient(metaclass=Singleton):
         return montessori_certifications_models.ListAirtableMontessoriCertificationResponse.parse_obj(raw)
 
     @cached(cache=TTLCache(maxsize=1024, ttl=600))
-    def get_language_by_id(self, language_id):
+    def get_language_by_id(self, language_id) -> languages_models.AirtableLanguageResponse:
         raw = self.client_api.get(
             base_id=school_db_base.BASE_ID,
             table_name=school_db_base.LANGUAGES_TABLE_NAME,
             record_id=language_id)
         return languages_models.AirtableLanguageResponse.parse_obj(raw)
 
-    def create_language(self, payload: languages_models.CreateAirtableLanguageFields):
+    def create_language(
+            self, payload: languages_models.CreateAirtableLanguageFields) -> languages_models.AirtableLanguageResponse:
         raw = self.client_api.create(
             base_id=school_db_base.BASE_ID,
             table_name=school_db_base.LANGUAGES_TABLE_NAME,
@@ -425,7 +450,7 @@ class AirtableClient(metaclass=Singleton):
         )
         return languages_models.AirtableLanguageResponse.parse_obj(raw)
 
-    def list_languages_by_ids(self, language_ids):
+    def list_languages_by_ids(self, language_ids) -> languages_models.ListAirtableLanguageResponse:
         match_formulas = []
         for l_id in language_ids:
             match_formulas.append(formulas.EQUAL(formulas.STR_VALUE(l_id), formulas.FIELD("Record ID")))
@@ -438,14 +463,15 @@ class AirtableClient(metaclass=Singleton):
         return languages_models.ListAirtableLanguageResponse.parse_obj(raw)
 
     @cached(cache=TTLCache(maxsize=1, ttl=600))
-    def list_location_contacts(self):
+    def list_location_contacts(self) -> location_contacts_models.ListAirtableLocationContactResponse:
         raw = self.client_api.all(
             base_id=start_school_first_contact_base.BASE_ID,
             table_name=start_school_first_contact_base.LOCATION_CONTACT_TABLE_NAME)
         return location_contacts_models.ListAirtableLocationContactResponse.parse_obj(raw)
 
     @cached(cache=TTLCache(maxsize=64, ttl=600))
-    def get_location_contact_by_id(self, location_contact_id):
+    def get_location_contact_by_id(
+            self, location_contact_id) -> location_contacts_models.AirtableLocationContactResponse:
         raw = self.client_api.get(
             base_id=start_school_first_contact_base.BASE_ID,
             table_name=start_school_first_contact_base.LOCATION_CONTACT_TABLE_NAME,
@@ -453,7 +479,7 @@ class AirtableClient(metaclass=Singleton):
         return location_contacts_models.AirtableLocationContactResponse.parse_obj(raw)
 
     def create_start_a_school_response(
-            self, payload: typeform_start_a_school_models.CreateAirtableSSJTypeformStartASchool):
+            self, payload: typeform_start_a_school_models.CreateAirtableSSJTypeformStartASchool) -> typeform_start_a_school_models.AirtableSSJTypeformStartASchoolResponse:
         raw = self.client_api.create(
             base_id=school_db_base.BASE_ID,
             table_name=school_db_base.SSJ_TYPEFORM_RESPONSES_TABLE_NAME,
@@ -461,7 +487,8 @@ class AirtableClient(metaclass=Singleton):
         )
         return typeform_start_a_school_models.AirtableSSJTypeformStartASchoolResponse.parse_obj(raw)
 
-    def create_contact_info(self, payload: contact_info_models.CreateAirtableContactInfoFields):
+    def create_contact_info(
+            self, payload: contact_info_models.CreateAirtableContactInfoFields) -> contact_info_models.AirtableContactInfoResponse:
         raw = self.client_api.create(
             base_id=school_db_base.BASE_ID,
             table_name=school_db_base.CONTACT_INFO_TABLE_NAME,
@@ -469,7 +496,8 @@ class AirtableClient(metaclass=Singleton):
         )
         return contact_info_models.AirtableContactInfoResponse.parse_obj(raw)
 
-    def create_socio_economic(self, payload: socio_economic_models.CreateAirtableSocioEconomicBackgroundFields):
+    def create_socio_economic(
+            self, payload: socio_economic_models.CreateAirtableSocioEconomicBackgroundFields) -> socio_economic_models.AirtableSocioEconomicBackgroundResponse:
         raw = self.client_api.create(
             base_id=school_db_base.BASE_ID,
             table_name=school_db_base.SOCIO_ECONOMIC_BACKGROUNDS_TABLE_NAME,

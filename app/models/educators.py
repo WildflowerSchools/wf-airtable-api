@@ -55,10 +55,10 @@ class CreateAPIEducatorFields(educators.CreateAPIEducatorFields):
             educational_attainment = education_categories[0]
 
         income_categories, _ = airtable_client.map_response_to_field_category_values(
-            FieldCategoryType.income_background, str(self.income_background))
-        income_background = None
+            FieldCategoryType.household_income, str(self.household_income))
+        household_income = None
         if len(income_categories) > 0:
-            income_background = income_categories[0]
+            household_income = income_categories[0]
 
         genders, gender_includes_non_specific_category = airtable_client.map_response_to_field_category_values(
             FieldCategoryType.gender, self.gender)
@@ -89,7 +89,7 @@ class CreateAPIEducatorFields(educators.CreateAPIEducatorFields):
             race_and_ethnicity=race_and_ethnicity,
             race_and_ethnicity_other=race_and_ethnicity_other,
             educational_attainment=educational_attainment,
-            income_background=income_background,
+            household_income=household_income,
             gender=gender,
             gender_other=gender_other,
             lgbtqia_identifying=lgbtqia,
