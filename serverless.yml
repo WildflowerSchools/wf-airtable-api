@@ -15,6 +15,7 @@ provider:
   name: aws
   runtime: python3.9
   stage: ${opt:stage, 'dev'}
+  timeout: 30
   environment:
     AIRTABLE_API_KEY: ${env:AIRTABLE_API_KEY}
     AUTH0_AUDIENCE: ${env:AUTH0_AUDIENCE}
