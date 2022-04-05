@@ -1,6 +1,6 @@
 org: wildflowerschools
 app: wf-airtable-api
-service: aws-python-fastapi
+service: wf-airtable-api-server
 
 frameworkVersion: '3'
 
