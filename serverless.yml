@@ -21,6 +21,7 @@ provider:
     AUTH0_AUDIENCE: ${env:AUTH0_AUDIENCE}
     AUTH0_DOMAIN: ${env:AUTH0_DOMAIN}
     GOOGLE_CLOUD_API_KEY: ${env:GOOGLE_CLOUD_API_KEY}
+    AIRTABLE_SCHOOL_DB_BASE_ID: ${env:AIRTABLE_SCHOOL_DB_BASE_ID}
     STAGE: ${self:provider.stage}
 
 functions:
