@@ -284,14 +284,19 @@ class AirtableClient(metaclass=Singleton):
             record_id=educator_id)
         return educator_models.AirtableEducatorResponse.parse_obj(raw)
 
-    def get_educators_by_email(self, educator_email) -> educator_models.ListAirtableEducatorResponse:
+    def get_educator_by_email(self, educator_email) -> educator_models.AirtableEducatorResponse:
         formula = formulas.INCLUDE(formulas.STR_VALUE(educator_email), formulas.FIELD("Contact Email"))
 
         raw = self.client_api.all(
             base_id=school_db_base.BASE_ID,
             table_name=school_db_base.EDUCATORS_TABLE_NAME,
             formula=formula)
-        return educator_models.ListAirtableEducatorResponse.parse_obj(raw)
+
+        raw_item = None
+        if len(raw) > 0:
+            raw_item = raw[0]
+
+        return educator_models.AirtableEducatorResponse.parse_obj(raw_item)
 
     def create_educator(
             self, payload: educator_models.CreateAirtableEducatorFields) -> educator_models.AirtableEducatorResponse:

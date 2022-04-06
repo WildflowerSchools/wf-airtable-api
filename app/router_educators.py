@@ -35,6 +35,18 @@ def fetch_and_validate_educator(educator_id, airtable_client: AirtableClient):
     return airtable_educator
 
 
+def fetch_and_validate_educator_by_email(email, airtable_client: AirtableClient):
+    try:
+        airtable_educator = airtable_client.get_educator_by_email(email)
+    except requests.exceptions.HTTPError as ex:
+        if ex.response.status_code == 404:
+            raise HTTPException(status_code=404, detail="Educator not found")
+        else:
+            raise
+
+    return airtable_educator
+
+
 # Dupe the root route to solve this issue: https://github.com/tiangolo/fastapi/issues/2060
 @router.get("/", response_model=educator_models.ListAPIEducatorResponse, include_in_schema=False)
 @router.get("", response_model=educator_models.ListAPIEducatorResponse)
@@ -68,12 +80,10 @@ async def create_educator(
         raise HTTPException(status_code=400, detail="Educator email required")
 
     # Is educator pre-existing?
-    pre_exists = len(airtable_client.get_educators_by_email(payload.email).__root__) > 0
-    if pre_exists:
-        if len(airtable_client.get_educators_by_email(payload.email).__root__) == 1:
-            educator = airtable_client.get_educators_by_email(payload.email).__root__[0]
-            airtable_client.add_typeform_start_a_school_response_to_educator(educator_id=educator.id,
-                                                                             typeform_start_a_school_response_id=payload.start_a_school_response_id)
+    existing_educator = airtable_client.get_educator_by_email(payload.email)
+    if existing_educator is not None:
+        airtable_client.add_typeform_start_a_school_response_to_educator(educator_id=existing_educator.id,
+                                                                         typeform_start_a_school_response_id=payload.start_a_school_response_id)
         raise HTTPException(status_code=409, detail="Educator already exists")
 
     # 1. Create the Educator
@@ -114,6 +124,21 @@ async def get_educator(educator_id, request: Request):
     return response_models.APIResponse(
         data=data,
         links={'self': request.app.url_path_for("get_educator", educator_id=educator_id)})
+
+
+#  TODO: Turn this into a generic and more dynamic find function
+@router.get("/find_by_email/{email}", response_model=educator_models.APIEducatorResponse)
+async def get_educator_by_email(email, request: Request):
+    airtable_client = get_airtable_client(request)
+    airtable_educator = fetch_and_validate_educator_by_email(email, airtable_client)
+
+    data = educator_models.APIEducatorData.from_airtable_educator(
+        airtable_educator=airtable_educator,
+        url_path_for=request.app.url_path_for)
+
+    return response_models.APIResponse(
+        data=data,
+        links={'self': request.app.url_path_for("get_educator_by_email", email=email)})
 
 
 @router.get("/{educator_id}/schools", response_model=school_models.ListAPISchoolResponse)
