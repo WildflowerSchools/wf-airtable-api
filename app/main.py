@@ -1,19 +1,23 @@
+import time
 import logging
-import requests
+import random
+import string
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.security import HTTPBearer
 from mangum import Mangum
+import requests
 
 from . import auth, const, router_hubs, router_pods, router_schools, router_partners, router_educators, router_location_contacts, router_ssj_typeforms
 from .airtable.client import AirtableClient
 
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 stage = const.STAGE
-root_path = f"/{stage}" if stage else "/"
+root_path = f"/{stage}" if stage else ""
 app = FastAPI(
     title="WF Airtable API",
     root_path=root_path,
@@ -42,13 +46,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(router_hubs.router)
-app.include_router(router_pods.router)
-app.include_router(router_schools.router)
-app.include_router(router_partners.router)
-app.include_router(router_educators.router)
-app.include_router(router_location_contacts.router)
-app.include_router(router_ssj_typeforms.router)
+
 airtable_client = AirtableClient()
 
 
@@ -57,6 +55,48 @@ async def airtable_client_session_middleware(request: Request, call_next):
     request.state.airtable_client = airtable_client
     response = await call_next(request)
     return response
+
+
+# DO NOT ATTEMPT TO CAPTURE REQUEST BODY HERE, IT WILL CAUSE THE APP TO FREEZE
+@app.middleware("http")
+async def log_request_timing(request: Request, call_next):
+    idem = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
+    request.state.idem = idem
+
+    logger.info(f"rid={idem} start request_path={request.url.path}")
+
+    start_time = time.time()
+
+    response = await call_next(request)
+
+    process_time = (time.time() - start_time) * 1000
+    formatted_process_time = '{0:.2f}'.format(process_time)
+    logger.info(f"rid={idem} complete completed_in={formatted_process_time}ms status_code={response.status_code}")
+
+    return response
+
+
+async def log_request_details(request: Request):
+    headers = '\r\n\t'.join('{}: {}'.format(k, v) for k, v in request.headers.items())
+    body = await request.body()
+    logger.info("""rid={rid} details
+    {method} {url}
+
+    HEADERS:
+    {headers}
+
+    BODY:
+    {body}
+    """.format(rid=request.state.idem, method=request.method, url=request.url, headers=headers, body=body.decode("utf-8")))
+
+
+app.include_router(router_hubs.router, dependencies=[Depends(log_request_details)])
+app.include_router(router_pods.router, dependencies=[Depends(log_request_details)])
+app.include_router(router_schools.router, dependencies=[Depends(log_request_details)])
+app.include_router(router_partners.router, dependencies=[Depends(log_request_details)])
+app.include_router(router_educators.router, dependencies=[Depends(log_request_details)])
+app.include_router(router_location_contacts.router, dependencies=[Depends(log_request_details)])
+app.include_router(router_ssj_typeforms.router, dependencies=[Depends(log_request_details)])
 
 
 @app.get("/")
