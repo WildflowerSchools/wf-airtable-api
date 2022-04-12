@@ -79,7 +79,7 @@ async def create_educator(
     if payload.email is None:
         raise HTTPException(status_code=400, detail="Educator email required")
 
-    # Is educator pre-existing?
+    # Is educator pre-existing? Return 409, but add the typeform response to the educator record first
     existing_educator = airtable_client.get_educator_by_email(payload.email)
     if existing_educator is not None:
         airtable_client.add_typeform_start_a_school_response_to_educator(educator_id=existing_educator.id,

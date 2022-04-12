@@ -14,11 +14,25 @@ from ..airtable.base_school_db import \
     languages as airtable_languages_models, \
     educators as airtable_educator_models, \
     educators_schools as airtable_educators_schools_models, \
+    newsletters as airtable_newsletters_models, \
     socio_economic_backgrounds as airtable_socio_economic_backgrounds_models
 
 
 class CreateAPIEducatorFields(educators.CreateAPIEducatorFields):
     def to_airtable_educator(self) -> airtable_educator_models.CreateAirtableEducatorFields:
+        from ..airtable.client import AirtableClient
+        airtable_client = AirtableClient()
+
+        newsletter_ids = []
+        newsletter_slugs = []
+        if self.discovery_newsletter:
+            newsletter_slugs.append(airtable_newsletters_models.NewsletterSlugs.DISCOVERY_GROUP)
+        if self.etl_newsletter:
+            newsletter_slugs.append(airtable_newsletters_models.NewsletterSlugs.EMERGING_TEACHER_LEADER_GROUP)
+        if len(newsletter_slugs) > 0:
+            newsletters = airtable_client.get_newsletters_by_slug(newsletter_slugs)
+            newsletter_ids = list(map(lambda n: n.id, newsletters.__root__))
+
         return airtable_educator_models.CreateAirtableEducatorFields(
             first_name=self.first_name,
             last_name=self.last_name,
@@ -27,7 +41,8 @@ class CreateAPIEducatorFields(educators.CreateAPIEducatorFields):
             home_address=self.home_address,
             assigned_partner=[self.assigned_partner_id],
             target_community=[self.target_community_id],
-            ssj_typeforms_start_a_school=[self.start_a_school_response_id]
+            ssj_typeforms_start_a_school=[self.start_a_school_response_id],
+            newsletters=newsletter_ids
         )
 
     def to_airtable_contact_info(self, educator_id) -> airtable_contact_info_models.CreateAirtableContactInfoFields:
@@ -184,11 +199,14 @@ class APIEducatorData(educators.APIEducatorData):
             race_and_ethnicity=airtable_educator.fields.race_and_ethnicity,
             race_and_ethnicity_other=airtable_educator.fields.race_and_ethnicity_other,
             educational_attainment=airtable_educator.fields.educational_attainment,
+            household_income=airtable_educator.fields.household_income,
             income_background=airtable_educator.fields.income_background,
             gender=airtable_educator.fields.gender,
             lgbtqia_identifying=airtable_educator.fields.lgbtqia_identifying,
             pronouns=airtable_educator.fields.pronouns,
-            montessori_certified=airtable_educator.fields.montessori_certified
+            montessori_certified=airtable_educator.fields.montessori_certified,
+            discovery_newsletter=any(n.fields.slug == airtable_newsletters_models.NewsletterSlugs.DISCOVERY_GROUP.value for n in airtable_educator.fields.newsletters),
+            etl_newsletter=any(n.fields.slug == airtable_newsletters_models.NewsletterSlugs.EMERGING_TEACHER_LEADER_GROUP.value for n in airtable_educator.fields.newsletters),
         )
 
         educators_schools_data = []

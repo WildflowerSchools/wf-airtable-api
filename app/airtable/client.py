@@ -13,6 +13,7 @@ from .base_school_db import \
     guides_schools as guides_schools_models, \
     pods as pod_models, \
     montessori_certifications as montessori_certifications_models, \
+    newsletters as newsletters_models, \
     languages as languages_models, \
     educators as educator_models, \
     educators_schools as educators_schools_models, \
@@ -534,6 +535,31 @@ class AirtableClient(metaclass=Singleton):
             fields=payload.dict(by_alias=True)
         )
         return socio_economic_models.AirtableSocioEconomicBackgroundResponse.parse_obj(raw)
+
+    def list_newsletters_by_ids(self, newsletter_ids) -> newsletters_models.ListAirtableNewsletterResponse:
+        match_formulas = []
+        for n_id in newsletter_ids:
+            match_formulas.append(formulas.EQUAL(formulas.STR_VALUE(n_id), formulas.FIELD("Record ID")))
+
+        formula = formulas.OR(*match_formulas)
+        raw = self.client_api.all(
+            base_id=school_db_base.BASE_ID,
+            table_name=school_db_base.NEWSLETTERS_TABLE_NAME,
+            formula=formula)
+        return newsletters_models.ListAirtableNewsletterResponse.parse_obj(raw)
+
+    def get_newsletters_by_slug(self,
+                                slugs: list[newsletters_models.NewsletterSlugs]) -> newsletters_models.ListAirtableNewsletterResponse:
+        match_formulas = []
+        for s in slugs:
+            match_formulas.append(formulas.EQUAL(formulas.STR_VALUE(s.value), formulas.FIELD("Slug")))
+
+        formula = formulas.OR(*match_formulas)
+        raw = self.client_api.all(
+            base_id=school_db_base.BASE_ID,
+            table_name=school_db_base.NEWSLETTERS_TABLE_NAME,
+            formula=formula)
+        return newsletters_models.ListAirtableNewsletterResponse.parse_obj(raw)
 
     @cached(cache=TTLCache(maxsize=1, ttl=600))
     def list_field_categories(self) -> field_category_models.ListAirtableFieldCategoriesResponse:
