@@ -59,47 +59,56 @@ class CreateAPIEducatorFields(educators.CreateAPIEducatorFields):
         from ..airtable.base_school_db.field_categories import FieldCategoryType
         airtable_client = AirtableClient()
 
-        race_and_ethnicity, race_and_ethnicity_includes_non_specific_category = airtable_client.map_response_to_field_category_values(
-            FieldCategoryType.race_ethnicity, self.race_and_ethnicity)
+        race_and_ethnicity = None
         race_and_ethnicity_other = None
-        if race_and_ethnicity_includes_non_specific_category:
-            race_and_ethnicity_other = ';'.join(self.race_and_ethnicity)
+        if self.race_and_ethnicity is not None:
+            race_and_ethnicity, race_and_ethnicity_includes_non_specific_category = airtable_client.map_response_to_field_category_values(
+                FieldCategoryType.race_ethnicity, self.race_and_ethnicity)
 
-        education_categories, _ = airtable_client.map_response_to_field_category_values(
-            FieldCategoryType.educational_attainment, str(self.educational_attainment))
+            if race_and_ethnicity_includes_non_specific_category:
+                race_and_ethnicity_other = ';'.join(self.race_and_ethnicity)
+
         educational_attainment = None
-        if len(education_categories) > 0:
-            educational_attainment = education_categories[0]
+        if self.educational_attainment is not None:
+            education_categories, _ = airtable_client.map_response_to_field_category_values(
+                FieldCategoryType.educational_attainment, str(self.educational_attainment))
+            if len(education_categories) > 0:
+                educational_attainment = education_categories[0]
 
-        income_categories, _ = airtable_client.map_response_to_field_category_values(
-            FieldCategoryType.household_income, str(self.household_income))
         household_income = None
-        if len(income_categories) > 0:
-            household_income = income_categories[0]
+        if self.household_income is not None:
+            income_categories, _ = airtable_client.map_response_to_field_category_values(
+                FieldCategoryType.household_income, str(self.household_income))
+            if len(income_categories) > 0:
+                household_income = income_categories[0]
 
-        genders, gender_includes_non_specific_category = airtable_client.map_response_to_field_category_values(
-            FieldCategoryType.gender, self.gender)
         gender = None
-        if len(genders) > 0:
-            gender = genders[0]
         gender_other = None
-        if gender_includes_non_specific_category:
-            gender_other = self.gender
+        if self.gender is not None:
+            genders, gender_includes_non_specific_category = airtable_client.map_response_to_field_category_values(
+                FieldCategoryType.gender, self.gender)
+            if len(genders) > 0:
+                gender = genders[0]
+            if gender_includes_non_specific_category:
+                gender_other = self.gender
 
-        lgbtqia_categories, _ = airtable_client.map_response_to_field_category_values(
-            FieldCategoryType.lgbtqia, str(self.lgbtqia_identifying))
         lgbtqia = None
-        if len(lgbtqia_categories) > 0:
-            lgbtqia = lgbtqia_categories[0]
+        if self.lgbtqia_identifying is not None:
+            lgbtqia_categories, _ = airtable_client.map_response_to_field_category_values(
+                FieldCategoryType.lgbtqia, str(self.lgbtqia_identifying))
 
-        pronouns, pronouns_includes_non_specific_category = airtable_client.map_response_to_field_category_values(
-            FieldCategoryType.pronouns, self.pronouns)
+            if len(lgbtqia_categories) > 0:
+                lgbtqia = lgbtqia_categories[0]
+
         pronoun = None
-        if len(pronouns) > 0:
-            pronoun = pronouns[0]
         pronouns_other = None
-        if pronouns_includes_non_specific_category:
-            pronouns_other = self.pronouns
+        if self.pronouns is not None:
+            pronouns, pronouns_includes_non_specific_category = airtable_client.map_response_to_field_category_values(
+                FieldCategoryType.pronouns, self.pronouns)
+            if len(pronouns) > 0:
+                pronoun = pronouns[0]
+            if pronouns_includes_non_specific_category:
+                pronouns_other = self.pronouns
 
         return airtable_socio_economic_backgrounds_models.CreateAirtableSocioEconomicBackgroundFields(
             educator=[educator_id],
@@ -205,8 +214,10 @@ class APIEducatorData(educators.APIEducatorData):
             lgbtqia_identifying=airtable_educator.fields.lgbtqia_identifying,
             pronouns=airtable_educator.fields.pronouns,
             montessori_certified=airtable_educator.fields.montessori_certified,
-            discovery_newsletter=any(n.fields.slug == airtable_newsletters_models.NewsletterSlugs.DISCOVERY_GROUP.value for n in airtable_educator.fields.newsletters),
-            etl_newsletter=any(n.fields.slug == airtable_newsletters_models.NewsletterSlugs.EMERGING_TEACHER_LEADER_GROUP.value for n in airtable_educator.fields.newsletters),
+            discovery_newsletter=any(
+                n.fields.slug == airtable_newsletters_models.NewsletterSlugs.DISCOVERY_GROUP.value for n in airtable_educator.fields.newsletters),
+            etl_newsletter=any(
+                n.fields.slug == airtable_newsletters_models.NewsletterSlugs.EMERGING_TEACHER_LEADER_GROUP.value for n in airtable_educator.fields.newsletters),
         )
 
         educators_schools_data = []
