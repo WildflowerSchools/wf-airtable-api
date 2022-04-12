@@ -22,9 +22,10 @@ from .base_school_db import \
     field_categories as field_category_models, \
     field_mapping as field_mapping_models, \
     typeform_start_a_school as typeform_start_a_school_models
-from .base_start_school_first_contact import \
-    const as start_school_first_contact_base, \
-    location_contacts as location_contacts_models
+from .base_map_by_geographic_area import \
+    const as map_by_geographic_area_base, \
+    geo_area_contacts as geo_area_contacts_models, \
+    geo_area_target_communities as geo_area_target_communities_models
 
 
 class AirtableClient(metaclass=Singleton):
@@ -475,20 +476,37 @@ class AirtableClient(metaclass=Singleton):
         return languages_models.ListAirtableLanguageResponse.parse_obj(raw)
 
     @cached(cache=TTLCache(maxsize=1, ttl=600))
-    def list_location_contacts(self) -> location_contacts_models.ListAirtableLocationContactResponse:
+    def list_geo_area_contacts(self) -> geo_area_contacts_models.ListAirtableGeoAreaContactResponse:
         raw = self.client_api.all(
-            base_id=start_school_first_contact_base.BASE_ID,
-            table_name=start_school_first_contact_base.LOCATION_CONTACT_TABLE_NAME)
-        return location_contacts_models.ListAirtableLocationContactResponse.parse_obj(raw)
+            base_id=map_by_geographic_area_base.BASE_ID,
+            table_name=map_by_geographic_area_base.AREA_CONTACT_TABLE_NAME)
+        return geo_area_contacts_models.ListAirtableGeoAreaContactResponse.parse_obj(raw)
 
     @cached(cache=TTLCache(maxsize=64, ttl=600))
-    def get_location_contact_by_id(
-            self, location_contact_id) -> location_contacts_models.AirtableLocationContactResponse:
+    def get_geo_area_contact_by_id(
+            self, geo_area_contact_id) -> geo_area_contacts_models.AirtableGeoAreaContactResponse:
         raw = self.client_api.get(
-            base_id=start_school_first_contact_base.BASE_ID,
-            table_name=start_school_first_contact_base.LOCATION_CONTACT_TABLE_NAME,
-            record_id=location_contact_id)
-        return location_contacts_models.AirtableLocationContactResponse.parse_obj(raw)
+            base_id=map_by_geographic_area_base.BASE_ID,
+            table_name=map_by_geographic_area_base.AREA_CONTACT_TABLE_NAME,
+            record_id=geo_area_contact_id)
+        return geo_area_contacts_models.AirtableGeoAreaContactResponse.parse_obj(raw)
+
+    @cached(cache=TTLCache(maxsize=1, ttl=600))
+    def list_geo_area_target_communities(
+            self) -> geo_area_target_communities_models.ListAirtableGeoAreaTargetCommunityResponse:
+        raw = self.client_api.all(
+            base_id=map_by_geographic_area_base.BASE_ID,
+            table_name=map_by_geographic_area_base.AREA_TARGET_COMMUNITY_TABLE_NAME)
+        return geo_area_target_communities_models.ListAirtableGeoAreaTargetCommunityResponse.parse_obj(raw)
+
+    @cached(cache=TTLCache(maxsize=64, ttl=600))
+    def get_geo_area_target_community_by_id(
+            self, geo_area_target_community_id) -> geo_area_target_communities_models.AirtableGeoAreaTargetCommunityResponse:
+        raw = self.client_api.get(
+            base_id=map_by_geographic_area_base.BASE_ID,
+            table_name=map_by_geographic_area_base.AREA_TARGET_COMMUNITY_TABLE_NAME,
+            record_id=geo_area_target_community_id)
+        return geo_area_target_communities_models.AirtableGeoAreaTargetCommunityResponse.parse_obj(raw)
 
     def create_start_a_school_response(
             self, payload: typeform_start_a_school_models.CreateAirtableSSJTypeformStartASchool) -> typeform_start_a_school_models.AirtableSSJTypeformStartASchoolResponse:

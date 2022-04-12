@@ -6,6 +6,7 @@ from . import montessori_certifications as airtable_montessori_certifications_mo
     languages as airtable_languages_models, \
     educators_schools as airtable_educators_schools_models
 from app.airtable.attachment import AirtableAttachment
+from .hubs import AirtableHubResponse
 from .languages import AirtableLanguageResponse
 from .montessori_certifications import AirtableMontessoriCertificationResponse
 from app.airtable.response import AirtableResponse
@@ -20,6 +21,8 @@ class CreateAirtableEducatorFields(BaseModel):
 
     stage: Optional[str] = Field(alias="Stage")
     assigned_partner: Optional[list[str]] = Field(alias="Assigned Partner")
+    target_community: Optional[list[str]] = Field(alias="Target community for exploration")
+
     source: Optional[list[str]] = Field(alias="Source")
     source_other: Optional[str] = Field(alias="Source - Other")
 
@@ -34,7 +37,7 @@ class AirtableEducatorFields(CreateAirtableEducatorFields):
     email: Optional[list[str]] = Field(alias="Contact Email")
     current_roles: Optional[list[str]] = Field(alias="Current Role")
     montessori_certified: Optional[bool] = Field(alias="Montessori Certified", default=False)
-    target_community: Optional[str] = Field(alias="Target Community Name")
+    target_community_name: Optional[str] = Field(alias="Target Community Name")
     race_and_ethnicity: Optional[list[str]] = Field(alias="Race & Ethnicity")
     race_and_ethnicity_other: Optional[str] = Field(alias="Race & Ethnicity - Other")
     educational_attainment: Optional[str] = Field(alias="Educational Attainment")
@@ -47,6 +50,9 @@ class AirtableEducatorFields(CreateAirtableEducatorFields):
     visioning_album_complete: Optional[bool] = Field(alias="Visioning album complete", default=False)
     visioning_album: Optional[AirtableAttachment] = Field(alias="Visioning album", default={})
 
+    hub: Optional[str] = Field(alias="Hub")
+    hub_name: Optional[str] = Field(alias="Hub Name")
+
     educators_schools: Optional[list[
         Union[str, airtable_educators_schools_models.AirtableEducatorsSchoolsResponse]]] = Field(alias="Educators at Schools")
     montessori_certifications: Optional[list[
@@ -58,11 +64,14 @@ class AirtableEducatorFields(CreateAirtableEducatorFields):
         allow_population_by_field_name = True
 
     _get_first_or_default_none = validator(
+        "target_community_name",
         "income_background",
         "gender",
         "lgbtqia_identifying",
         "pronouns",
         "race_and_ethnicity_other",
+        "hub",
+        "hub_name",
         pre=True,
         allow_reuse=True)(get_first_or_default_none)
 

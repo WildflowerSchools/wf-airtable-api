@@ -5,6 +5,7 @@ from wf_airtable_api_schema.models import educators
 
 from . import response as response_models
 from . import educators_schools as educators_schools_models
+from . import hubs as hubs_models
 from . import languages as languages_models
 from . import montessori_certifications as montessori_certifications_models
 from ..airtable.base_school_db import \
@@ -25,6 +26,7 @@ class CreateAPIEducatorFields(educators.CreateAPIEducatorFields):
             stage=self.stage,
             home_address=self.home_address,
             assigned_partner=[self.assigned_partner_id],
+            target_community=[self.target_community_id],
             ssj_typeforms_start_a_school=[self.start_a_school_response_id]
         )
 
@@ -172,7 +174,7 @@ class APIEducatorData(educators.APIEducatorData):
             email=airtable_educator.fields.email,
             details=airtable_educator.fields.details,
             home_address=airtable_educator.fields.home_address,
-            target_community=airtable_educator.fields.target_community,
+            target_community=airtable_educator.fields.target_community_name,
             stage=airtable_educator.fields.stage,
             visioning_album_complete=airtable_educator.fields.visioning_album_complete,
             visioning_album=airtable_educator.fields.visioning_album,
@@ -242,6 +244,18 @@ class APIEducatorData(educators.APIEducatorData):
                 else:
                     educators_montessori_certifications_data.append(d)
 
+        hub_data = response_models.APILinksAndData()
+        if airtable_educator.fields.hub is not None:
+            hub_data = response_models.APILinksAndData(
+                links={'self': url_path_for("get_hub", hub_id=airtable_educator.fields.hub)},
+                data=response_models.APIDataWithFields(
+                    id=airtable_educator.fields.hub,
+                    type=hubs_models.MODEL_TYPE,
+                    fields=hubs_models.APIHubFields(
+                        name=airtable_educator.fields.hub_name
+                    ))
+            )
+
         relationships = APIEducatorRelationships(
             educators_schools=response_models.APILinksAndData(
                 links={'self': url_path_for("get_educator_schools", educator_id=airtable_educator.id)},
@@ -253,7 +267,8 @@ class APIEducatorData(educators.APIEducatorData):
                 data=educators_languages_data),
             montessori_certifications=response_models.APILinksAndData(
                 links=None,
-                data=educators_montessori_certifications_data)
+                data=educators_montessori_certifications_data),
+            hub=hub_data
         )
         links = response_models.APILinks(
             links={'self': url_path_for("get_educator", educator_id=airtable_educator.id)}
