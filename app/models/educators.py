@@ -16,6 +16,7 @@ from ..airtable.base_school_db import \
     educators_schools as airtable_educators_schools_models, \
     newsletters as airtable_newsletters_models, \
     socio_economic_backgrounds as airtable_socio_economic_backgrounds_models
+from ..airtable.base_school_db.languages import CertificationStatus
 
 
 class CreateAPIEducatorFields(educators.CreateAPIEducatorFields):
@@ -168,11 +169,11 @@ class CreateAPIEducatorFields(educators.CreateAPIEducatorFields):
             if certifier_includes_non_specific_category:
                 certifier_other = m.certifier
 
-            certification_statuses, _ = airtable_client.map_response_to_field_category_values(
-                FieldCategoryType.montessori_certification_status, m.certification_status)
             certification_status = None
-            if len(certification_statuses) > 0:
-                certification_status = certification_statuses[0]
+            if m.is_montessori_certified:
+                certification_status = CertificationStatus.CERTIFIED
+            elif m.is_seeking_montessori_certification:
+                certification_status = CertificationStatus.TRAINING
 
             airtable_montessori_certification = airtable_montessori_certifications_models.CreateAirtableMontessoriCertificationFields(
                 educator=[educator_id],

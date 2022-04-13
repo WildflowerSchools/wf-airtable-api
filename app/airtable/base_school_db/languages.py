@@ -1,9 +1,17 @@
+from enum import Enum
 from typing import Optional
 
 from pydantic import BaseModel, Field, validator
 
 from app.airtable.response import AirtableResponse
 from app.airtable.validators import get_first_or_default_none
+
+
+class CertificationStatus(str, Enum):
+    CERTIFIED = "Certified"
+    NOT_IN_TRAINING = "Not in Training"
+    PAUSED = "Paused"
+    TRAINING = "Training"
 
 
 class CreateAirtableLanguageFields(BaseModel):

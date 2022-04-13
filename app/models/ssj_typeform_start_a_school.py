@@ -13,6 +13,7 @@ class CreateApiSSJTypeformStartASchoolFields(ssj_typeform_start_a_school.CreateA
             last_name=self.last_name,
             email=self.email,
             is_montessori_certified=self.is_montessori_certified,
+            is_seeking_montessori_certification=self.is_seeking_montessori_certification,
             montessori_certification_year=self.montessori_certification_year,
             montessori_certification_levels=", ".join(
                 self.montessori_certification_levels) if self.montessori_certification_levels is not None else None,
@@ -62,6 +63,7 @@ class ApiSSJTypeformStartASchoolData(ssj_typeform_start_a_school.ApiSSJTypeformS
             last_name=airtable_start_a_school.fields.last_name,
             email=airtable_start_a_school.fields.email,
             is_montessori_certified=airtable_start_a_school.fields.is_montessori_certified,
+            is_seeking_montessori_certification=airtable_start_a_school.fields.is_seeking_montessori_certification,
             montessori_certification_year=airtable_start_a_school.fields.montessori_certification_year,
             montessori_certification_levels=montessori_certification_levels,
             school_location_city=airtable_start_a_school.fields.school_location_city,
