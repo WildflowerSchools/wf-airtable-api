@@ -16,7 +16,7 @@ class CreateAirtableSocioEconomicBackgroundFields(BaseModel):
     income_background: Optional[str] = Field(alias="Income Background As Child")
     gender: Optional[str] = Field(alias="Gender")
     gender_other: Optional[str] = Field(alias="Gender - Other")
-    lgbtqia_identifying: Optional[str] = Field(alias="LGBTQIA", default=False)
+    lgbtqia_identifying: Optional[str] = Field(alias="LGBTQIA")
     pronouns: Optional[str] = Field(alias="Pronouns")
     pronouns_other: Optional[str] = Field(alias="Pronouns - Other")
 

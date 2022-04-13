@@ -47,7 +47,7 @@ class AirtableEducatorFields(CreateAirtableEducatorFields):
     income_background: Optional[str] = Field(alias="Income Background")
     gender: Optional[str] = Field(alias="Gender")
     gender_other: Optional[str] = Field(alias="Gender - Other")
-    lgbtqia_identifying: Optional[bool] = Field(alias="LGBTQIA", default=False)
+    lgbtqia_identifying: Optional[bool] = Field(alias="LGBTQIA")
     pronouns: Optional[str] = Field(alias="Pronouns")
     pronouns_other: Optional[str] = Field(alias="Pronouns - Other")
     visioning_album_complete: Optional[bool] = Field(alias="Visioning album complete", default=False)
@@ -91,7 +91,12 @@ class AirtableEducatorFields(CreateAirtableEducatorFields):
     # noinspection PyMethodParameters
     @validator("lgbtqia_identifying", pre=True)
     def normalize_lgbtqia(cls, v):
-        return v == "TRUE"
+        if v == "TRUE":
+            return True
+        elif v == "FALSE":
+            return False
+        else:
+            return None
 
     # noinspection PyMethodParameters
     @validator("educators_schools")
