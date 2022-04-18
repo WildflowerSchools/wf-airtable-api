@@ -1,6 +1,6 @@
 {
   "name": "wf-airtable-api",
-  "version": "1.2.4",
+  "version": "1.7.7",
   "description": "Python FastAPI for easier interaction with Airtable",
   "author": "Benjamin Jaffe-Talberg",
   "devDependencies": {
