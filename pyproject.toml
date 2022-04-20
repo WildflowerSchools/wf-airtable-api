@@ -22,7 +22,7 @@ pyjwt = {extras = ["crypto"], version = ">=2.3.0"}
 python-jose = ">=3.3.0"
 mangum = ">=0.14.1"
 uvicorn = ">=0.17.5"
-wf-airtable-api-schema = "^0.3.1"
+wf-airtable-api-schema = {path = "../wf-airtable-api-schema"}
 Shapely = "^1.8.1"
 
 [tool.poetry.dev-dependencies]

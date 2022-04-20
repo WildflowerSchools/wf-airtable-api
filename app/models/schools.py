@@ -25,6 +25,7 @@ class APISchoolData(schools.APISchoolData):
             address=airtable_school.fields.address,
             latitude=airtable_school.fields.latitude,
             longitude=airtable_school.fields.longitude,
+            organizational_unit=airtable_school.fields.organizational_unit,
 
             ages_served=airtable_school.fields.ages_served,
             school_calendar=airtable_school.fields.school_calendar,

@@ -17,6 +17,7 @@ class AirtableSchoolFields(BaseModel):
     address: Optional[str] = Field(alias="Address")
     latitude: Optional[float] = Field(alias="Latitude")
     longitude: Optional[float] = Field(alias="Longitude")
+    organizational_unit: Optional[str] = Field(alias="Google Workspace Org Unit Path")
 
     ages_served: Optional[list[str]] = Field(alias="Ages served")
     school_calendar: Optional[str] = Field(alias="School calendar")

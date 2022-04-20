@@ -1,6 +1,7 @@
 from cachetools import cached, TTLCache
-from typing import Generator, Union, Optional
+from typing import Generator, Union, Optional, List, Any
 
+from .base_school_db.educators import ListAirtableEducatorResponse
 from .base_school_db.field_categories import FieldCategoryType
 from .. import const
 from ..utils.singleton import Singleton
@@ -141,6 +142,22 @@ class AirtableClient(metaclass=Singleton):
         raw, res_offset = self.client_api.paginate(
             school_db_base.BASE_ID, table_name=school_db_base.SCHOOLS_TABLE_NAME, offset=offset, page_size=page_size)
         return school_models.ListAirtableSchoolResponse.parse_obj(raw), res_offset
+
+    def find_schools(self, filters: dict) -> school_models.ListAirtableSchoolResponse:
+        match_formulas = []
+        for field, value in filters.items():
+            match_formulas.append(formulas.INCLUDE(formulas.STR_VALUE(value), formulas.FIELD(field)))
+
+        formula = formulas.AND(*match_formulas)
+        raw = self.client_api.all(
+            base_id=school_db_base.BASE_ID,
+            table_name=school_db_base.SCHOOLS_TABLE_NAME,
+            formula=formula)
+
+        if len(raw) == 0:
+            return school_models.ListAirtableSchoolResponse()
+
+        return school_models.ListAirtableSchoolResponse.parse_obj(raw)
 
     @cached(cache=TTLCache(maxsize=1024, ttl=600))
     def get_school_by_id(self, school_id) -> school_models.AirtableSchoolResponse:
@@ -292,20 +309,28 @@ class AirtableClient(metaclass=Singleton):
             record_id=educator_id)
         return educator_models.AirtableEducatorResponse.parse_obj(raw)
 
-    def get_educator_by_email(self, educator_email) -> Optional[educator_models.AirtableEducatorResponse]:
-        formula = formulas.INCLUDE(formulas.STR_VALUE(educator_email), formulas.FIELD("Contact Email"))
+    def find_educators(self, filters: dict) -> ListAirtableEducatorResponse:
+        match_formulas = []
+        for field, value in filters.items():
+            if isinstance(value, list):
+                sub_match_formulas = []
+                for v in value:
+                    sub_match_formulas.append(formulas.INCLUDE(formulas.STR_VALUE(v), formulas.FIELD(field)))
 
+                match_formulas.append(formulas.OR(*sub_match_formulas))
+            else:
+                match_formulas.append(formulas.INCLUDE(formulas.STR_VALUE(value), formulas.FIELD(field)))
+
+        formula = formulas.AND(*match_formulas)
         raw = self.client_api.all(
             base_id=school_db_base.BASE_ID,
             table_name=school_db_base.EDUCATORS_TABLE_NAME,
             formula=formula)
 
-        if len(raw) > 0:
-            raw_item = raw[0]
-        else:
-            return None
+        if len(raw) == 0:
+            return educator_models.ListAirtableEducatorResponse()
 
-        return educator_models.AirtableEducatorResponse.parse_obj(raw_item)
+        return educator_models.ListAirtableEducatorResponse.parse_obj(raw)
 
     def create_educator(
             self, payload: educator_models.CreateAirtableEducatorFields) -> educator_models.AirtableEducatorResponse:
