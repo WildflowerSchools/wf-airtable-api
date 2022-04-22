@@ -228,10 +228,10 @@ class APIEducatorData(educators.APIEducatorData):
                     educators_schools_data.append(response_models.APIDataWithFields(
                         id=d.id,
                         type=educators_schools_models.MODEL_TYPE,
-                        fields=educators_schools_models.APIEducatorsSchoolsFields(
+                        fields=educators_schools_models.APIEducatorSchoolFields(
                             educator_name=d.fields.educator_name,
                             school_name=d.fields.school_name,
-                            role=d.fields.role,
+                            roles=d.fields.roles,
                             currently_active=d.fields.currently_active,
                             start_date=d.fields.start_date,
                             end_date=d.fields.end_date

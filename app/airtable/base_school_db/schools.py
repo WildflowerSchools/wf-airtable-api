@@ -27,7 +27,9 @@ class AirtableSchoolFields(BaseModel):
     website: Optional[AnyUrl] = Field(alias="Website")
 
     hub: Optional[str] = Field(alias="Hub")
+    hub_name: Optional[str] = Field(alias="Hub Name")
     pod: Optional[str] = Field(alias="Pod")
+    pod_name: Optional[str] = Field(alias="Pod Name")
     guides_entrepreneurs: Optional[list[str]] = Field(alias="Guides and Entrepreneurs")
     primary_contacts: Optional[list[str]] = Field(alias="Primary Contacts")
     all_educators: Optional[list[str]] = Field(alias="All Educator Record IDs")
@@ -52,7 +54,9 @@ class AirtableSchoolFields(BaseModel):
     # reusable validator
     _get_first_or_default_none = validator(
         "hub",
+        "hub_name",
         "pod",
+        "pod_name",
         "address",
         "latitude",
         "longitude",

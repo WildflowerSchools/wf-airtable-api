@@ -4,11 +4,11 @@ from wf_airtable_api_schema.models.schools import *
 from wf_airtable_api_schema.models import schools
 
 from . import response as response_models
-from ..airtable.base_school_db import schools as airtable_school_models
 from . import educators as educator_models
 from . import hubs as hub_models
 from . import partners as partner_models
 from . import pods as pod_models
+from ..airtable.base_school_db import schools as airtable_school_models
 
 
 class APISchoolData(schools.APISchoolData):
@@ -26,6 +26,8 @@ class APISchoolData(schools.APISchoolData):
             latitude=airtable_school.fields.latitude,
             longitude=airtable_school.fields.longitude,
             organizational_unit=airtable_school.fields.organizational_unit,
+            hub_name=airtable_school.fields.hub_name,
+            pod_name=airtable_school.fields.pod_name,
 
             ages_served=airtable_school.fields.ages_served,
             school_calendar=airtable_school.fields.school_calendar,

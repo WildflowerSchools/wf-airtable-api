@@ -10,7 +10,16 @@ from fastapi.security import HTTPBearer
 from mangum import Mangum
 import requests
 
-from . import auth, const, router_hubs, router_pods, router_schools, router_partners, router_educators, router_geo_area_mapping, router_ssj_typeforms
+from . import auth,\
+    const,\
+    router_hubs,\
+    router_pods,\
+    router_schools,\
+    router_partners,\
+    router_educators,\
+    router_geo_area_mapping, \
+    router_ssj_typeforms,\
+    router_educators_schools
 from .airtable.client import AirtableClient
 
 logging.basicConfig(level=logging.INFO)
@@ -28,6 +37,7 @@ app = FastAPI(
         router_educators.OPENAPI_TAG_METADATA,
         router_partners.OPENAPI_TAG_METADATA,
         *router_geo_area_mapping.OPENAPI_TAG_METADATA,
+        router_educators_schools.OPENAPI_TAG_METADATA
     ])
 
 token_auth_scheme = HTTPBearer()
@@ -90,13 +100,21 @@ async def log_request_details(request: Request):
     """.format(rid=request.state.idem, method=request.method, url=request.url, headers=headers, body=body.decode("utf-8")))
 
 
-app.include_router(router_hubs.router, dependencies=[Depends(log_request_details)])
-app.include_router(router_pods.router, dependencies=[Depends(log_request_details)])
-app.include_router(router_schools.router, dependencies=[Depends(log_request_details)])
-app.include_router(router_partners.router, dependencies=[Depends(log_request_details)])
-app.include_router(router_educators.router, dependencies=[Depends(log_request_details)])
-app.include_router(router_geo_area_mapping.router, dependencies=[Depends(log_request_details)])
-app.include_router(router_ssj_typeforms.router, dependencies=[Depends(log_request_details)])
+def add_routers(routers):
+    for r in routers:
+        app.include_router(r, dependencies=[Depends(log_request_details)])
+
+
+add_routers([
+    router_hubs.router,
+    router_pods.router,
+    router_schools.router,
+    router_partners.router,
+    router_educators.router,
+    router_geo_area_mapping.router,
+    router_ssj_typeforms.router,
+    router_educators_schools.router
+])
 
 
 @app.get("/")

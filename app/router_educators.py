@@ -50,15 +50,19 @@ def find_and_validate_educators(filters, airtable_client: AirtableClient):
 
 
 def fetch_and_validate_educator_by_email(email, airtable_client: AirtableClient):
+    educator_not_found_exception = HTTPException(status_code=404, detail="Educator not found")
+
     try:
-        airtable_educator = airtable_client.get_educator_by_email(email)
+        airtable_educators = airtable_client.find_educators({"email": email}).__root__
+        if airtable_educators is None or len(airtable_educators) == 0:
+            raise educator_not_found_exception
+
+        return airtable_educators[0]
     except requests.exceptions.HTTPError as ex:
         if ex.response.status_code == 404:
-            raise HTTPException(status_code=404, detail="Educator not found")
+            raise educator_not_found_exception
         else:
             raise
-
-    return airtable_educator
 
 
 # Dupe the root route to solve this issue: https://github.com/tiangolo/fastapi/issues/2060
@@ -94,8 +98,9 @@ async def create_educator(
         raise HTTPException(status_code=400, detail="Educator email required")
 
     # Is educator pre-existing? Return 409, but add the typeform response to the educator record first
-    existing_educator = airtable_client.get_educator_by_email(payload.email)
-    if existing_educator is not None:
+    existing_educators = airtable_client.find_educators({"email": payload.email}).__root__
+    if existing_educators is not None and len(existing_educators) > 0:
+        existing_educator = existing_educators[0]
         airtable_client.add_typeform_start_a_school_response_to_educator(educator_id=existing_educator.id,
                                                                          typeform_start_a_school_response_id=payload.start_a_school_response_id)
         raise HTTPException(status_code=409, detail="Educator already exists")

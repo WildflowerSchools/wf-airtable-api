@@ -1,6 +1,6 @@
 import uvicorn
 
-from app.main import app
+import app.main
 
 if __name__ == '__main__':
-    uvicorn.run(app)
+    uvicorn.run(app.main.app)
