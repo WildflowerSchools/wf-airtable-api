@@ -37,28 +37,28 @@ class Place(BaseModel):
 
     def get_locality_component(self):
         for ac in self.address_components:
-            if 'locality' in ac.types:
+            if "locality" in ac.types:
                 return ac
 
         return None
 
     def get_colloquial_area_component(self):
         for ac in self.address_components:
-            if 'colloquial_area' in ac.types:
+            if "colloquial_area" in ac.types:
                 return ac
 
         return None
 
     def get_state_component(self):
         for ac in self.address_components:
-            if 'administrative_area_level_1' in ac.types:
+            if "administrative_area_level_1" in ac.types:
                 return ac
 
         return None
 
     def get_country_component(self):
         for ac in self.address_components:
-            if 'country' in ac.types:
+            if "country" in ac.types:
                 return ac
 
         return None

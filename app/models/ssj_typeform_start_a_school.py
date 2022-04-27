@@ -15,8 +15,9 @@ class CreateApiSSJTypeformStartASchoolFields(ssj_typeform_start_a_school.CreateA
             is_montessori_certified=self.is_montessori_certified,
             is_seeking_montessori_certification=self.is_seeking_montessori_certification,
             montessori_certification_year=self.montessori_certification_year,
-            montessori_certification_levels=", ".join(
-                self.montessori_certification_levels) if self.montessori_certification_levels is not None else None,
+            montessori_certification_levels=", ".join(self.montessori_certification_levels)
+            if self.montessori_certification_levels is not None
+            else None,
             school_location_city=self.school_location_city,
             school_location_state=self.school_location_state,
             school_location_country=self.school_location_country,
@@ -24,10 +25,12 @@ class CreateApiSSJTypeformStartASchoolFields(ssj_typeform_start_a_school.CreateA
             contact_location_city=self.contact_location_city,
             contact_location_state=self.contact_location_state,
             contact_location_country=self.contact_location_country,
-            age_classrooms_interested_in_offering=", ".join(
-                self.age_classrooms_interested_in_offering) if self.age_classrooms_interested_in_offering is not None else None,
-            socio_economic_race_and_ethnicity=", ".join(
-                self.socio_economic_race_and_ethnicity) if self.socio_economic_race_and_ethnicity is not None else None,
+            age_classrooms_interested_in_offering=", ".join(self.age_classrooms_interested_in_offering)
+            if self.age_classrooms_interested_in_offering is not None
+            else None,
+            socio_economic_race_and_ethnicity=", ".join(self.socio_economic_race_and_ethnicity)
+            if self.socio_economic_race_and_ethnicity is not None
+            else None,
             socio_economic_race_and_ethnicity_other=self.socio_economic_race_and_ethnicity_other,
             socio_economic_gender=self.socio_economic_gender,
             socio_economic_gender_other=self.socio_economic_gender_other,
@@ -35,18 +38,22 @@ class CreateApiSSJTypeformStartASchoolFields(ssj_typeform_start_a_school.CreateA
             socio_economic_primary_language=self.socio_economic_primary_language,
             message=self.message,
             receive_newsletter=self.receive_newsletter,
-            receive_event_invitations=self.receive_event_invitations)
+            receive_event_invitations=self.receive_event_invitations,
+        )
 
 
 class ApiSSJTypeformStartASchoolData(ssj_typeform_start_a_school.ApiSSJTypeformStartASchoolData):
     @classmethod
-    def from_airtable(cls,
-                      airtable_start_a_school: airtable_start_a_school_models.AirtableSSJTypeformStartASchoolResponse,
-                      url_path_for: Callable):
+    def from_airtable(
+        cls,
+        airtable_start_a_school: airtable_start_a_school_models.AirtableSSJTypeformStartASchoolResponse,
+        url_path_for: Callable,
+    ):
         montessori_certification_levels = None
         if airtable_start_a_school.fields.montessori_certification_levels is not None:
             montessori_certification_levels = [
-                mcl.strip() for mcl in airtable_start_a_school.fields.montessori_certification_levels.split(", ")]
+                mcl.strip() for mcl in airtable_start_a_school.fields.montessori_certification_levels.split(", ")
+            ]
 
         age_classrooms = None
         if airtable_start_a_school.fields.age_classrooms_interested_in_offering is not None:
@@ -55,7 +62,8 @@ class ApiSSJTypeformStartASchoolData(ssj_typeform_start_a_school.ApiSSJTypeformS
         socio_economic_race_and_ethnicity = None
         if airtable_start_a_school.fields.socio_economic_race_and_ethnicity is not None:
             socio_economic_race_and_ethnicity = [
-                re.strip() for re in airtable_start_a_school.fields.socio_economic_race_and_ethnicity]
+                re.strip() for re in airtable_start_a_school.fields.socio_economic_race_and_ethnicity
+            ]
 
         fields = ApiSSJTypeformStartASchoolFields(
             response_id=airtable_start_a_school.fields.response_id,
@@ -82,13 +90,7 @@ class ApiSSJTypeformStartASchoolData(ssj_typeform_start_a_school.ApiSSJTypeformS
             socio_economic_primary_language=airtable_start_a_school.fields.socio_economic_primary_language,
             message=airtable_start_a_school.fields.message,
             receive_newsletter=airtable_start_a_school.fields.receive_newsletter,
-            receive_event_invitations=airtable_start_a_school.fields.receive_event_invitations
+            receive_event_invitations=airtable_start_a_school.fields.receive_event_invitations,
         )
 
-        return cls(
-            id=airtable_start_a_school.id,
-            type=MODEL_TYPE,
-            fields=fields,
-            relationships={},
-            links={}
-        )
+        return cls(id=airtable_start_a_school.id, type=MODEL_TYPE, fields=fields, relationships={}, links={})

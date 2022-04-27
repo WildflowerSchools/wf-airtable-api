@@ -28,13 +28,11 @@ class AirtableEducatorsSchoolsFields(CreateUpdateAirtableEducatorsSchoolsFields)
     educator: Optional[Union[str, object]] = Field(alias="Educator")
     school: Optional[Union[str, object]] = Field(alias="School")
 
-    _get_first_or_default_none = validator("educator",
-                                           "school",
-                                           pre=True,
-                                           allow_reuse=True)(get_first_or_default_none)
+    _get_first_or_default_none = validator("educator", "school", pre=True, allow_reuse=True)(get_first_or_default_none)
 
     def load_educator_relationship(self):
         from ..client import AirtableClient
+
         airtable_client = AirtableClient()
 
         if self.educator is None:
@@ -56,6 +54,7 @@ class AirtableEducatorsSchoolsFields(CreateUpdateAirtableEducatorsSchoolsFields)
 
     def load_school_relationship(self):
         from ..client import AirtableClient
+
         airtable_client = AirtableClient()
 
         if self.school is None:

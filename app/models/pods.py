@@ -18,57 +18,38 @@ class APIPodData(pods.APIPodData):
 
         hub_data = None
         if airtable_pod.fields.hub:
-            hub_data = APIDataBase(
-                id=airtable_pod.fields.hub,
-                type=hub_models.MODEL_TYPE)
+            hub_data = APIDataBase(id=airtable_pod.fields.hub, type=hub_models.MODEL_TYPE)
 
         pod_contacts_data = []
         if airtable_pod.fields.pod_contacts is not None:
             for pc_id in airtable_pod.fields.pod_contacts:
-                pod_contacts_data.append(APIDataBase(
-                    id=pc_id,
-                    type=partner_models.MODEL_TYPE))
+                pod_contacts_data.append(APIDataBase(id=pc_id, type=partner_models.MODEL_TYPE))
 
         schools_data = []
         if airtable_pod.fields.schools is not None:
             for s_id in airtable_pod.fields.schools:
-                schools_data.append(APIDataBase(
-                    id=s_id,
-                    type=school_models.MODEL_TYPE))
+                schools_data.append(APIDataBase(id=s_id, type=school_models.MODEL_TYPE))
 
         relationships = APIPodRelationships(
             hub=response_models.APILinksAndData(
-                links={'self': url_path_for("get_pod_hub", pod_id=airtable_pod.id)},
-                data=hub_data),
+                links={"self": url_path_for("get_pod_hub", pod_id=airtable_pod.id)}, data=hub_data
+            ),
             pod_contacts=response_models.APILinksAndData(
-                links={'self': url_path_for("get_pod_contacts", pod_id=airtable_pod.id)},
-                data=pod_contacts_data),
+                links={"self": url_path_for("get_pod_contacts", pod_id=airtable_pod.id)}, data=pod_contacts_data
+            ),
             schools=response_models.APILinksAndData(
-                links={'self': url_path_for("get_pod_schools", pod_id=airtable_pod.id)},
-                data=schools_data),
+                links={"self": url_path_for("get_pod_schools", pod_id=airtable_pod.id)}, data=schools_data
+            ),
         )
-        links = response_models.APILinks(
-            links={'self': url_path_for("get_pod", pod_id=airtable_pod.id)}
-        )
-        return cls(
-            id=airtable_pod.id,
-            type=MODEL_TYPE,
-            fields=fields,
-            relationships=relationships,
-            links=links.links
-        )
+        links = response_models.APILinks(links={"self": url_path_for("get_pod", pod_id=airtable_pod.id)})
+        return cls(id=airtable_pod.id, type=MODEL_TYPE, fields=fields, relationships=relationships, links=links.links)
 
 
 class ListAPIPodData(pods.ListAPIPodData):
     @classmethod
-    def from_airtable_pods(cls,
-                           airtable_pods: airtable_pod_models.ListAirtablePodResponse,
-                           url_path_for: Callable):
+    def from_airtable_pods(cls, airtable_pods: airtable_pod_models.ListAirtablePodResponse, url_path_for: Callable):
         pod_responses = []
         for p in airtable_pods.__root__:
-            pod_responses.append(
-                APIPodData.from_airtable_pod(
-                    airtable_pod=p,
-                    url_path_for=url_path_for))
+            pod_responses.append(APIPodData.from_airtable_pod(airtable_pod=p, url_path_for=url_path_for))
 
         return cls(__root__=pod_responses)

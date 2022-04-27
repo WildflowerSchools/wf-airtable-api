@@ -28,10 +28,7 @@ class AirtableLanguageFields(CreateAirtableLanguageFields):
     educator_full_name: Optional[str] = Field(alias="Educator Full Name")
     language: Optional[str] = Field(alias="Language | Language Other")
 
-    _get_first_or_default_none = validator(
-        "educator_full_name",
-        pre=True,
-        allow_reuse=True)(get_first_or_default_none)
+    _get_first_or_default_none = validator("educator_full_name", pre=True, allow_reuse=True)(get_first_or_default_none)
 
 
 class AirtableLanguageResponse(AirtableResponse):

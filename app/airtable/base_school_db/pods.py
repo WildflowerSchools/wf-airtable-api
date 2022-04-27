@@ -12,10 +12,7 @@ class AirtablePodFields(BaseModel):
     pod_contacts: Optional[list[str]] = Field(alias="Pod Contact")
     schools: Optional[list[str]] = Field(alias="Schools")
 
-    _get_first_or_default_none = validator(
-        "hub",
-        pre=True,
-        allow_reuse=True)(get_first_or_default_none)
+    _get_first_or_default_none = validator("hub", pre=True, allow_reuse=True)(get_first_or_default_none)
 
 
 class AirtablePodResponse(AirtableResponse):

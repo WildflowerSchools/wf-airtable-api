@@ -9,15 +9,13 @@ from .models import schools as school_models
 from . import auth
 from .utils.utils import get_airtable_client
 
-OPENAPI_TAG_METADATA = {
-    "name": hub_models.MODEL_TYPE, "description": "Hubs data"
-}
+OPENAPI_TAG_METADATA = {"name": hub_models.MODEL_TYPE, "description": "Hubs data"}
 
 router = APIRouter(
     prefix="/hubs",
     tags=[hub_models.MODEL_TYPE],
-    dependencies=[Depends(auth.JWTBearer(any_scope=['read:all', 'read:educators', 'read:schools']))],
-    responses={404: {"description": "Not found"}}
+    dependencies=[Depends(auth.JWTBearer(any_scope=["read:all", "read:educators", "read:schools"]))],
+    responses={404: {"description": "Not found"}},
 )
 
 
@@ -41,13 +39,10 @@ async def list_hubs(request: Request):
     airtable_hubs = airtable_client.list_hubs()
 
     data = hub_models.ListAPIHubData.from_airtable_hubs(
-        airtable_hubs=airtable_hubs,
-        url_path_for=request.app.url_path_for).__root__
+        airtable_hubs=airtable_hubs, url_path_for=request.app.url_path_for
+    ).__root__
 
-    return hub_models.ListAPIHubResponse(
-        data=data,
-        links={'self': request.app.url_path_for("list_hubs")}
-    )
+    return hub_models.ListAPIHubResponse(data=data, links={"self": request.app.url_path_for("list_hubs")})
 
 
 @router.get("/{hub_id}", response_model=hub_models.APIHubResponse)
@@ -55,14 +50,9 @@ async def get_hub(hub_id, request: Request):
     airtable_client = get_airtable_client(request)
     airtable_hub = fetch_and_validate_hub(hub_id, airtable_client)
 
-    data = hub_models.APIHubData.from_airtable_hub(
-        airtable_hub=airtable_hub,
-        url_path_for=request.app.url_path_for)
+    data = hub_models.APIHubData.from_airtable_hub(airtable_hub=airtable_hub, url_path_for=request.app.url_path_for)
 
-    return hub_models.APIHubResponse(
-        data=data,
-        links={'self': request.app.url_path_for("get_hub", hub_id=hub_id)}
-    )
+    return hub_models.APIHubResponse(data=data, links={"self": request.app.url_path_for("get_hub", hub_id=hub_id)})
 
 
 @router.get("/{hub_id}/regional_site_entrepreneurs", response_model=partner_models.ListAPIPartnerResponse)
@@ -72,12 +62,11 @@ async def get_hub_site_entrepreneurs(hub_id, request: Request):
     airtable_partners = airtable_client.get_partners_by_hub_id(hub_id)
 
     data = partner_models.ListAPIPartnerData.from_airtable_partners(
-        airtable_partners=airtable_partners,
-        url_path_for=request.app.url_path_for).__root__
+        airtable_partners=airtable_partners, url_path_for=request.app.url_path_for
+    ).__root__
 
     return partner_models.ListAPIPartnerResponse(
-        data=data,
-        links={'self': request.app.url_path_for("get_hub_site_entrepreneurs", hub_id=hub_id)}
+        data=data, links={"self": request.app.url_path_for("get_hub_site_entrepreneurs", hub_id=hub_id)}
     )
 
 
@@ -88,12 +77,11 @@ async def get_hub_pods(hub_id, request: Request):
     airtable_pods = airtable_client.get_pods_by_hub_id(hub_id)
 
     data = pod_models.ListAPIPodData.from_airtable_pods(
-        airtable_pods=airtable_pods,
-        url_path_for=request.app.url_path_for).__root__
+        airtable_pods=airtable_pods, url_path_for=request.app.url_path_for
+    ).__root__
 
     return pod_models.ListAPIPodResponse(
-        data=data,
-        links={'self': request.app.url_path_for("get_hub_pods", hub_id=hub_id)}
+        data=data, links={"self": request.app.url_path_for("get_hub_pods", hub_id=hub_id)}
     )
 
 
@@ -104,10 +92,9 @@ async def get_hub_schools(hub_id, request: Request):
     airtable_schools = airtable_client.get_schools_by_hub_id(hub_id)
 
     data = school_models.ListAPISchoolData.from_airtable_schools(
-        airtable_schools=airtable_schools,
-        url_path_for=request.app.url_path_for).__root__
+        airtable_schools=airtable_schools, url_path_for=request.app.url_path_for
+    ).__root__
 
     return school_models.ListAPISchoolResponse(
-        data=data,
-        links={'self': request.app.url_path_for("get_hub_schools", hub_id=hub_id)}
+        data=data, links={"self": request.app.url_path_for("get_hub_schools", hub_id=hub_id)}
     )

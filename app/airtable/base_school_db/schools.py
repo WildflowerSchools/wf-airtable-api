@@ -53,21 +53,12 @@ class AirtableSchoolFields(BaseModel):
 
     # reusable validator
     _get_first_or_default_none = validator(
-        "hub",
-        "hub_name",
-        "pod",
-        "pod_name",
-        "address",
-        "latitude",
-        "longitude",
-        pre=True,
-        allow_reuse=True)(get_first_or_default_none)
+        "hub", "hub_name", "pod", "pod_name", "address", "latitude", "longitude", pre=True, allow_reuse=True
+    )(get_first_or_default_none)
 
-    _get_first_or_default_dict = validator(
-        "affiliation_agreement",
-        "logo",
-        pre=True,
-        allow_reuse=True)(get_first_or_default_dict)
+    _get_first_or_default_dict = validator("affiliation_agreement", "logo", pre=True, allow_reuse=True)(
+        get_first_or_default_dict
+    )
 
     def get_logo_url(self, default=None):
         if isinstance(self.logo, AirtableAttachment):

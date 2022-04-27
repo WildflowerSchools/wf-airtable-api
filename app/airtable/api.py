@@ -6,11 +6,11 @@ class Api(api.Api):
         params = self._options_to_params(**options)
 
         table_url = self.get_table_url(base_id, table_name)
-        if isinstance(offset, str) and str.strip(offset) != '':
+        if isinstance(offset, str) and str.strip(offset) != "":
             params.update({"offset": str.strip(offset)})
 
         data = self._request("get", table_url, params=params)
         records = data.get("records", [])
-        next_offset = data.get("offset", '')
+        next_offset = data.get("offset", "")
 
         return records, next_offset

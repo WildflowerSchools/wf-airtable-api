@@ -39,7 +39,8 @@ class AirtableGeoAreaContactFields(BaseModel):
         "longitude",
         "geocode",
         pre=True,
-        allow_reuse=True)(get_first_or_default_none)
+        allow_reuse=True,
+    )(get_first_or_default_none)
 
 
 class AirtableGeoAreaContactResponse(AirtableResponse):

@@ -2,11 +2,12 @@ from typing import Optional, Union
 
 from pydantic import BaseModel, Field, validator
 
-from . import \
-    educators_schools as educators_schools_models, \
-    montessori_certifications as airtable_montessori_certifications_models, \
-    languages as airtable_languages_models, \
-    newsletters as airtable_newsletters_models
+from . import (
+    educators_schools as educators_schools_models,
+    montessori_certifications as airtable_montessori_certifications_models,
+    languages as airtable_languages_models,
+    newsletters as airtable_newsletters_models,
+)
 from app.airtable.attachment import AirtableAttachment
 from app.airtable.response import AirtableResponse
 from app.airtable.validators import get_first_or_default_none, get_first_or_default_dict
@@ -54,14 +55,18 @@ class AirtableEducatorFields(CreateAirtableEducatorFields):
     hub: Optional[str] = Field(alias="Hub")
     hub_name: Optional[str] = Field(alias="Hub Name")
 
-    educators_schools: Optional[list[
-        Union[str, educators_schools_models.AirtableEducatorsSchoolsResponse]]] = Field(alias="Educators at Schools")
-    montessori_certifications: Optional[list[
-        Union[str, airtable_montessori_certifications_models.AirtableMontessoriCertificationResponse]]] = Field(alias="Montessori Certifications")
-    languages: Optional[list[
-        Union[str, airtable_languages_models.AirtableLanguageResponse]]] = Field(alias="Language Record IDs")
-    newsletters: Optional[list[
-        Union[str, airtable_newsletters_models.AirtableNewsletterResponse]]] = Field(alias="Newsletter and Group Subscriptions", default=[])
+    educators_schools: Optional[list[Union[str, educators_schools_models.AirtableEducatorsSchoolsResponse]]] = Field(
+        alias="Educators at Schools"
+    )
+    montessori_certifications: Optional[
+        list[Union[str, airtable_montessori_certifications_models.AirtableMontessoriCertificationResponse]]
+    ] = Field(alias="Montessori Certifications")
+    languages: Optional[list[Union[str, airtable_languages_models.AirtableLanguageResponse]]] = Field(
+        alias="Language Record IDs"
+    )
+    newsletters: Optional[list[Union[str, airtable_newsletters_models.AirtableNewsletterResponse]]] = Field(
+        alias="Newsletter and Group Subscriptions", default=[]
+    )
 
     class Config:
         allow_population_by_field_name = True
@@ -79,12 +84,10 @@ class AirtableEducatorFields(CreateAirtableEducatorFields):
         "hub",
         "hub_name",
         pre=True,
-        allow_reuse=True)(get_first_or_default_none)
+        allow_reuse=True,
+    )(get_first_or_default_none)
 
-    _get_first_or_default_dict = validator(
-        "visioning_album",
-        pre=True,
-        allow_reuse=True)(get_first_or_default_dict)
+    _get_first_or_default_dict = validator("visioning_album", pre=True, allow_reuse=True)(get_first_or_default_dict)
 
     # noinspection PyMethodParameters
     @validator("lgbtqia_identifying", pre=True)
@@ -98,6 +101,7 @@ class AirtableEducatorFields(CreateAirtableEducatorFields):
 
     def load_educators_schools_relationship(self):
         from ..client import AirtableClient
+
         airtable_client = AirtableClient()
 
         _ids = []
@@ -120,6 +124,7 @@ class AirtableEducatorFields(CreateAirtableEducatorFields):
 
     def load_montessori_certifications_relationship(self):
         from ..client import AirtableClient
+
         airtable_client = AirtableClient()
 
         _ids = []
@@ -129,19 +134,23 @@ class AirtableEducatorFields(CreateAirtableEducatorFields):
             return _records
 
         for id_or_record in self.montessori_certifications:
-            if isinstance(id_or_record, airtable_montessori_certifications_models.AirtableMontessoriCertificationResponse):
+            if isinstance(
+                id_or_record, airtable_montessori_certifications_models.AirtableMontessoriCertificationResponse
+            ):
                 _records.append(id_or_record)
             elif isinstance(id_or_record, str):
                 _ids.append(id_or_record)
 
         list_airtable_montessori_certifications = airtable_client.list_montessori_certifications_by_ids(
-            montessori_certification_ids=_ids)
+            montessori_certification_ids=_ids
+        )
         _records += list_airtable_montessori_certifications.__root__
 
         return _records
 
     def load_languages_relationship(self):
         from ..client import AirtableClient
+
         airtable_client = AirtableClient()
 
         _ids = []
@@ -164,6 +173,7 @@ class AirtableEducatorFields(CreateAirtableEducatorFields):
 
     def load_newsletters_relationship(self):
         from ..client import AirtableClient
+
         airtable_client = AirtableClient()
 
         _ids = []

@@ -6,7 +6,7 @@ install:
     poetry install
 
 fmt:
-    autopep8 app
+    black app
 
 test:
     PYTHONPATH=./ pytest -s

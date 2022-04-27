@@ -15,12 +15,14 @@ class AirtablePartnerFields(BaseModel):
     roles: Optional[list[str]] = Field(alias="Roles")
     hubs: Optional[list[str]] = Field(alias="Hubs")
     pods: Optional[list[str]] = Field(alias="Pods")
-    schools_partner_guiding: Optional[list[Union[str, airtable_guides_schools_models.AirtableGuidesSchoolsResponse]]] = Field(
-        alias="Guides x Schools")
+    schools_partner_guiding: Optional[
+        list[Union[str, airtable_guides_schools_models.AirtableGuidesSchoolsResponse]]
+    ] = Field(alias="Guides x Schools")
     educators_partner_guiding: Optional[list[str]] = Field(alias="TLs")
 
     def load_schools_guides_relationship(self):
         from ..client import AirtableClient
+
         airtable_client = AirtableClient()
 
         _ids = []

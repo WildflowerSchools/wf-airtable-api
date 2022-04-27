@@ -15,10 +15,13 @@ from ..geocode.google_maps_client import GoogleMapsAPI
 
 class APIGeoAreaContactData(geo_area_contacts.APIGeoAreaContactData):
     @classmethod
-    def from_airtable_geo_area_contact(cls,
-                                       airtable_geo_area_contact: airtable_geo_area_contacts_models.AirtableGeoAreaContactResponse,
-                                       url_path_for: Callable):
+    def from_airtable_geo_area_contact(
+        cls,
+        airtable_geo_area_contact: airtable_geo_area_contacts_models.AirtableGeoAreaContactResponse,
+        url_path_for: Callable,
+    ):
         from ..airtable.client import AirtableClient
+
         airtable_client = AirtableClient()
 
         geocode_dict = None
@@ -36,13 +39,12 @@ class APIGeoAreaContactData(geo_area_contacts.APIGeoAreaContactData):
             sendgrid_template_id=airtable_geo_area_contact.fields.sendgrid_template_id,
             latitude=airtable_geo_area_contact.fields.latitude,
             longitude=airtable_geo_area_contact.fields.longitude,
-            geocode=geocode_dict)
+            geocode=geocode_dict,
+        )
 
         hub_data = None
         if airtable_geo_area_contact.fields.hub_synced_record_id:
-            hub_data = APIDataBase(
-                id=airtable_geo_area_contact.fields.hub_synced_record_id,
-                type=hub_models.MODEL_TYPE)
+            hub_data = APIDataBase(id=airtable_geo_area_contact.fields.hub_synced_record_id, type=hub_models.MODEL_TYPE)
 
         rse_data = None
         if airtable_geo_area_contact.fields.assigned_rse_synced_record_id:
@@ -50,29 +52,28 @@ class APIGeoAreaContactData(geo_area_contacts.APIGeoAreaContactData):
             # However, the Record IDs are unique to each base. So lookup needs to be performed to
             # translate Record IDs between bases
             partner_record = airtable_client.get_partner_by_synced_record_id(
-                airtable_geo_area_contact.fields.assigned_rse_synced_record_id)
+                airtable_geo_area_contact.fields.assigned_rse_synced_record_id
+            )
 
-            rse_data = APIDataBase(
-                id=partner_record.id,
-                type=partner_models.MODEL_TYPE)
+            rse_data = APIDataBase(id=partner_record.id, type=partner_models.MODEL_TYPE)
 
         relationships = APIGeoAreaContactRelationships(
             hub=response_models.APILinksAndData(
-                links={'self': url_path_for("get_hub", hub_id=hub_data.id)},
-                data=hub_data),
+                links={"self": url_path_for("get_hub", hub_id=hub_data.id)}, data=hub_data
+            ),
             assigned_rse=response_models.APILinksAndData(
-                links={'self': url_path_for("get_partner", partner_id=rse_data.id)},
-                data=rse_data),
+                links={"self": url_path_for("get_partner", partner_id=rse_data.id)}, data=rse_data
+            ),
         )
         links = response_models.APILinks(
-            links={'self': url_path_for("get_geo_area_contact", geo_area_contact_id=airtable_geo_area_contact.id)}
+            links={"self": url_path_for("get_geo_area_contact", geo_area_contact_id=airtable_geo_area_contact.id)}
         )
         return cls(
             id=airtable_geo_area_contact.id,
             type=MODEL_TYPE,
             fields=fields,
             relationships=relationships,
-            links=links.links
+            links=links.links,
         )
 
     def geocode(self):
@@ -84,14 +85,17 @@ class APIGeoAreaContactData(geo_area_contacts.APIGeoAreaContactData):
 
 class ListAPIGeoAreaContactData(geo_area_contacts.ListAPIGeoAreaContactData):
     @classmethod
-    def from_airtable_geo_area_contacts(cls,
-                                        airtable_geo_area_contacts: airtable_geo_area_contacts_models.ListAirtableGeoAreaContactResponse,
-                                        url_path_for: Callable):
+    def from_airtable_geo_area_contacts(
+        cls,
+        airtable_geo_area_contacts: airtable_geo_area_contacts_models.ListAirtableGeoAreaContactResponse,
+        url_path_for: Callable,
+    ):
         responses = []
         for lc in airtable_geo_area_contacts.__root__:
             responses.append(
                 APIGeoAreaContactData.from_airtable_geo_area_contact(
-                    airtable_geo_area_contact=lc,
-                    url_path_for=url_path_for))
+                    airtable_geo_area_contact=lc, url_path_for=url_path_for
+                )
+            )
 
         return cls(__root__=responses)

@@ -19,7 +19,10 @@ def distance_between_places(a: Place, b: Place):
 
 
 def is_place_contained_within(a: Place, b: Place):
-    return b.geometry.viewport.northeast.lat >= a.geometry.location.lat >= b.geometry.viewport.southwest.lat and b.geometry.viewport.northeast.lng >= a.geometry.location.lng >= b.geometry.viewport.southwest.lng
+    return (
+        b.geometry.viewport.northeast.lat >= a.geometry.location.lat >= b.geometry.viewport.southwest.lat
+        and b.geometry.viewport.northeast.lng >= a.geometry.location.lng >= b.geometry.viewport.southwest.lng
+    )
 
 
 def is_place_within_radius(a: Place, b: Place, radius: int):
@@ -47,7 +50,8 @@ def is_place_within_country(a: Place, country: Place):
 
 
 def get_geo_area_nearest_to_place(
-        place: Place, geo_areas: Union[list[APIGeoAreaContactData], list[APIGeoAreaTargetCommunityData]]):
+    place: Place, geo_areas: Union[list[APIGeoAreaContactData], list[APIGeoAreaTargetCommunityData]]
+):
     default_geo_area = None
     default_international_geo_area = None
     city_geo_areas = []
@@ -82,7 +86,7 @@ def get_geo_area_nearest_to_place(
 
     geo_areas_near_cities = []
     for ga in city_geo_areas:
-        if (is_place_within_radius(place, ga.geocode(), ga.fields.city_radius)):
+        if is_place_within_radius(place, ga.geocode(), ga.fields.city_radius):
             geo_areas_near_cities.append(ga)
 
     if len(geo_areas_near_cities) > 0:
@@ -101,7 +105,7 @@ def get_geo_area_nearest_to_place(
             # -74.2011374 40.6325788, -74.1849067 40.6464003, -74.1400525 40.6422367, -74.0952643 40.6488871,
             # -74.0560421 40.6522048, -74.0336221 40.6935376, -74.0136887 40.7624537, -73.9336322 40.8769537,
             # -73.9010989 40.997664))
-            match = re.match(r'(?:[POLYGON]+)?(?:[\s\(]+)?([-+\d\.\s,]+)', ga.fields.polygon_coordinates)
+            match = re.match(r"(?:[POLYGON]+)?(?:[\s\(]+)?([-+\d\.\s,]+)", ga.fields.polygon_coordinates)
             if match is None:
                 continue
 
@@ -109,7 +113,7 @@ def get_geo_area_nearest_to_place(
             str_point_list = str_point_list.strip().split(",")
 
             def str_point_to_geo_point(s):
-                parts = s.strip().split(' ')
+                parts = s.strip().split(" ")
                 return geometry.Point(float(parts[1]), float(parts[0]))
 
             geo_point_list = list(map(str_point_to_geo_point, str_point_list))
@@ -120,19 +124,19 @@ def get_geo_area_nearest_to_place(
 
     if geo_area is None:
         for ga in region_geo_areas:
-            if (is_place_contained_within(place, ga.geocode())):
+            if is_place_contained_within(place, ga.geocode()):
                 geo_area = ga
                 break
 
     if geo_area is None:
         for ga in state_geo_areas:
-            if (is_place_within_state(place, ga.geocode())):
+            if is_place_within_state(place, ga.geocode()):
                 geo_area = ga
                 break
 
     if geo_area is None:
         for ga in country_geo_areas:
-            if (is_place_within_country(place, ga.geocode())):
+            if is_place_within_country(place, ga.geocode()):
                 geo_area = ga
                 break
 
