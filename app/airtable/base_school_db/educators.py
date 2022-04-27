@@ -102,6 +102,10 @@ class AirtableEducatorFields(CreateAirtableEducatorFields):
 
         _ids = []
         _records = []
+
+        if self.educators_schools is None:
+            return _records
+
         for id_or_record in self.educators_schools:
             if isinstance(id_or_record, educators_schools_models.AirtableEducatorsSchoolsResponse):
                 _records.append(id_or_record)
@@ -120,6 +124,10 @@ class AirtableEducatorFields(CreateAirtableEducatorFields):
 
         _ids = []
         _records = []
+
+        if self.montessori_certifications is None:
+            return _records
+
         for id_or_record in self.montessori_certifications:
             if isinstance(id_or_record, airtable_montessori_certifications_models.AirtableMontessoriCertificationResponse):
                 _records.append(id_or_record)
@@ -138,6 +146,10 @@ class AirtableEducatorFields(CreateAirtableEducatorFields):
 
         _ids = []
         _records = []
+
+        if self.languages is None:
+            return _records
+
         for id_or_record in self.languages:
             if isinstance(id_or_record, airtable_languages_models.AirtableLanguageResponse):
                 _records.append(id_or_record)
@@ -156,6 +168,10 @@ class AirtableEducatorFields(CreateAirtableEducatorFields):
 
         _ids = []
         _records = []
+
+        if self.newsletters is None:
+            return _records
+
         for id_or_record in self.newsletters:
             if isinstance(id_or_record, airtable_newsletters_models.AirtableNewsletterResponse):
                 _records.append(id_or_record)

@@ -12,22 +12,30 @@ from ..airtable.base_school_db import \
     educators_schools as airtable_educator_school_models
 
 
+class CreateUpdateAPIEducatorSchoolFields(educators_schools.CreateUpdateAPIEducatorSchoolFields):
+    def to_airtable_educator_schools(self) -> airtable_educator_school_models.CreateUpdateAirtableEducatorsSchoolsFields:
+        return airtable_educator_school_models.CreateUpdateAirtableEducatorsSchoolsFields(
+            educator=self.educator_id,
+            school=self.school_id,
+            roles=self.roles,
+            currently_active=self.currently_active,
+            start_date=self.start_date,
+            end_date=self.end_date,
+            mark_for_deletion=self.mark_for_deletion
+        )
+
+
 class APIEducatorSchoolData(educators_schools.APIEducatorSchoolData):
     @classmethod
     def from_airtable_educator_school(cls,
                                       airtable_educator_school: airtable_educator_school_models.AirtableEducatorsSchoolsResponse,
                                       url_path_for: Callable):
         fields = APIEducatorSchoolFields(
-            educator_id=airtable_educator_school.fields.educator_id,
-            school_id=airtable_educator_school.fields.school_id,
-            educator_name=airtable_educator_school.fields.educator_name,
-            school_name=airtable_educator_school.fields.school_name,
             start_date=airtable_educator_school.fields.start_date,
             end_date=airtable_educator_school.fields.end_date,
             roles=airtable_educator_school.fields.roles,
             currently_active=airtable_educator_school.fields.currently_active,
-            mark_for_deletion=airtable_educator_school.fields.mark_for_deletion
-        )
+            mark_for_deletion=airtable_educator_school.fields.mark_for_deletion)
 
         educator_record = airtable_educator_school.fields.educator
         educator_data = airtable_educator_school.fields.educator_id
@@ -65,3 +73,18 @@ class APIEducatorSchoolData(educators_schools.APIEducatorSchoolData):
             relationships=relationships,
             links=links.links
         )
+
+
+class ListAPIEducatorSchoolData(educators_schools.ListAPIEducatorSchoolData):
+    @classmethod
+    def from_airtable_educator_schools(cls,
+                                       airtable_educator_schools: airtable_educator_school_models.ListAirtableEducatorsSchoolsResponse,
+                                       url_path_for: Callable):
+        responses = []
+        for es in airtable_educator_schools.__root__:
+            responses.append(
+                APIEducatorSchoolData.from_airtable_educator_school(
+                    airtable_educator_school=es,
+                    url_path_for=url_path_for))
+
+        return cls(__root__=responses)

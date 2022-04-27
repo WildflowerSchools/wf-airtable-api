@@ -4,34 +4,32 @@ from typing import Optional, Union
 from pydantic import BaseModel, Field, validator
 
 
-#import app.airtable.base_school_db.educators
-#import app.airtable.base_school_db.schools
 from . import educators as educators_models
 from . import schools as schools_models
 from app.airtable.response import AirtableResponse
 from app.airtable.validators import get_first_or_default_none
 
 
-class AirtableEducatorsSchoolsFields(BaseModel):
-    educator_id: Optional[str] = Field(alias="Educator")
-    school_id: Optional[str] = Field(alias="School")
-    educator_name: Optional[str] = Field(alias="Educator Full Name")
-    school_name: Optional[str] = Field(alias="School Name")
-    roles: Optional[list[str]] = Field(alias="Role")
+class CreateUpdateAirtableEducatorsSchoolsFields(BaseModel):
+    educator: Optional[list[str]] = Field(alias="Educator Record ID")
+    school: Optional[list[str]] = Field(alias="School Record ID")
+
+    roles: Optional[list[str]] = Field(alias="Roles (staging)")
     currently_active: Optional[bool] = Field(alias="Currently Active")
     start_date: Optional[date] = Field(alias="Start date")
     end_date: Optional[date] = Field(alias="End date")
     mark_for_deletion: Optional[bool] = Field(alias="Mark for deletion")
 
+    class Config:
+        allow_population_by_field_name = True
+
+
+class AirtableEducatorsSchoolsFields(CreateUpdateAirtableEducatorsSchoolsFields):
     educator: Optional[Union[str, object]] = Field(alias="Educator")
     school: Optional[Union[str, object]] = Field(alias="School")
 
     _get_first_or_default_none = validator("educator",
-                                           "educator_id",
-                                           "educator_name",
                                            "school",
-                                           "school_id",
-                                           "school_name",
                                            pre=True,
                                            allow_reuse=True)(get_first_or_default_none)
 
