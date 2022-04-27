@@ -18,8 +18,8 @@ class CreateUpdateAPIEducatorSchoolFields(educators_schools.CreateUpdateAPIEduca
         self,
     ) -> airtable_educator_school_models.CreateUpdateAirtableEducatorsSchoolsFields:
         return airtable_educator_school_models.CreateUpdateAirtableEducatorsSchoolsFields(
-            educator=self.educator_id,
-            school=self.school_id,
+            educator=[self.educator_id],
+            school=[self.school_id],
             roles=self.roles,
             currently_active=self.currently_active,
             start_date=self.start_date,
@@ -44,7 +44,7 @@ class APIEducatorSchoolData(educators_schools.APIEducatorSchoolData):
         )
 
         educator_record = airtable_educator_school.fields.educator
-        educator_data = airtable_educator_school.fields.educator_id
+        educator_data = educator_record
         if isinstance(educator_record, airtable_educator_models.AirtableEducatorResponse):
             educator_data = response_models.APIDataWithFields(
                 id=educator_record.id,
@@ -53,7 +53,7 @@ class APIEducatorSchoolData(educators_schools.APIEducatorSchoolData):
             )
 
         school_record = airtable_educator_school.fields.school
-        school_data = airtable_educator_school.fields.school_id
+        school_data = school_record
         if isinstance(school_record, airtable_school_models.AirtableSchoolResponse):
             school_data = response_models.APIDataWithFields(
                 id=school_record.id,
@@ -63,11 +63,11 @@ class APIEducatorSchoolData(educators_schools.APIEducatorSchoolData):
 
         relationships = APIEducatorSchoolRelationships(
             educator=response_models.APILinksAndData(
-                links={"self": url_path_for("get_educator", educator_id=airtable_educator_school.fields.educator_id)},
+                links={"self": url_path_for("get_educator", educator_id=educator_record.id)},
                 data=educator_data,
             ),
             school=response_models.APILinksAndData(
-                links={"self": url_path_for("get_school", school_id=airtable_educator_school.fields.school_id)},
+                links={"self": url_path_for("get_school", school_id=school_record.id)},
                 data=school_data,
             ),
         )

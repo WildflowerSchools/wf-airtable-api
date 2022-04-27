@@ -279,7 +279,7 @@ class AirtableClient(metaclass=Singleton):
         raw = self.client_api.all(base_id=BASE_ID, table_name=EDUCATORS_TABLE_NAME, formula=formula)
 
         if len(raw) == 0:
-            return ListAirtableEducatorResponse()
+            return ListAirtableEducatorResponse(__root__=[])
 
         response = ListAirtableEducatorResponse.parse_obj(raw)
         if load_relationships:

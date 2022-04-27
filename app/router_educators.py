@@ -6,7 +6,11 @@ from urllib.parse import unquote, urlencode
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 
 from .airtable.client import AirtableClient
-from .airtable.base_school_db import educators as airtable_educator_models
+from .airtable.base_school_db import (
+    educators as airtable_educator_models,
+    ListAirtableEducatorResponse,
+    AirtableEducatorResponse,
+)
 from .models import educators as educator_models
 from .models import partners as partner_models
 from .models import schools as school_models
@@ -35,30 +39,31 @@ def fetch_and_validate_educator(educator_id, airtable_client: AirtableClient):
     return airtable_educator
 
 
-def find_and_validate_educators(filters, airtable_client: AirtableClient):
+def find_and_validate_educators(email: Optional[str], airtable_client: AirtableClient) -> ListAirtableEducatorResponse:
     try:
+        filters = {}
+        if email:
+            filters[airtable_educator_models.AirtableEducatorFields.__fields__["email"].alias] = email
         airtable_educators = airtable_client.find_educators(filters)
     except requests.exceptions.HTTPError as ex:
         if ex.response.status_code == 404:
-            raise HTTPException(status_code=404, detail="Educator records not found")
+            return ListAirtableEducatorResponse(__root__=[])
         else:
             raise
 
     return airtable_educators
 
 
-def fetch_and_validate_educator_by_email(email, airtable_client: AirtableClient):
-    educator_not_found_exception = HTTPException(status_code=404, detail="Educator not found")
-
+def fetch_and_validate_educator_by_email(email, airtable_client: AirtableClient) -> Optional[AirtableEducatorResponse]:
     try:
-        airtable_educators = airtable_client.find_educators({"email": email}).__root__
-        if airtable_educators is None or len(airtable_educators) == 0:
-            raise educator_not_found_exception
+        airtable_educators = find_and_validate_educators(email=email, airtable_client=airtable_client)
+        if airtable_educators is None or len(airtable_educators.__root__) == 0:
+            return None
 
-        return airtable_educators[0]
+        return airtable_educators.__root__[0]
     except requests.exceptions.HTTPError as ex:
         if ex.response.status_code == 404:
-            raise educator_not_found_exception
+            return None
         else:
             raise
 
@@ -94,9 +99,8 @@ async def create_educator(payload: educator_models.CreateAPIEducatorFields, requ
         raise HTTPException(status_code=400, detail="Educator email required")
 
     # Is educator pre-existing? Return 409, but add the typeform response to the educator record first
-    existing = airtable_client.find_educators({"email": payload.email}).__root__
-    if existing is not None and len(existing) > 0:
-        existing_educator = existing[0]
+    existing_educator = fetch_and_validate_educator_by_email(email=payload.email, airtable_client=airtable_client)
+    if existing_educator is not None:
         airtable_client.add_typeform_start_a_school_response_to_educator(
             educator_id=existing_educator.id, typeform_start_a_school_response_id=payload.start_a_school_response_id
         )
@@ -133,11 +137,7 @@ async def create_educator(payload: educator_models.CreateAPIEducatorFields, requ
 async def find_educators(request: Request, email: Optional[list[str]] = Query(None)):
     airtable_client = get_airtable_client(request)
 
-    filters = {}
-    if email:
-        filters[airtable_educator_models.AirtableEducatorFields.__fields__["email"].alias] = email
-
-    airtable_educators = find_and_validate_educators(filters, airtable_client)
+    airtable_educators = find_and_validate_educators(email=email, airtable_client=airtable_client)
 
     data = educator_models.ListAPIEducatorData.from_airtable_educators(
         airtable_educators=airtable_educators, url_path_for=request.app.url_path_for

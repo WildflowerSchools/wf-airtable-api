@@ -36,15 +36,27 @@ class CreateAPIEducatorFields(educators.CreateAPIEducatorFields):
             newsletters = airtable_client.get_newsletters_by_slug(newsletter_slugs)
             newsletter_ids = list(map(lambda n: n.id, newsletters.__root__))
 
+        assigned_partner = None
+        if self.assigned_partner_id:
+            assigned_partner = [self.assigned_partner_id]
+
+        target_community = None
+        if self.target_community_id:
+            target_community = [self.target_community_id]
+
+        start_a_school_response = None
+        if self.start_a_school_response_id:
+            start_a_school_response = [self.start_a_school_response_id]
+
         return airtable_educator_models.CreateAirtableEducatorFields(
             first_name=self.first_name,
             last_name=self.last_name,
             details=self.details,
             stage=self.stage,
             home_address=self.home_address,
-            assigned_partner=[self.assigned_partner_id],
-            target_community=[self.target_community_id],
-            ssj_typeforms_start_a_school=[self.start_a_school_response_id],
+            assigned_partner=assigned_partner,
+            target_community=target_community,
+            ssj_typeforms_start_a_school=start_a_school_response,
             newsletters=newsletter_ids,
         )
 
@@ -257,8 +269,6 @@ class APIEducatorData(educators.APIEducatorData):
                             id=d.id,
                             type=educators_schools_models.MODEL_TYPE,
                             fields=educators_schools_models.APIEducatorSchoolFields(
-                                educator_name=d.fields.educator_name,
-                                school_name=d.fields.school_name,
                                 roles=d.fields.roles,
                                 currently_active=d.fields.currently_active,
                                 start_date=d.fields.start_date,

@@ -44,9 +44,9 @@ async def find_educator_schools(
 
     filters = {}
     if educator_id:
-        filters[AirtableEducatorsSchoolsFields.__fields__["educator_id"].alias] = educator_id
+        filters[AirtableEducatorsSchoolsFields.__fields__["educator"].alias] = educator_id
     if school_id:
-        filters[AirtableEducatorsSchoolsFields.__fields__["school_id"].alias] = school_id
+        filters[AirtableEducatorsSchoolsFields.__fields__["school"].alias] = school_id
 
     matches = airtable_client.find_educator_schools(filters=filters)
 
@@ -84,8 +84,8 @@ async def create_educator_school(request: Request, payload: educator_school_mode
 
     # Is educator_id + school_id pre-existing?
     filters = {
-        AirtableEducatorsSchoolsFields.__fields__["educator_id"].alias: payload.educator_id,
-        AirtableEducatorsSchoolsFields.__fields__["school_id"].alias: payload.school_id,
+        AirtableEducatorsSchoolsFields.__fields__["educator"].alias: payload.educator_id,
+        AirtableEducatorsSchoolsFields.__fields__["school"].alias: payload.school_id,
     }
     existing = airtable_client.find_educator_schools(filters=filters).__root__
     if existing is not None and len(existing) > 0:
@@ -96,7 +96,7 @@ async def create_educator_school(request: Request, payload: educator_school_mode
         payload=airtable_educator_schools_payload
     )
 
-    return airtable_educator_schools_response
+    return await get_educator_school(educator_school_id=airtable_educator_schools_response.id, request=request)
 
 
 @router.put("/{educator_school_id}", response_model=educator_school_models.APIEducatorSchoolResponse)
@@ -109,4 +109,4 @@ async def update_educator_school(
     airtable_educator_schools_response = airtable_client.update_educator_schools(
         record_id=educator_school_id, payload=airtable_educator_schools_payload
     )
-    return airtable_educator_schools_response
+    return await get_educator_school(educator_school_id=airtable_educator_schools_response.id, request=request)

@@ -11,13 +11,13 @@ from app.airtable.validators import get_first_or_default_none
 
 
 class CreateUpdateAirtableEducatorsSchoolsFields(BaseModel):
-    educator: Optional[list[str]] = Field(alias="Educator Record ID")
-    school: Optional[list[str]] = Field(alias="School Record ID")
+    educator: Optional[list[str]] = Field(alias="Educator")
+    school: Optional[list[str]] = Field(alias="School")
 
     roles: Optional[list[str]] = Field(alias="Roles (staging)")
     currently_active: Optional[bool] = Field(alias="Currently Active")
-    start_date: Optional[date] = Field(alias="Start date")
-    end_date: Optional[date] = Field(alias="End date")
+    start_date: Optional[date] = Field(alias="Start Date")
+    end_date: Optional[date] = Field(alias="End Date")
     mark_for_deletion: Optional[bool] = Field(alias="Mark for deletion")
 
     class Config:
