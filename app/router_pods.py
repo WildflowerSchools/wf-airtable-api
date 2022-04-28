@@ -20,7 +20,7 @@ router = APIRouter(
 )
 
 
-def fetch_and_validate_pod(pod_id, airtable_client: AirtableClient):
+def fetch_pod_wrapper(pod_id, airtable_client: AirtableClient):
     try:
         airtable_pod = airtable_client.get_pod_by_id(pod_id)
     except requests.exceptions.HTTPError as ex:
@@ -49,7 +49,7 @@ async def list_pods(request: Request):
 @router.get("/{pod_id}", response_model=pod_models.APIPodResponse)
 async def get_pod(pod_id, request: Request):
     airtable_client = get_airtable_client(request)
-    airtable_pod = fetch_and_validate_pod(pod_id, airtable_client)
+    airtable_pod = fetch_pod_wrapper(pod_id, airtable_client)
 
     data = pod_models.APIPodData.from_airtable_pod(airtable_pod=airtable_pod, url_path_for=request.app.url_path_for)
 
@@ -59,7 +59,7 @@ async def get_pod(pod_id, request: Request):
 @router.get("/{pod_id}/hub", response_model=hub_models.APIHubResponse)
 async def get_pod_hub(pod_id, request: Request):
     airtable_client = get_airtable_client(request)
-    fetch_and_validate_pod(pod_id, airtable_client)
+    fetch_pod_wrapper(pod_id, airtable_client)
     airtable_hub = airtable_client.get_hub_by_pod_id(pod_id)
 
     if airtable_hub is None:
@@ -73,7 +73,7 @@ async def get_pod_hub(pod_id, request: Request):
 @router.get("/{pod_id}/contacts", response_model=partner_models.ListAPIPartnerResponse)
 async def get_pod_contacts(pod_id, request: Request):
     airtable_client = get_airtable_client(request)
-    fetch_and_validate_pod(pod_id, airtable_client)
+    fetch_pod_wrapper(pod_id, airtable_client)
     airtable_partners = airtable_client.get_partners_by_pod_id(pod_id)
 
     data = partner_models.ListAPIPartnerData.from_airtable_partners(
@@ -88,7 +88,7 @@ async def get_pod_contacts(pod_id, request: Request):
 @router.get("/{pod_id}/schools", response_model=school_models.ListAPISchoolResponse)
 async def get_pod_schools(pod_id, request: Request):
     airtable_client = get_airtable_client(request)
-    fetch_and_validate_pod(pod_id, airtable_client)
+    fetch_pod_wrapper(pod_id, airtable_client)
     airtable_schools = airtable_client.get_schools_by_pod_id(pod_id)
 
     data = school_models.ListAPISchoolData.from_airtable_schools(

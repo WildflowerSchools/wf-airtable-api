@@ -24,7 +24,9 @@ router = APIRouter(
 )
 
 
-def fetch_and_validate_educator_school(educator_school_id, airtable_client: AirtableClient):
+def fetch_educator_school_wrapper(
+    educator_school_id, airtable_client: AirtableClient
+) -> AirtableEducatorsSchoolsResponse:
     try:
         airtable_educator_school = airtable_client.get_educator_school_by_id(educator_school_id)
     except requests.exceptions.HTTPError as ex:
@@ -36,19 +38,34 @@ def fetch_and_validate_educator_school(educator_school_id, airtable_client: Airt
     return airtable_educator_school
 
 
+def find_educator_schools_wrapper(
+    educator_id: Optional[str], school_id: Optional[str], airtable_client: AirtableClient
+) -> ListAirtableEducatorsSchoolsResponse:
+    try:
+        filters = {}
+        if educator_id:
+            filters[AirtableFindEducatorsSchoolsFields.__fields__["educator_id"].alias] = educator_id
+        if school_id:
+            filters[AirtableFindEducatorsSchoolsFields.__fields__["school_id"].alias] = school_id
+        educator_schools = airtable_client.find_educator_schools(filters=filters)
+    except requests.exceptions.HTTPError as ex:
+        if ex.response.status_code == 404:
+            return ListAirtableEducatorsSchoolsResponse(__root__=[])
+        else:
+            raise
+
+    return educator_schools
+
+
 @router.get("/find", response_model=educator_school_models.ListAPIEducatorSchoolResponse)
 async def find_educator_schools(
     request: Request, educator_id: Optional[str] = Query(None), school_id: Optional[str] = Query(None)
 ):
     airtable_client = get_airtable_client(request)
 
-    filters = {}
-    if educator_id:
-        filters[AirtableEducatorsSchoolsFields.__fields__["educator"].alias] = educator_id
-    if school_id:
-        filters[AirtableEducatorsSchoolsFields.__fields__["school"].alias] = school_id
-
-    matches = airtable_client.find_educator_schools(filters=filters)
+    matches = find_educator_schools_wrapper(
+        educator_id=educator_id, school_id=school_id, airtable_client=airtable_client
+    )
 
     data = educator_school_models.ListAPIEducatorSchoolData.from_airtable_educator_schools(
         airtable_educator_schools=matches, url_path_for=request.app.url_path_for
@@ -62,7 +79,7 @@ async def find_educator_schools(
 @router.get("/{educator_school_id}", response_model=educator_school_models.APIEducatorSchoolResponse)
 async def get_educator_school(educator_school_id, request: Request):
     airtable_client = get_airtable_client(request)
-    airtable_educator_school = fetch_and_validate_educator_school(educator_school_id, airtable_client)
+    airtable_educator_school = fetch_educator_school_wrapper(educator_school_id, airtable_client)
 
     data = educator_school_models.APIEducatorSchoolData.from_airtable_educator_school(
         airtable_educator_school=airtable_educator_school, url_path_for=request.app.url_path_for
@@ -83,12 +100,10 @@ async def create_educator_school(request: Request, payload: educator_school_mode
         raise HTTPException(status_code=400, detail="Educator id and School id are both required")
 
     # Is educator_id + school_id pre-existing?
-    filters = {
-        AirtableEducatorsSchoolsFields.__fields__["educator"].alias: payload.educator_id,
-        AirtableEducatorsSchoolsFields.__fields__["school"].alias: payload.school_id,
-    }
-    existing = airtable_client.find_educator_schools(filters=filters).__root__
-    if existing is not None and len(existing) > 0:
+    matches = find_educator_schools_wrapper(
+        educator_id=payload.educator_id, school_id=payload.school_id, airtable_client=airtable_client
+    )
+    if matches is not None and len(matches.__root__) > 0:
         raise HTTPException(status_code=409, detail="Educator and school are already linked")
 
     airtable_educator_schools_payload = payload.to_airtable_educator_schools()

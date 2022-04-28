@@ -44,7 +44,7 @@ geo_area_target_community_router = APIRouter(
 )
 
 
-def fetch_and_validate_geo_area_contact(geo_area_contact_id, airtable_client: AirtableClient):
+def fetch_geo_area_contact_wrapper(geo_area_contact_id, airtable_client: AirtableClient):
     try:
         airtable_geo_area_contact = airtable_client.get_geo_area_contact_by_id(geo_area_contact_id)
     except requests.exceptions.HTTPError as ex:
@@ -56,7 +56,7 @@ def fetch_and_validate_geo_area_contact(geo_area_contact_id, airtable_client: Ai
     return airtable_geo_area_contact
 
 
-def fetch_and_validate_geo_area_target_community(geo_area_target_community_id, airtable_client: AirtableClient):
+def fetch_geo_area_target_community_wrapper(geo_area_target_community_id, airtable_client: AirtableClient):
     try:
         airtable_geo_area_target_community = airtable_client.get_geo_area_target_community_by_id(
             geo_area_target_community_id
@@ -111,7 +111,7 @@ async def get_geo_area_contact_given_address(request: Request, address: str):
 )
 async def get_geo_area_contact(geo_area_contact_id, request: Request):
     airtable_client = get_airtable_client(request)
-    airtable_geo_area_contact = fetch_and_validate_geo_area_contact(geo_area_contact_id, airtable_client)
+    airtable_geo_area_contact = fetch_geo_area_contact_wrapper(geo_area_contact_id, airtable_client)
 
     data = geo_area_contact_models.APIGeoAreaContactData.from_airtable_geo_area_contact(
         airtable_geo_area_contact=airtable_geo_area_contact, url_path_for=request.app.url_path_for
@@ -170,7 +170,7 @@ async def get_geo_area_target_community_given_address(request: Request, address:
 )
 async def get_geo_area_target_community(geo_area_target_community_id, request: Request):
     airtable_client = get_airtable_client(request)
-    airtable_geo_area_target_community = fetch_and_validate_geo_area_target_community(
+    airtable_geo_area_target_community = fetch_geo_area_target_community_wrapper(
         geo_area_target_community_id, airtable_client
     )
 

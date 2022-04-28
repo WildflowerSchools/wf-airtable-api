@@ -25,7 +25,7 @@ router = APIRouter(
 )
 
 
-def fetch_and_validate_partner(partner_id, airtable_client: AirtableClient):
+def fetch_partner_wrapper(partner_id, airtable_client: AirtableClient):
     try:
         airtable_partner = airtable_client.get_partner_by_id(partner_id)
     except requests.exceptions.HTTPError as ex:
@@ -62,7 +62,7 @@ async def list_partners(request: Request, page_size: str = 100, offset: str = ""
 @router.get("/{partner_id}", response_model=partner_models.APIPartnerResponse)
 async def get_partner(partner_id, request: Request):
     airtable_client = request.state.airtable_client
-    airtable_partner = fetch_and_validate_partner(partner_id, airtable_client)
+    airtable_partner = fetch_partner_wrapper(partner_id, airtable_client)
 
     data = partner_models.APIPartnerData.from_airtable_partner(
         airtable_partner=airtable_partner, url_path_for=request.app.url_path_for
@@ -76,7 +76,7 @@ async def get_partner(partner_id, request: Request):
 @router.get("/{partner_id}/hubs_as_entrepreneur", response_model=hub_models.ListAPIHubResponse)
 async def get_partner_hubs_as_entrepreneur(partner_id, request: Request):
     airtable_client = request.state.airtable_client
-    fetch_and_validate_partner(partner_id, airtable_client)
+    fetch_partner_wrapper(partner_id, airtable_client)
     airtable_hubs = airtable_client.get_hubs_by_entrepreneur_id(partner_id)
 
     data = hub_models.ListAPIHubData.from_airtable_hubs(
@@ -91,7 +91,7 @@ async def get_partner_hubs_as_entrepreneur(partner_id, request: Request):
 @router.get("/{partner_id}/pods_as_contact", response_model=pod_models.ListAPIPodResponse)
 async def get_partner_pods_as_contact(partner_id, request: Request):
     airtable_client = request.state.airtable_client
-    fetch_and_validate_partner(partner_id, airtable_client)
+    fetch_partner_wrapper(partner_id, airtable_client)
     airtable_pods = airtable_client.get_pods_by_contact_id(partner_id)
 
     data = pod_models.ListAPIPodData.from_airtable_pods(
@@ -106,7 +106,7 @@ async def get_partner_pods_as_contact(partner_id, request: Request):
 @router.get("/{partner_id}/schools_guiding", response_model=school_models.ListAPISchoolResponse)
 async def get_guides_schools(partner_id, request: Request):
     airtable_client = request.state.airtable_client
-    fetch_and_validate_partner(partner_id, airtable_client)
+    fetch_partner_wrapper(partner_id, airtable_client)
     airtable_schools = airtable_client.get_schools_by_guide_id(partner_id)
 
     data = school_models.ListAPISchoolData.from_airtable_schools(
@@ -121,7 +121,7 @@ async def get_guides_schools(partner_id, request: Request):
 @router.get("/{partner_id}/educators_guiding", response_model=educator_models.ListAPIEducatorResponse)
 async def get_guides_educators(partner_id, request: Request):
     airtable_client = request.state.airtable_client
-    fetch_and_validate_partner(partner_id, airtable_client)
+    fetch_partner_wrapper(partner_id, airtable_client)
     airtable_educators = airtable_client.get_educators_by_guide_id(partner_id)
 
     data = educator_models.ListAPIEducatorData.from_airtable_educators(

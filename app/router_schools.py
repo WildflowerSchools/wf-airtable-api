@@ -25,7 +25,7 @@ router = APIRouter(
 )
 
 
-def fetch_and_validate_school(school_id, airtable_client: AirtableClient):
+def fetch_school_wrapper(school_id, airtable_client: AirtableClient):
     try:
         airtable_school = airtable_client.get_school_by_id(school_id)
     except requests.exceptions.HTTPError as ex:
@@ -37,7 +37,7 @@ def fetch_and_validate_school(school_id, airtable_client: AirtableClient):
     return airtable_school
 
 
-def find_and_validate_schools(filters, airtable_client: AirtableClient):
+def find_schools_wrapper(filters, airtable_client: AirtableClient):
     try:
         airtable_schools = airtable_client.find_schools(filters)
     except requests.exceptions.HTTPError as ex:
@@ -81,7 +81,7 @@ async def find_schools(request: Request, organizational_unit: Optional[str] = No
             airtable_school_models.AirtableSchoolFields.__fields__["organizational_unit"].alias
         ] = organizational_unit
 
-    airtable_schools = find_and_validate_schools(filters, airtable_client)
+    airtable_schools = find_schools_wrapper(filters, airtable_client)
 
     data = school_models.ListAPISchoolData.from_airtable_schools(
         airtable_schools=airtable_schools, url_path_for=request.app.url_path_for
@@ -95,7 +95,7 @@ async def find_schools(request: Request, organizational_unit: Optional[str] = No
 @router.get("/{school_id}", response_model=school_models.APISchoolResponse)
 async def get_school(school_id, request: Request):
     airtable_client = request.state.airtable_client
-    airtable_school = fetch_and_validate_school(school_id, airtable_client)
+    airtable_school = fetch_school_wrapper(school_id, airtable_client)
 
     if airtable_school is None:
         raise HTTPException(status_code=404, detail="School not found")
@@ -112,7 +112,7 @@ async def get_school(school_id, request: Request):
 @router.get("/{school_id}/hub", response_model=hub_models.APIHubResponse)
 async def get_school_hub(school_id, request: Request):
     airtable_client = request.state.airtable_client
-    fetch_and_validate_school(school_id, airtable_client)
+    fetch_school_wrapper(school_id, airtable_client)
     airtable_hub = airtable_client.get_hub_by_school_id(school_id)
 
     if airtable_hub is None:
@@ -128,7 +128,7 @@ async def get_school_hub(school_id, request: Request):
 @router.get("/{school_id}/pod", response_model=pod_models.APIPodResponse)
 async def get_school_pod(school_id, request: Request):
     airtable_client = request.state.airtable_client
-    fetch_and_validate_school(school_id, airtable_client)
+    fetch_school_wrapper(school_id, airtable_client)
     airtable_pod = airtable_client.get_pod_by_school_id(school_id)
 
     if airtable_pod is None:
@@ -144,7 +144,7 @@ async def get_school_pod(school_id, request: Request):
 @router.get("/{school_id}/guides_and_entrepreneurs", response_model=partner_models.ListAPIPartnerResponse)
 async def get_school_guides_and_entrepreneurs(school_id, request: Request):
     airtable_client = request.state.airtable_client
-    fetch_and_validate_school(school_id, airtable_client)
+    fetch_school_wrapper(school_id, airtable_client)
     airtable_partners = airtable_client.get_guides_by_school_id(school_id)
 
     data = partner_models.ListAPIPartnerData.from_airtable_partners(
@@ -159,7 +159,7 @@ async def get_school_guides_and_entrepreneurs(school_id, request: Request):
 @router.get("/{school_id}/primary_contacts", response_model=educator_models.ListAPIEducatorResponse)
 async def get_school_primary_contacts(school_id, request: Request):
     airtable_client = request.state.airtable_client
-    fetch_and_validate_school(school_id, airtable_client)
+    fetch_school_wrapper(school_id, airtable_client)
     airtable_educators = airtable_client.get_primary_contacts_by_school_id(school_id)
 
     data = educator_models.ListAPIEducatorData.from_airtable_educators(
@@ -174,7 +174,7 @@ async def get_school_primary_contacts(school_id, request: Request):
 @router.get("/{school_id}/educators", response_model=educator_models.ListAPIEducatorResponse)
 async def get_school_educators(school_id, request: Request):
     airtable_client = request.state.airtable_client
-    fetch_and_validate_school(school_id, airtable_client)
+    fetch_school_wrapper(school_id, airtable_client)
     airtable_educators = airtable_client.get_all_educators_by_school_id(school_id)
 
     data = educator_models.ListAPIEducatorData.from_airtable_educators(
@@ -189,7 +189,7 @@ async def get_school_educators(school_id, request: Request):
 @router.get("/{school_id}/current_educators", response_model=educator_models.ListAPIEducatorResponse)
 async def get_school_current_educators(school_id, request: Request):
     airtable_client = request.state.airtable_client
-    fetch_and_validate_school(school_id, airtable_client)
+    fetch_school_wrapper(school_id, airtable_client)
     airtable_educators = airtable_client.get_current_educators_by_school_id(school_id)
 
     data = educator_models.ListAPIEducatorData.from_airtable_educators(
@@ -204,7 +204,7 @@ async def get_school_current_educators(school_id, request: Request):
 @router.get("/{school_id}/current_tls", response_model=educator_models.ListAPIEducatorResponse)
 async def get_school_current_tls(school_id, request: Request):
     airtable_client = request.state.airtable_client
-    fetch_and_validate_school(school_id, airtable_client)
+    fetch_school_wrapper(school_id, airtable_client)
     airtable_educators = airtable_client.get_current_tls_by_school_id(school_id)
 
     data = educator_models.ListAPIEducatorData.from_airtable_educators(
@@ -219,7 +219,7 @@ async def get_school_current_tls(school_id, request: Request):
 @router.get("/{school_id}/founders", response_model=educator_models.ListAPIEducatorResponse)
 async def get_school_founders(school_id, request: Request):
     airtable_client = request.state.airtable_client
-    fetch_and_validate_school(school_id, airtable_client)
+    fetch_school_wrapper(school_id, airtable_client)
     airtable_educators = airtable_client.get_founders_by_school_id(school_id)
 
     data = educator_models.ListAPIEducatorData.from_airtable_educators(

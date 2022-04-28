@@ -19,7 +19,7 @@ router = APIRouter(
 )
 
 
-def fetch_and_validate_hub(hub_id, airtable_client: AirtableClient):
+def fetch_hub_wrapper(hub_id, airtable_client: AirtableClient):
     try:
         airtable_hub = airtable_client.get_hub_by_id(hub_id)
     except requests.exceptions.HTTPError as ex:
@@ -48,7 +48,7 @@ async def list_hubs(request: Request):
 @router.get("/{hub_id}", response_model=hub_models.APIHubResponse)
 async def get_hub(hub_id, request: Request):
     airtable_client = get_airtable_client(request)
-    airtable_hub = fetch_and_validate_hub(hub_id, airtable_client)
+    airtable_hub = fetch_hub_wrapper(hub_id, airtable_client)
 
     data = hub_models.APIHubData.from_airtable_hub(airtable_hub=airtable_hub, url_path_for=request.app.url_path_for)
 
@@ -58,7 +58,7 @@ async def get_hub(hub_id, request: Request):
 @router.get("/{hub_id}/regional_site_entrepreneurs", response_model=partner_models.ListAPIPartnerResponse)
 async def get_hub_site_entrepreneurs(hub_id, request: Request):
     airtable_client = get_airtable_client(request)
-    fetch_and_validate_hub(hub_id, airtable_client)
+    fetch_hub_wrapper(hub_id, airtable_client)
     airtable_partners = airtable_client.get_partners_by_hub_id(hub_id)
 
     data = partner_models.ListAPIPartnerData.from_airtable_partners(
@@ -73,7 +73,7 @@ async def get_hub_site_entrepreneurs(hub_id, request: Request):
 @router.get("/{hub_id}/pods", response_model=pod_models.ListAPIPodResponse)
 async def get_hub_pods(hub_id, request: Request):
     airtable_client = get_airtable_client(request)
-    fetch_and_validate_hub(hub_id, airtable_client)
+    fetch_hub_wrapper(hub_id, airtable_client)
     airtable_pods = airtable_client.get_pods_by_hub_id(hub_id)
 
     data = pod_models.ListAPIPodData.from_airtable_pods(
@@ -88,7 +88,7 @@ async def get_hub_pods(hub_id, request: Request):
 @router.get("/{hub_id}/schools", response_model=school_models.ListAPISchoolResponse)
 async def get_hub_schools(hub_id, request: Request):
     airtable_client = get_airtable_client(request)
-    fetch_and_validate_hub(hub_id, airtable_client)
+    fetch_hub_wrapper(hub_id, airtable_client)
     airtable_schools = airtable_client.get_schools_by_hub_id(hub_id)
 
     data = school_models.ListAPISchoolData.from_airtable_schools(

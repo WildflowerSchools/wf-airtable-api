@@ -24,6 +24,11 @@ class CreateUpdateAirtableEducatorsSchoolsFields(BaseModel):
         allow_population_by_field_name = True
 
 
+class AirtableFindEducatorsSchoolsFields(CreateUpdateAirtableEducatorsSchoolsFields):
+    educator_id: Optional[list[str]] = Field(alias="Educator Record ID")
+    school_id: Optional[list[str]] = Field(alias="School Record ID")
+
+
 class AirtableEducatorsSchoolsFields(CreateUpdateAirtableEducatorsSchoolsFields):
     educator: Optional[Union[str, object]] = Field(alias="Educator")
     school: Optional[Union[str, object]] = Field(alias="School")

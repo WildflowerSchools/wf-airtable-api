@@ -44,8 +44,10 @@ class APIEducatorSchoolData(educators_schools.APIEducatorSchoolData):
         )
 
         educator_record = airtable_educator_school.fields.educator
+        educator_id = educator_record
         educator_data = educator_record
         if isinstance(educator_record, airtable_educator_models.AirtableEducatorResponse):
+            educator_id = educator_record.id
             educator_data = response_models.APIDataWithFields(
                 id=educator_record.id,
                 type=educators_models.MODEL_TYPE,
@@ -53,8 +55,10 @@ class APIEducatorSchoolData(educators_schools.APIEducatorSchoolData):
             )
 
         school_record = airtable_educator_school.fields.school
+        school_id = school_record
         school_data = school_record
         if isinstance(school_record, airtable_school_models.AirtableSchoolResponse):
+            school_id = school_record.id
             school_data = response_models.APIDataWithFields(
                 id=school_record.id,
                 type=schools_models.MODEL_TYPE,
@@ -63,11 +67,11 @@ class APIEducatorSchoolData(educators_schools.APIEducatorSchoolData):
 
         relationships = APIEducatorSchoolRelationships(
             educator=response_models.APILinksAndData(
-                links={"self": url_path_for("get_educator", educator_id=educator_record.id)},
+                links={"self": url_path_for("get_educator", educator_id=educator_id)},
                 data=educator_data,
             ),
             school=response_models.APILinksAndData(
-                links={"self": url_path_for("get_school", school_id=school_record.id)},
+                links={"self": url_path_for("get_school", school_id=school_id)},
                 data=school_data,
             ),
         )
