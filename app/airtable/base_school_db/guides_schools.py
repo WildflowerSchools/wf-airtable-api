@@ -15,8 +15,9 @@ class AirtableGuidesSchoolsFields(BaseModel):
     type: Optional[str] = Field(alias="Type")
     active: Optional[str] = Field(alias="Currently active")
 
-    _get_first_or_default_none = validator("school_id", "guide_id", pre=True,
-                                           allow_reuse=True)(get_first_or_default_none)
+    _get_first_or_default_none = validator("school_id", "guide_id", pre=True, allow_reuse=True)(
+        get_first_or_default_none
+    )
 
 
 class AirtableGuidesSchoolsResponse(AirtableResponse):

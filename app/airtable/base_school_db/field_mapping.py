@@ -13,10 +13,7 @@ class AirtableFieldMappingFields(BaseModel):
     field_category_type: Optional[str] = Field(alias="Field Category Type")
     field_categories: Optional[list[str]] = Field(alias="Field Categories")
 
-    _get_first_or_default_none = validator(
-        "field_category_type",
-        pre=True,
-        allow_reuse=True)(get_first_or_default_none)
+    _get_first_or_default_none = validator("field_category_type", pre=True, allow_reuse=True)(get_first_or_default_none)
 
 
 class AirtableFieldMappingResponse(AirtableResponse):
@@ -26,15 +23,17 @@ class AirtableFieldMappingResponse(AirtableResponse):
 class ListAirtableFieldMappingResponse(ListAirtableResponse):
     __root__: list[AirtableFieldMappingResponse]
 
-    def map_response_value(self, field_category_type: FieldCategoryType,
-                           response_value) -> Optional[AirtableFieldMappingResponse]:
+    def map_response_value(
+        self, field_category_type: FieldCategoryType, response_value
+    ) -> Optional[AirtableFieldMappingResponse]:
         if response_value is None:
             return None
 
         def filter_mappings(mapping):
-            return \
-                mapping.fields.field_category_type.strip().lower() == field_category_type.strip().lower() and \
-                mapping.fields.response.strip().lower() == response_value.strip().lower()
+            return (
+                mapping.fields.field_category_type.strip().lower() == field_category_type.strip().lower()
+                and mapping.fields.response.strip().lower() == response_value.strip().lower()
+            )
 
         mapping_match = list(filter(filter_mappings, self.__root__))
         if len(mapping_match) > 0:

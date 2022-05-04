@@ -21,9 +21,7 @@ class CreateAirtableMontessoriCertificationFields(BaseModel):
 class AirtableMontessoriCertificationFields(CreateAirtableMontessoriCertificationFields):
     educator_full_name: Optional[str] = Field(alias="Educator Full Name")
 
-    _get_first_or_default_none = validator("educator_full_name",
-                                           pre=True,
-                                           allow_reuse=True)(get_first_or_default_none)
+    _get_first_or_default_none = validator("educator_full_name", pre=True, allow_reuse=True)(get_first_or_default_none)
 
 
 class AirtableMontessoriCertificationResponse(AirtableResponse):

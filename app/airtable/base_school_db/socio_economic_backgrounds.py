@@ -29,11 +29,9 @@ class AirtableSocioEconomicBackgroundFields(CreateAirtableSocioEconomicBackgroun
     partner_name: Optional[str] = Field(alias="Partner Name")
     languages: Optional[list[str]] = Field(alias="Languages")
 
-    _get_first_or_default_none = validator(
-        "educator_full_name",
-        "partner_name",
-        pre=True,
-        allow_reuse=True)(get_first_or_default_none)
+    _get_first_or_default_none = validator("educator_full_name", "partner_name", pre=True, allow_reuse=True)(
+        get_first_or_default_none
+    )
 
 
 class AirtableSocioEconomicBackgroundResponse(AirtableResponse):

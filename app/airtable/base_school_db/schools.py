@@ -17,6 +17,7 @@ class AirtableSchoolFields(BaseModel):
     address: Optional[str] = Field(alias="Address")
     latitude: Optional[float] = Field(alias="Latitude")
     longitude: Optional[float] = Field(alias="Longitude")
+    organizational_unit: Optional[str] = Field(alias="Google Workspace Org Unit Path")
 
     ages_served: Optional[list[str]] = Field(alias="Ages served")
     school_calendar: Optional[str] = Field(alias="School calendar")
@@ -26,7 +27,9 @@ class AirtableSchoolFields(BaseModel):
     website: Optional[AnyUrl] = Field(alias="Website")
 
     hub: Optional[str] = Field(alias="Hub")
+    hub_name: Optional[str] = Field(alias="Hub Name")
     pod: Optional[str] = Field(alias="Pod")
+    pod_name: Optional[str] = Field(alias="Pod Name")
     guides_entrepreneurs: Optional[list[str]] = Field(alias="Guides and Entrepreneurs")
     primary_contacts: Optional[list[str]] = Field(alias="Primary Contacts")
     all_educators: Optional[list[str]] = Field(alias="All Educator Record IDs")
@@ -50,19 +53,12 @@ class AirtableSchoolFields(BaseModel):
 
     # reusable validator
     _get_first_or_default_none = validator(
-        "hub",
-        "pod",
-        "address",
-        "latitude",
-        "longitude",
-        pre=True,
-        allow_reuse=True)(get_first_or_default_none)
+        "hub", "hub_name", "pod", "pod_name", "address", "latitude", "longitude", pre=True, allow_reuse=True
+    )(get_first_or_default_none)
 
-    _get_first_or_default_dict = validator(
-        "affiliation_agreement",
-        "logo",
-        pre=True,
-        allow_reuse=True)(get_first_or_default_dict)
+    _get_first_or_default_dict = validator("affiliation_agreement", "logo", pre=True, allow_reuse=True)(
+        get_first_or_default_dict
+    )
 
     def get_logo_url(self, default=None):
         if isinstance(self.logo, AirtableAttachment):

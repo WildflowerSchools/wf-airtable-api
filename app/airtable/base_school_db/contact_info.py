@@ -4,7 +4,7 @@ from pydantic import BaseModel, Field
 
 from app.airtable.response import AirtableResponse
 
-MODEL_TYPE = 'contact_info'
+MODEL_TYPE = "contact_info"
 
 
 class CreateAirtableContactInfoFields(BaseModel):
