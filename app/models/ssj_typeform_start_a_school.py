@@ -43,7 +43,7 @@ class CreateApiSSJTypeformStartASchoolFields(ssj_typeform_start_a_school.CreateA
             socio_economic_primary_language=self.socio_economic_primary_language,
             message=self.message,
             equity_reflection=self.equity_reflection,
-            receive_communications=self.receive_communications
+            receive_communications=self.receive_communications,
         )
 
 
@@ -100,7 +100,7 @@ class ApiSSJTypeformStartASchoolData(ssj_typeform_start_a_school.ApiSSJTypeformS
             socio_economic_primary_language=airtable_start_a_school.fields.socio_economic_primary_language,
             message=airtable_start_a_school.fields.message,
             equity_reflection=airtable_start_a_school.fields.equity_reflection,
-            receive_communications=airtable_start_a_school.fields.receive_communications
+            receive_communications=airtable_start_a_school.fields.receive_communications,
         )
 
         return cls(id=airtable_start_a_school.id, type=MODEL_TYPE, fields=fields, relationships={}, links={})
