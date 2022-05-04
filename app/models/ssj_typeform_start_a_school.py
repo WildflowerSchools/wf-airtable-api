@@ -25,6 +25,8 @@ class CreateApiSSJTypeformStartASchoolFields(ssj_typeform_start_a_school.CreateA
             contact_location_city=self.contact_location_city,
             contact_location_state=self.contact_location_state,
             contact_location_country=self.contact_location_country,
+            has_interest_in_joining_another_school=self.has_interest_in_joining_another_school,
+            is_willing_to_move=self.is_willing_to_move,
             age_classrooms_interested_in_offering=", ".join(self.age_classrooms_interested_in_offering)
             if self.age_classrooms_interested_in_offering is not None
             else None,
@@ -32,13 +34,16 @@ class CreateApiSSJTypeformStartASchoolFields(ssj_typeform_start_a_school.CreateA
             if self.socio_economic_race_and_ethnicity is not None
             else None,
             socio_economic_race_and_ethnicity_other=self.socio_economic_race_and_ethnicity_other,
+            socio_economic_lgbtqia_identifying=self.socio_economic_lgbtqia_identifying,
+            socio_economic_pronouns=self.socio_economic_pronouns,
+            socio_economic_pronouns_other=self.socio_economic_pronouns_other,
             socio_economic_gender=self.socio_economic_gender,
             socio_economic_gender_other=self.socio_economic_gender_other,
             socio_economic_household_income=self.socio_economic_household_income,
             socio_economic_primary_language=self.socio_economic_primary_language,
             message=self.message,
-            receive_newsletter=self.receive_newsletter,
-            receive_event_invitations=self.receive_event_invitations,
+            equity_reflection=self.equity_reflection,
+            receive_communications=self.receive_communications
         )
 
 
@@ -81,16 +86,21 @@ class ApiSSJTypeformStartASchoolData(ssj_typeform_start_a_school.ApiSSJTypeformS
             contact_location_city=airtable_start_a_school.fields.contact_location_city,
             contact_location_state=airtable_start_a_school.fields.contact_location_state,
             contact_location_country=airtable_start_a_school.fields.contact_location_country,
+            has_interest_in_joining_another_school=airtable_start_a_school.fields.has_interest_in_joining_another_school,
+            is_willing_to_move=airtable_start_a_school.fields.is_willing_to_move,
             age_classrooms_interested_in_offering=age_classrooms,
             socio_economic_race_and_ethnicity=socio_economic_race_and_ethnicity,
             socio_economic_race_and_ethnicity_other=airtable_start_a_school.fields.socio_economic_race_and_ethnicity_other,
+            socio_economic_lgbtqia_identifying=airtable_start_a_school.fields.socio_economic_lgbtqia_identifying,
+            socio_economic_pronouns=airtable_start_a_school.fields.socio_economic_pronouns,
+            socio_economic_pronouns_other=airtable_start_a_school.fields.socio_economic_pronouns_other,
             socio_economic_gender=airtable_start_a_school.fields.socio_economic_gender,
             socio_economic_gender_other=airtable_start_a_school.fields.socio_economic_gender_other,
             socio_economic_household_income=airtable_start_a_school.fields.socio_economic_household_income,
             socio_economic_primary_language=airtable_start_a_school.fields.socio_economic_primary_language,
             message=airtable_start_a_school.fields.message,
-            receive_newsletter=airtable_start_a_school.fields.receive_newsletter,
-            receive_event_invitations=airtable_start_a_school.fields.receive_event_invitations,
+            equity_reflection=airtable_start_a_school.fields.equity_reflection,
+            receive_communications=airtable_start_a_school.fields.receive_communications
         )
 
         return cls(id=airtable_start_a_school.id, type=MODEL_TYPE, fields=fields, relationships={}, links={})

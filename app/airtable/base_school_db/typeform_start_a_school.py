@@ -21,16 +21,21 @@ class CreateAirtableSSJTypeformStartASchool(BaseModel):
     contact_location_city: str = Field(alias="Contact Location: City")
     contact_location_state: str = Field(alias="Contact Location: State")
     contact_location_country: Optional[str] = Field(alias="Contact Location: Country")
+    has_interest_in_joining_another_school: bool = Field(alias="Has Interest in Joining Another School", default=False)
+    is_willing_to_move: bool = Field(alias="Is Willing to Move", default=False)
     age_classrooms_interested_in_offering: str = Field(alias="Age Classrooms Interested In Offering")
     socio_economic_race_and_ethnicity: Optional[str] = Field(alias="Socio-Economic: Race & Ethnicity")
     socio_economic_race_and_ethnicity_other: Optional[str] = Field(alias="Socio-Economic: Race & Ethnicity Other")
+    socio_economic_lgbtqia_identifying: Optional[str] = Field(alias="Socio-Economic: LGBTQIA Identifying")
+    socio_economic_pronouns: Optional[str] = Field(alias="Socio-Economic: Pronouns")
+    socio_economic_pronouns_other: Optional[str] = Field(alias="Socio-Economic: Pronouns Other")
     socio_economic_gender: Optional[str] = Field(alias="Socio-Economic: Gender")
     socio_economic_gender_other: Optional[str] = Field(alias="Socio-Economic: Gender Other")
     socio_economic_household_income: Optional[str] = Field(alias="Socio-Economic: Household Income")
     socio_economic_primary_language: Optional[str] = Field(alias="Socio-Economic: Primary Language")
     message: str = Field(alias="Message")
-    receive_newsletter: bool = Field(alias="Receive Newsletter", default=False)
-    receive_event_invitations: bool = Field(alias="Receive Event Invitations", default=False)
+    equity_reflection: str = Field(alias="Equity Reflection")
+    receive_communications: bool = Field(alias="Receive Communications", default=False)
 
     class Config:
         allow_population_by_field_name = True

@@ -113,6 +113,7 @@ class CreateAPIEducatorFields(educators.CreateAPIEducatorFields):
             if gender_includes_non_specific_category:
                 gender_other = self.gender
 
+        # TODO: Use Enums
         lgbtqia = None
         if self.lgbtqia_identifying is not None:
             lgbtqia_categories, _ = airtable_client.map_response_to_field_category_values(
@@ -122,14 +123,15 @@ class CreateAPIEducatorFields(educators.CreateAPIEducatorFields):
             if len(lgbtqia_categories) > 0:
                 lgbtqia = lgbtqia_categories[0]
 
-        pronoun = None
+        # TODO: Use Enums
+        pronouns = None
         pronouns_other = None
         if self.pronouns is not None:
-            pronouns, pronouns_includes_non_specific_category = airtable_client.map_response_to_field_category_values(
+            _pronouns, pronouns_includes_non_specific_category = airtable_client.map_response_to_field_category_values(
                 FieldCategoryType.pronouns, self.pronouns
             )
-            if len(pronouns) > 0:
-                pronoun = pronouns[0]
+            if len(_pronouns) > 0:
+                pronouns = _pronouns[0]
             if pronouns_includes_non_specific_category:
                 pronouns_other = self.pronouns
 
@@ -142,7 +144,7 @@ class CreateAPIEducatorFields(educators.CreateAPIEducatorFields):
             gender=gender,
             gender_other=gender_other,
             lgbtqia_identifying=lgbtqia,
-            pronouns=pronoun,
+            pronouns=pronouns,
             pronouns_other=pronouns_other,
         )
 
