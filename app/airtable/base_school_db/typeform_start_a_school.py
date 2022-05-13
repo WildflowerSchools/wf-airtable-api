@@ -12,6 +12,7 @@ class CreateAirtableSSJTypeformStartASchool(BaseModel):
     email: str = Field(alias="Email")
     is_montessori_certified: bool = Field(alias="Is Montessori Certified", default=False)
     is_seeking_montessori_certification: bool = Field(alias="Is Seeking Montessori Certification", default=False)
+    montessori_certification_certifier: Optional[str] = Field(alias="Montessori Certification Certifier")
     montessori_certification_year: Optional[int] = Field(alias="Montessori Certification Year")
     montessori_certification_levels: Optional[str] = Field(alias="Montessori Certification Levels")
     school_location_city: str = Field(alias="School Location: City")
