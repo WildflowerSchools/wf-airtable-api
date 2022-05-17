@@ -24,7 +24,7 @@ class CreateAirtableSSJTypeformStartASchool(BaseModel):
     contact_location_country: Optional[str] = Field(alias="Contact Location: Country")
     has_interest_in_joining_another_school: bool = Field(alias="Has Interest in Joining Another School", default=False)
     is_willing_to_move: bool = Field(alias="Is Willing to Move", default=False)
-    age_classrooms_interested_in_offering: str = Field(alias="Age Classrooms Interested In Offering")
+    age_classrooms_interested_in_offering: Optional[str] = Field(alias="Age Classrooms Interested In Offering")
     socio_economic_race_and_ethnicity: Optional[str] = Field(alias="Socio-Economic: Race & Ethnicity")
     socio_economic_race_and_ethnicity_other: Optional[str] = Field(alias="Socio-Economic: Race & Ethnicity Other")
     socio_economic_lgbtqia_identifying: Optional[str] = Field(alias="Socio-Economic: LGBTQIA Identifying")
@@ -35,7 +35,7 @@ class CreateAirtableSSJTypeformStartASchool(BaseModel):
     socio_economic_household_income: Optional[str] = Field(alias="Socio-Economic: Household Income")
     socio_economic_primary_language: Optional[str] = Field(alias="Socio-Economic: Primary Language")
     message: str = Field(alias="Message")
-    equity_reflection: str = Field(alias="Equity Reflection")
+    equity_reflection: Optional[str] = Field(alias="Equity Reflection")
     receive_communications: bool = Field(alias="Receive Communications", default=False)
 
     class Config:
