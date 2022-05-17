@@ -106,13 +106,15 @@ async def create_educator(payload: educator_models.CreateAPIEducatorFields, requ
         )
         raise HTTPException(status_code=409, detail="Educator already exists")
 
-    # 1. Create the Educator
-    airtable_educator_payload = payload.to_airtable_educator()
-    airtable_educator_response = airtable_client.create_educator(payload=airtable_educator_payload)
+    # 1. Create the Contact Info record
+    airtable_contact_info_payload = payload.to_airtable_contact_info()
+    airtable_contact_info_response = airtable_client.create_contact_info(airtable_contact_info_payload)
 
-    # 2. Create the Contact Info record (linked to educator)
-    airtable_contact_info_payload = payload.to_airtable_contact_info(airtable_educator_response.id)
-    airtable_client.create_contact_info(airtable_contact_info_payload)
+    # 2. Create the Educator (linked to Contact Info)
+    airtable_educator_payload = payload.to_airtable_educator(contact_info_id=airtable_contact_info_response.id)
+    airtable_educator_response = airtable_client.create_educator(
+        payload=airtable_educator_payload, load_relationships=False
+    )
 
     # 3. Create the Socio-economic record (linked to educator)
     airtable_socio_economic_payload = payload.to_airtable_socio_economic(airtable_educator_response.id)

@@ -14,6 +14,8 @@ from app.airtable.validators import get_first_or_default_none, get_first_or_defa
 
 
 class CreateAirtableEducatorFields(BaseModel):
+    contact: Optional[list[str]] = Field(alias="Contact Info")
+
     first_name: Optional[str] = Field(alias="First Name")
     last_name: Optional[str] = Field(alias="Last Name")
     details: Optional[str] = Field(alias="Details")

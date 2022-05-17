@@ -21,10 +21,16 @@ from ..airtable.base_school_db.languages import CertificationStatus
 
 
 class CreateAPIEducatorFields(educators.CreateAPIEducatorFields):
-    def to_airtable_educator(self) -> airtable_educator_models.CreateAirtableEducatorFields:
+    def to_airtable_educator(
+        self, contact_info_id: Optional[str] = None
+    ) -> airtable_educator_models.CreateAirtableEducatorFields:
         from ..airtable.client import AirtableClient
 
         airtable_client = AirtableClient()
+
+        contact_info = []
+        if contact_info_id:
+            contact_info.append(contact_info_id)
 
         newsletter_ids = []
         newsletter_slugs = []
@@ -49,6 +55,7 @@ class CreateAPIEducatorFields(educators.CreateAPIEducatorFields):
             start_a_school_response = [self.start_a_school_response_id]
 
         return airtable_educator_models.CreateAirtableEducatorFields(
+            contact=contact_info,
             first_name=self.first_name,
             last_name=self.last_name,
             details=self.details,
@@ -60,9 +67,14 @@ class CreateAPIEducatorFields(educators.CreateAPIEducatorFields):
             newsletters=newsletter_ids,
         )
 
-    def to_airtable_contact_info(self, educator_id) -> airtable_contact_info_models.CreateAirtableContactInfoFields:
+    def to_airtable_contact_info(
+        self, educator_id: Optional[str] = None
+    ) -> airtable_contact_info_models.CreateAirtableContactInfoFields:
+        educator = []
+        if educator_id:
+            educator.append(educator_id)
         return airtable_contact_info_models.CreateAirtableContactInfoFields(
-            educator=[educator_id], type="Personal email", email=self.email, is_primary=True
+            educator=educator, type="Personal email", email=self.email, is_primary=True
         )
 
     def to_airtable_socio_economic(
