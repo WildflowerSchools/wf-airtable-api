@@ -37,6 +37,7 @@ class CreateAirtableEducatorFields(BaseModel):
 
 class AirtableEducatorFields(CreateAirtableEducatorFields):
     full_name: Optional[str] = Field(alias="Full Name")
+    all_emails: Optional[list[str]] = Field(alias="All Contact Emails")
     email: Optional[list[str]] = Field(alias="Contact Email")
     current_roles: Optional[list[str]] = Field(alias="Current Role")
     montessori_certified: Optional[bool] = Field(alias="Montessori Certified", default=False)

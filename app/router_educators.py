@@ -43,7 +43,7 @@ def find_educators_wrapper(email: Optional[str], airtable_client: AirtableClient
     try:
         filters = {}
         if email:
-            filters[airtable_educator_models.AirtableEducatorFields.__fields__["email"].alias] = email
+            filters[airtable_educator_models.AirtableEducatorFields.__fields__["all_emails"].alias] = email
         airtable_educators = airtable_client.find_educators(filters)
     except requests.exceptions.HTTPError as ex:
         if ex.response.status_code == 404:
@@ -95,7 +95,7 @@ async def list_educators(request: Request, page_size: str = 100, offset: str = "
 async def create_educator(payload: educator_models.CreateAPIEducatorFields, request: Request):
     airtable_client = get_airtable_client(request)
 
-    if payload.email is None:
+    if payload.email is None or payload.email == "":
         raise HTTPException(status_code=400, detail="Educator email required")
 
     # Is educator pre-existing? Return 409, but add the typeform response to the educator record first
