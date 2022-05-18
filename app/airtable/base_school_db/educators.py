@@ -93,6 +93,11 @@ class AirtableEducatorFields(CreateAirtableEducatorFields):
     _get_first_or_default_dict = validator("visioning_album", pre=True, allow_reuse=True)(get_first_or_default_dict)
 
     # noinspection PyMethodParameters
+    @validator("all_emails", pre=True)
+    def scrub_bad_emails(cls, v):
+        return list(filter(None, v))
+
+    # noinspection PyMethodParameters
     @validator("lgbtqia_identifying", pre=True)
     def normalize_lgbtqia(cls, v):
         if v == "TRUE":

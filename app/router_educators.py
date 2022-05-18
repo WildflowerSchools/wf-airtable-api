@@ -39,12 +39,12 @@ def fetch_educator_wrapper(educator_id, airtable_client: AirtableClient) -> Airt
     return airtable_educator
 
 
-def find_educators_wrapper(email: Optional[str], airtable_client: AirtableClient) -> ListAirtableEducatorResponse:
+def find_educators_wrapper(email: Optional[str], airtable_client: AirtableClient, load_relationships: bool = True) -> ListAirtableEducatorResponse:
     try:
         filters = {}
         if email:
             filters[airtable_educator_models.AirtableEducatorFields.__fields__["all_emails"].alias] = email
-        airtable_educators = airtable_client.find_educators(filters)
+        airtable_educators = airtable_client.find_educators(filters, load_relationships=load_relationships)
     except requests.exceptions.HTTPError as ex:
         if ex.response.status_code == 404:
             return ListAirtableEducatorResponse(__root__=[])
