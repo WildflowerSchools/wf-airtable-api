@@ -39,7 +39,9 @@ def fetch_educator_wrapper(educator_id, airtable_client: AirtableClient) -> Airt
     return airtable_educator
 
 
-def find_educators_wrapper(email: Optional[str], airtable_client: AirtableClient, load_relationships: bool = True) -> ListAirtableEducatorResponse:
+def find_educators_wrapper(
+    email: Optional[str], airtable_client: AirtableClient, load_relationships: bool = True
+) -> ListAirtableEducatorResponse:
     try:
         filters = {}
         if email:

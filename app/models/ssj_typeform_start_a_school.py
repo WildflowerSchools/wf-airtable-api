@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Callable
 
 from wf_airtable_api_schema.models.ssj_typeform_start_a_school import *
@@ -19,6 +20,10 @@ class CreateApiSSJTypeformStartASchoolFields(ssj_typeform_start_a_school.CreateA
         socio_economic_race_and_ethnicity = None
         if self.socio_economic_race_and_ethnicity is not None:
             socio_economic_race_and_ethnicity = ", ".join(self.socio_economic_race_and_ethnicity)
+
+        entry_date = datetime.now()
+        if self.entry_date is not None:
+            entry_date = self.entry_date
 
         return airtable_start_a_school_models.CreateAirtableSSJTypeformStartASchool(
             first_name=self.first_name,
@@ -51,6 +56,7 @@ class CreateApiSSJTypeformStartASchoolFields(ssj_typeform_start_a_school.CreateA
             message=self.message,
             equity_reflection=self.equity_reflection,
             receive_communications=self.receive_communications,
+            entry_date=entry_date,
         )
 
 
@@ -109,6 +115,7 @@ class ApiSSJTypeformStartASchoolData(ssj_typeform_start_a_school.ApiSSJTypeformS
             message=airtable_start_a_school.fields.message,
             equity_reflection=airtable_start_a_school.fields.equity_reflection,
             receive_communications=airtable_start_a_school.fields.receive_communications,
+            entry_date=airtable_start_a_school.fields.entry_date,
         )
 
         return cls(id=airtable_start_a_school.id, type=MODEL_TYPE, fields=fields, relationships={}, links={})
