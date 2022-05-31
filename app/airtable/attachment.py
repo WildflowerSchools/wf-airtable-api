@@ -1,5 +1,7 @@
 from typing import Dict, Optional
-from pydantic import BaseModel, HttpUrl
+from pydantic import HttpUrl
+
+from app.airtable.base_model import BaseModel
 
 
 class AirtableAttachmentThumbnailDetails(BaseModel):

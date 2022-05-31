@@ -1,8 +1,9 @@
 from enum import Enum
 from typing import Optional
 
-from pydantic import BaseModel, Field
+from pydantic import Field
 
+from app.airtable.base_model import BaseModel
 from app.airtable.response import AirtableResponse
 
 

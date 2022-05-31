@@ -1,7 +1,8 @@
 from typing import Optional
 
-from pydantic import BaseModel, Field, validator
+from pydantic import Field, validator
 
+from app.airtable.base_model import BaseModel
 from app.airtable.response import AirtableResponse
 from app.airtable.validators import get_first_or_default_none
 

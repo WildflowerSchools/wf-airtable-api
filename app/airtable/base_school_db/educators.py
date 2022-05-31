@@ -1,6 +1,6 @@
 from typing import Optional, Union
 
-from pydantic import BaseModel, Field, validator
+from pydantic import Field, validator
 
 from . import (
     educators_schools as educators_schools_models,
@@ -9,6 +9,7 @@ from . import (
     newsletters as airtable_newsletters_models,
 )
 from app.airtable.attachment import AirtableAttachment
+from app.airtable.base_model import BaseModel
 from app.airtable.response import AirtableResponse
 from app.airtable.validators import get_first_or_default_none, get_first_or_default_dict
 

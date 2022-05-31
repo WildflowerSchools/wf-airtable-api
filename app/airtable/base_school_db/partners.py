@@ -1,7 +1,8 @@
 from typing import Optional, Union
 
-from pydantic import BaseModel, Field, validator
+from pydantic import Field, validator
 
+from app.airtable.base_model import BaseModel
 from app.airtable.base_school_db import guides_schools as airtable_guides_schools_models
 from app.airtable.response import AirtableResponse
 

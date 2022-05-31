@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import BaseModel
+from app.airtable.base_model import BaseModel
 
 
 class AirtableResponse(BaseModel):

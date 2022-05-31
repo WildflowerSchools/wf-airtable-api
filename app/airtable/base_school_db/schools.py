@@ -1,9 +1,10 @@
 from datetime import date, datetime
 from typing import Optional
 
-from pydantic import AnyUrl, BaseModel, Field, validator
+from pydantic import AnyUrl, Field, validator
 
 from app.airtable.attachment import AirtableAttachment
+from app.airtable.base_model import BaseModel
 from app.airtable.response import AirtableResponse
 from app.airtable.validators import get_first_or_default_none, get_first_or_default_dict
 

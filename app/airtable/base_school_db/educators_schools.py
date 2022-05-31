@@ -1,11 +1,12 @@
 from datetime import date
 from typing import Optional, Union
 
-from pydantic import BaseModel, Field, validator
+from pydantic import Field, validator
 
 
 from . import educators as educators_models
 from . import schools as schools_models
+from app.airtable.base_model import BaseModel
 from app.airtable.response import AirtableResponse
 from app.airtable.validators import get_first_or_default_none
 
