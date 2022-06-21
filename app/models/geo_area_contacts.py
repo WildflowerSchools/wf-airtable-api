@@ -57,10 +57,14 @@ class APIGeoAreaContactData(geo_area_contacts.APIGeoAreaContactData):
 
             rse_data = APIDataBase(id=partner_record.id, type=partner_models.MODEL_TYPE)
 
-        relationships = APIGeoAreaContactRelationships(
-            hub=response_models.APILinksAndData(
+        hub_link = None
+        if hub_data and 'id' in hub_data:
+            hub_link = response_models.APILinksAndData(
                 links={"self": url_path_for("get_hub", hub_id=hub_data.id)}, data=hub_data
-            ),
+            )
+
+        relationships = APIGeoAreaContactRelationships(
+            hub=hub_link,
             assigned_rse=response_models.APILinksAndData(
                 links={"self": url_path_for("get_partner", partner_id=rse_data.id)}, data=rse_data
             ),
