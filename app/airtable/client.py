@@ -541,11 +541,12 @@ class AirtableClient(metaclass=Singleton):
         )
         return AirtableSSJTypeformStartASchoolResponse.parse_obj(raw)
 
-    def create_contact_info(self, payload: CreateAirtableContactInfoFields) -> AirtableContactInfoResponse:
-        raw = self.client_api.create(
-            base_id=BASE_ID, table_name=CONTACT_INFO_TABLE_NAME, fields=payload.dict(by_alias=True)
-        )
-        return AirtableContactInfoResponse.parse_obj(raw)
+    # 7/15/2022 - Moved away from Contact Info for a more flat structure in the Educator table itself
+    # def create_contact_info(self, payload: CreateAirtableContactInfoFields) -> AirtableContactInfoResponse:
+    #     raw = self.client_api.create(
+    #         base_id=BASE_ID, table_name=CONTACT_INFO_TABLE_NAME, fields=payload.dict(by_alias=True)
+    #     )
+    #     return AirtableContactInfoResponse.parse_obj(raw)
 
     def create_socio_economic(
         self, payload: CreateAirtableSocioEconomicBackgroundFields

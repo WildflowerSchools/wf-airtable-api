@@ -15,6 +15,7 @@ class CreateUpdateAirtableEducatorsSchoolsFields(BaseModel):
     educator: Optional[list[str]] = Field(alias="Educator")
     school: Optional[list[str]] = Field(alias="School")
 
+    email: Optional[str] = Field(alias="Email at School")
     roles: Optional[list[str]] = Field(alias="Roles (staging)")
     currently_active: Optional[bool] = Field(alias="Currently Active")
     start_date: Optional[date] = Field(alias="Start Date")

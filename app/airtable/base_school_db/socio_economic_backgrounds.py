@@ -39,5 +39,5 @@ class AirtableSocioEconomicBackgroundResponse(AirtableResponse):
     fields: AirtableSocioEconomicBackgroundFields
 
 
-class ListAirtableHubResponse(BaseModel):
+class ListAirtableSocioEconomicBackgroundResponse(BaseModel):
     __root__: list[AirtableSocioEconomicBackgroundResponse]

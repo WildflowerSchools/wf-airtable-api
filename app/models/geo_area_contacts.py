@@ -58,7 +58,7 @@ class APIGeoAreaContactData(geo_area_contacts.APIGeoAreaContactData):
             rse_data = APIDataBase(id=partner_record.id, type=partner_models.MODEL_TYPE)
 
         hub_link = None
-        if hub_data and 'id' in hub_data:
+        if hub_data and "id" in hub_data:
             hub_link = response_models.APILinksAndData(
                 links={"self": url_path_for("get_hub", hub_id=hub_data.id)}, data=hub_data
             )

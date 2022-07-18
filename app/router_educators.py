@@ -89,7 +89,7 @@ async def list_educators(request: Request, page_size: str = 100, offset: str = "
             "next"
         ] = f'{request.app.url_path_for("list_educators")}?{urlencode({"page_size": page_size, "offset": next_offset})}'
 
-    return educator_models.ListAPIEducatorData(data=data, links=links, meta={"offset": next_offset})
+    return educator_models.ListAPIEducatorResponse(data=data, links=links, meta={"offset": next_offset})
 
 
 @router.post("/", response_model=educator_models.APIEducatorResponse, include_in_schema=False)
@@ -109,11 +109,14 @@ async def create_educator(payload: educator_models.CreateAPIEducatorFields, requ
         raise HTTPException(status_code=409, detail="Educator already exists")
 
     # 1. Create the Contact Info record
-    airtable_contact_info_payload = payload.to_airtable_contact_info()
-    airtable_contact_info_response = airtable_client.create_contact_info(airtable_contact_info_payload)
+    # 7/15/2022 - Moved away from Contact Info for a more flat structure in the Educator table itself
+    # airtable_contact_info_payload = payload.to_airtable_contact_info()
+    # airtable_contact_info_response = airtable_client.create_contact_info(airtable_contact_info_payload)
 
     # 2. Create the Educator (linked to Contact Info)
-    airtable_educator_payload = payload.to_airtable_educator(contact_info_id=airtable_contact_info_response.id)
+    airtable_educator_payload = (
+        payload.to_airtable_educator()
+    )  # deprecated -> contact_info_id=airtable_contact_info_response.id)
     airtable_educator_response = airtable_client.create_educator(
         payload=airtable_educator_payload, load_relationships=False
     )

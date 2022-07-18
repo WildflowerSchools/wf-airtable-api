@@ -15,7 +15,13 @@ from app.airtable.validators import get_first_or_default_none, get_first_or_defa
 
 
 class CreateAirtableEducatorFields(BaseModel):
-    contact: Optional[list[str]] = Field(alias="Contact Info")
+    # deprecated
+    # contact: Optional[list[str]] = Field(alias="Contact Info")
+
+    primary_personal_email: Optional[str] = Field(alias="Primary Personal Email")
+    other_personal_emails: Optional[str] = Field(alias="Other Personal Emails")
+    primary_wildflower_email: Optional[str] = Field(alias="Primary Wildflower Email")
+    wildflowerschools_email: Optional[str] = Field(alias="Wildflowerschools.org Email")
 
     first_name: Optional[str] = Field(alias="First Name")
     last_name: Optional[str] = Field(alias="Last Name")
@@ -38,8 +44,17 @@ class CreateAirtableEducatorFields(BaseModel):
 
 class AirtableEducatorFields(CreateAirtableEducatorFields):
     full_name: Optional[str] = Field(alias="Full Name")
-    all_emails: Optional[list[str]] = Field(alias="All Contact Emails")
+    # deprecated
+    all_contact_emails: Optional[list[str]] = Field(alias="All Contact Emails")
+    # deprecated
     email: Optional[list[str]] = Field(alias="Contact Email")
+
+    all_emails: Optional[list[str]] = Field(alias="All Emails")
+    primary_personal_email: Optional[str] = Field(alias="Primary Personal Email")
+    other_personal_emails: Optional[list[str]] = Field(alias="Other Personal Emails")
+    primary_wildflower_email: Optional[str] = Field(alias="Primary Wildflower Email")
+    wildflowerschools_email: Optional[str] = Field(alias="Wildflowerschools.org Email")
+
     current_roles: Optional[list[str]] = Field(alias="Current Role")
     montessori_certified: Optional[bool] = Field(alias="Montessori Certified", default=False)
     target_community_name: Optional[str] = Field(alias="Target Community Name")
@@ -93,10 +108,21 @@ class AirtableEducatorFields(CreateAirtableEducatorFields):
 
     _get_first_or_default_dict = validator("visioning_album", pre=True, allow_reuse=True)(get_first_or_default_dict)
 
+    # deprecated
+    # noinspection PyMethodParameters
+    @validator("all_contact_emails", pre=True)
+    def scrub_bad_contact_emails(cls, v):
+        return list(filter(None, v))
+
     # noinspection PyMethodParameters
     @validator("all_emails", pre=True)
-    def scrub_bad_emails(cls, v):
-        return list(filter(None, v))
+    def split_all_emails(cls, v):
+        return v.split(",") if v is not None else None
+
+    # noinspection PyMethodParameters
+    @validator("other_personal_emails", pre=True)
+    def split_other_personal_emails(cls, v):
+        return v.split(",") if v is not None else None
 
     # noinspection PyMethodParameters
     @validator("lgbtqia_identifying", pre=True)

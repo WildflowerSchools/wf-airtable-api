@@ -20,6 +20,7 @@ class CreateUpdateAPIEducatorSchoolFields(educators_schools.CreateUpdateAPIEduca
         return airtable_educator_school_models.CreateUpdateAirtableEducatorsSchoolsFields(
             educator=[self.educator_id],
             school=[self.school_id],
+            email=self.email,
             roles=self.roles,
             currently_active=self.currently_active,
             start_date=self.start_date,
@@ -38,6 +39,7 @@ class APIEducatorSchoolData(educators_schools.APIEducatorSchoolData):
         fields = APIEducatorSchoolFields(
             start_date=airtable_educator_school.fields.start_date,
             end_date=airtable_educator_school.fields.end_date,
+            email=airtable_educator_school.fields.email,
             roles=airtable_educator_school.fields.roles,
             currently_active=airtable_educator_school.fields.currently_active,
             mark_for_deletion=airtable_educator_school.fields.mark_for_deletion,

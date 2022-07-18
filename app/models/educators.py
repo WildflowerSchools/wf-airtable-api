@@ -9,7 +9,6 @@ from . import hubs as hubs_models
 from . import languages as languages_models
 from . import montessori_certifications as montessori_certifications_models
 from ..airtable.base_school_db import (
-    contact_info as airtable_contact_info_models,
     montessori_certifications as airtable_montessori_certifications_models,
     languages as airtable_languages_models,
     educators as airtable_educator_models,
@@ -22,15 +21,16 @@ from ..airtable.base_school_db.languages import CertificationStatus
 
 class CreateAPIEducatorFields(educators.CreateAPIEducatorFields):
     def to_airtable_educator(
-        self, contact_info_id: Optional[str] = None
+        self,  # , contact_info_id: Optional[str] = None
     ) -> airtable_educator_models.CreateAirtableEducatorFields:
         from ..airtable.client import AirtableClient
 
         airtable_client = AirtableClient()
 
-        contact_info = []
-        if contact_info_id:
-            contact_info.append(contact_info_id)
+        # 7/15/2022 - Moved away from Contact Info for a more flat structure in the Educator table itself
+        # contact_info = []
+        # if contact_info_id:
+        #    contact_info.append(contact_info_id)
 
         newsletter_ids = []
         newsletter_slugs = []
@@ -55,7 +55,7 @@ class CreateAPIEducatorFields(educators.CreateAPIEducatorFields):
             start_a_school_response = [self.start_a_school_response_id]
 
         return airtable_educator_models.CreateAirtableEducatorFields(
-            contact=contact_info,
+            primary_personal_email=self.email,
             first_name=self.first_name,
             last_name=self.last_name,
             details=self.details,
@@ -67,15 +67,16 @@ class CreateAPIEducatorFields(educators.CreateAPIEducatorFields):
             newsletters=newsletter_ids,
         )
 
-    def to_airtable_contact_info(
-        self, educator_id: Optional[str] = None
-    ) -> airtable_contact_info_models.CreateAirtableContactInfoFields:
-        educator = []
-        if educator_id:
-            educator.append(educator_id)
-        return airtable_contact_info_models.CreateAirtableContactInfoFields(
-            educator=educator, type="Personal email", email=self.email, is_primary=True
-        )
+    # 7/15/2022 - Moved away from Contact Info for a more flat structure in the Educator table itself
+    # def to_airtable_contact_info(
+    #     self, educator_id: Optional[str] = None
+    # ) -> airtable_contact_info_models.CreateAirtableContactInfoFields:
+    #     educator = []
+    #     if educator_id:
+    #         educator.append(educator_id)
+    #     return airtable_contact_info_models.CreateAirtableContactInfoFields(
+    #         educator=educator, type="Personal email", email=self.email, is_primary=True
+    #     )
 
     def to_airtable_socio_economic(
         self, educator_id
@@ -245,7 +246,11 @@ class APIEducatorData(educators.APIEducatorData):
             full_name=airtable_educator.fields.full_name,
             first_name=airtable_educator.fields.first_name,
             last_name=airtable_educator.fields.last_name,
-            email=airtable_educator.fields.email,
+            all_emails=airtable_educator.fields.all_emails,
+            primary_personal_email=airtable_educator.fields.primary_personal_email,
+            other_personal_emails=airtable_educator.fields.other_personal_emails,
+            primary_wildflower_email=airtable_educator.fields.primary_wildflower_email,
+            wildflowerschools_email=airtable_educator.fields.wildflowerschools_email,
             details=airtable_educator.fields.details,
             home_address=airtable_educator.fields.home_address,
             target_community=airtable_educator.fields.target_community_name,
@@ -284,6 +289,7 @@ class APIEducatorData(educators.APIEducatorData):
                             type=educators_schools_models.MODEL_TYPE,
                             fields=educators_schools_models.APIEducatorSchoolFields(
                                 roles=d.fields.roles,
+                                email=d.fields.email,
                                 currently_active=d.fields.currently_active,
                                 start_date=d.fields.start_date,
                                 end_date=d.fields.end_date,
