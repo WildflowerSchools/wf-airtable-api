@@ -509,7 +509,7 @@ standard = ["websockets (>=10.0)", "httptools (>=0.4.0)", "watchfiles (>=0.13)",
 
 [[package]]
 name = "wf-airtable-api-schema"
-version = "0.4.5"
+version = "0.4.6"
 description = "Simple package defining a schema translation layer between the client and Airtable bases"
 category = "main"
 optional = false
@@ -521,7 +521,7 @@ pydantic = ">=1.9.0,<2.0.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "1a2a8af2561643d1810aa23b478237a73c6ade68daf17f3ced6a0a30e21e371e"
+content-hash = "a75456033b3f769fa3824b511c514111f4a2414e64844899e3b80ec1a20ddcc6"
 
 [metadata.files]
 anyio = [
@@ -874,6 +874,6 @@ uvicorn = [
     {file = "uvicorn-0.18.2.tar.gz", hash = "sha256:cade07c403c397f9fe275492a48c1b869efd175d5d8a692df649e6e7e2ed8f4e"},
 ]
 wf-airtable-api-schema = [
-    {file = "wf-airtable-api-schema-0.4.5.tar.gz", hash = "sha256:0035a14f5d09c845f6ca5b1edf7dee28584a44d2da8e2c0eb6e3c1096407e109"},
-    {file = "wf_airtable_api_schema-0.4.5-py3-none-any.whl", hash = "sha256:284aa7474879a5b444ac9be69ecc25cd70c5cdffc986ed914ffab358f4260daf"},
+    {file = "wf-airtable-api-schema-0.4.6.tar.gz", hash = "sha256:4650ae06da6cbf6c04c9dfa7a1d9bdd80fa50a15956be8667937f845bc8cfbf7"},
+    {file = "wf_airtable_api_schema-0.4.6-py3-none-any.whl", hash = "sha256:ef571be48e14ef87ea2bca16d4d4a3bc60c6329f9aa2bbeba5cbe9d5607e05a1"},
 ]

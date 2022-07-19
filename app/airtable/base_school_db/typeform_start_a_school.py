@@ -38,6 +38,7 @@ class CreateAirtableSSJTypeformStartASchool(BaseModel):
     message: str = Field(alias="Message")
     equity_reflection: Optional[str] = Field(alias="Equity Reflection")
     receive_communications: bool = Field(alias="Receive Communications", default=False)
+    source: Optional[str] = Field(alias="Source")
     entry_date: datetime = Field(alias="Entry Date")
 
     class Config:
