@@ -3,7 +3,9 @@ import logging
 import random
 import string
 
-from fastapi import FastAPI, Request, Depends
+from fastapi import FastAPI, Request, Depends, status
+import fastapi.exceptions as fastapiExceptions
+from fastapi.encoders import jsonable_encoder
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.security import HTTPBearer
@@ -122,20 +124,32 @@ add_routers(
 )
 
 
+# Raise errors to the Serverless platform
+def capture_serverless_exception(request, ex):
+    if "aws.context" in request.scope:
+        context = request.scope["aws.context"]
+        if context and hasattr(context, "serverless_sdk"):
+            context.serverless_sdk.capture_exception(ex)
+
+
 @app.get("/")
 async def hola_mundo():
     return JSONResponse(content={"message": "¡Hola, mundo!"})
 
 
-@app.exception_handler(404)
+@app.exception_handler(status.HTTP_404_NOT_FOUND)
 async def resource_not_found(request, ex):
-    return JSONResponse(status_code=404, content={"error": ex.detail if hasattr(ex, "detail") else "Not Found"})
+    capture_serverless_exception(request, ex)
+    return JSONResponse(
+        status_code=status.HTTP_404_NOT_FOUND, content={"detail": ex.detail if hasattr(ex, "detail") else "Not Found"}
+    )
 
 
 @app.exception_handler(requests.exceptions.HTTPError)
 async def airtable_resource_not_found(request, ex):
-    if ex.response.status_code == 404:
-        return JSONResponse(status_code=404, content={"error": "Airtable resource not found"})
+    capture_serverless_exception(request, ex)
+    if ex.response.status_code == status.HTTP_404_NOT_FOUND:
+        return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"detail": "Airtable resource not found"})
     else:
         logger.exception(ex)
         return JSONResponse(status_code=ex.response.status_code, content=None)
@@ -143,14 +157,28 @@ async def airtable_resource_not_found(request, ex):
 
 @app.exception_handler(auth.AuthError)
 async def handle_auth_error(request, ex):
-    logger.exception(ex)
-    return JSONResponse(status_code=ex.status_code, content=ex.error)
+    capture_serverless_exception(request, ex)
+    return JSONResponse(
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, content=jsonable_encoder({"detail": ex.error})
+    )
+
+
+@app.exception_handler(fastapiExceptions.RequestValidationError)
+async def handle_request_validation_error(request, ex):
+    capture_serverless_exception(request, ex)
+    return JSONResponse(
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        content=jsonable_encoder({"detail": ex.errors(), "body": ex.body}),
+    )
 
 
 @app.exception_handler(Exception)
 async def handle_general_exception(request, ex):
-    logger.exception(ex)
-    return JSONResponse(status_code=500, content="Unexpected server error")
+    capture_serverless_exception(request, ex)
+    return JSONResponse(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        content=jsonable_encoder({"detail": "Unexpected server error"}),
+    )
 
 
 handler = Mangum(app)
