@@ -46,9 +46,8 @@ class AirtableEducatorFields(CreateAirtableEducatorFields):
     full_name: Optional[str] = Field(alias="Full Name")
     # deprecated
     all_contact_emails: Optional[list[str]] = Field(alias="All Contact Emails")
-    # deprecated
-    email: Optional[list[str]] = Field(alias="Contact Email")
-
+    
+    email: Optional[str] = Field(alias="Contact Email")
     all_emails: Optional[list[str]] = Field(alias="All Emails")
     primary_personal_email: Optional[str] = Field(alias="Primary Personal Email")
     other_personal_emails: Optional[list[str]] = Field(alias="Other Personal Emails")

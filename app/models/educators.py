@@ -246,6 +246,7 @@ class APIEducatorData(educators.APIEducatorData):
             full_name=airtable_educator.fields.full_name,
             first_name=airtable_educator.fields.first_name,
             last_name=airtable_educator.fields.last_name,
+            email=airtable_educator.fields.email,
             all_emails=airtable_educator.fields.all_emails,
             primary_personal_email=airtable_educator.fields.primary_personal_email,
             other_personal_emails=airtable_educator.fields.other_personal_emails,
