@@ -45,7 +45,7 @@ class CreateAirtableEducatorFields(BaseModel):
 class AirtableEducatorFields(CreateAirtableEducatorFields):
     full_name: Optional[str] = Field(alias="Full Name")
     # deprecated
-    all_contact_emails: Optional[list[str]] = Field(alias="All Contact Emails")
+    # all_contact_emails: Optional[list[str]] = Field(alias="All Contact Emails")
 
     email: Optional[str] = Field(alias="Contact Email")
     all_emails: Optional[list[str]] = Field(alias="All Emails")
@@ -109,9 +109,9 @@ class AirtableEducatorFields(CreateAirtableEducatorFields):
 
     # deprecated
     # noinspection PyMethodParameters
-    @validator("all_contact_emails", pre=True)
-    def scrub_bad_contact_emails(cls, v):
-        return list(filter(None, v))
+    # @validator("all_contact_emails", pre=True)
+    # def scrub_bad_contact_emails(cls, v):
+    #     return list(filter(None, v))
 
     # noinspection PyMethodParameters
     @validator("all_emails", pre=True)
