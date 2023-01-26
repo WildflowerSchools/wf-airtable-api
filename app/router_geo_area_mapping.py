@@ -153,7 +153,7 @@ async def get_geo_area_target_community_given_address(request: Request, address:
     place = gmaps_client.geocode_address(address)
 
     if place is None:
-        raise HTTPException(status_code=404, detail="Address not found")
+        logger.warning(f"Unable to geocode address: {address}")
 
     geo_area_target_communities = await list_geo_area_target_communities(request)
     geo_area_target_community = geocode_utils.get_geo_area_nearest_to_place(place, geo_area_target_communities.data)
