@@ -1,5 +1,5 @@
 import re
-from typing import Union
+from typing import Optional, Union
 
 from haversine import haversine, Unit
 from shapely import geometry
@@ -50,7 +50,7 @@ def is_place_within_country(a: Place, country: Place):
 
 
 def get_geo_area_nearest_to_place(
-    place: Place, geo_areas: Union[list[APIGeoAreaContactData], list[APIGeoAreaTargetCommunityData]]
+    place: Optional[Place], geo_areas: Union[list[APIGeoAreaContactData], list[APIGeoAreaTargetCommunityData]]
 ):
     default_geo_area = None
     default_international_geo_area = None
@@ -81,6 +81,9 @@ def get_geo_area_nearest_to_place(
 
         elif ga.fields.area_type == AirtableGeographicAreaTypes.AREA_TYPE_COUNTRY:
             country_geo_areas.append(ga)
+
+    if place is None:
+        return default_geo_area
 
     geo_area = None
 

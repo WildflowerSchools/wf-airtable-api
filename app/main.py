@@ -1,5 +1,4 @@
 import time
-import logging
 import random
 import string
 
@@ -15,6 +14,7 @@ import requests
 from . import (
     auth,
     const,
+    log,
     router_hubs,
     router_pods,
     router_schools,
@@ -26,8 +26,7 @@ from . import (
 )
 from .airtable.client import AirtableClient
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+logger = log.logger
 
 stage = const.STAGE
 root_path = f"/{stage}" if stage else ""

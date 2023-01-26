@@ -6,6 +6,7 @@ import requests
 from .airtable.client import AirtableClient
 from .geocode.google_maps_client import GoogleMapsAPI
 from .geocode import utils as geocode_utils
+from .log import logger
 from .models import geo_area_contacts as geo_area_contact_models
 from .models import geo_area_target_communities as geo_area_target_community_models
 from . import auth
@@ -93,7 +94,7 @@ async def get_geo_area_contact_given_address(request: Request, address: str):
     place = gmaps_client.geocode_address(address)
 
     if place is None:
-        raise HTTPException(status_code=404, detail="Address not found")
+        logger.warning(f"Unable to geocode address: {address}")
 
     geo_area_contacts = await list_geo_area_contacts(request)
     geo_area_contact = geocode_utils.get_geo_area_nearest_to_place(place, geo_area_contacts.data)
