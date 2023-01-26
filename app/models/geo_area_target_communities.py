@@ -53,11 +53,14 @@ class APIGeoAreaTargetCommunityData(geo_area_target_communities.APIGeoAreaTarget
             )
 
         relationships = APIGeoAreaTargetCommunityRelationships(
-            hub=response_models.APILinksAndData(
-                links={"self": url_path_for("get_hub", hub_id=hub_data.id)}, data=hub_data
-            ),
             target_community=response_models.APILinksAndData(links=None, data=target_community_data),
         )
+
+        if hub_data is not None:
+            relationships.hub = response_models.APILinksAndData(
+                links={"self": url_path_for("get_hub", hub_id=hub_data.id)}, data=hub_data
+            )
+
         links = response_models.APILinks(
             links={
                 "self": url_path_for(
