@@ -28,11 +28,12 @@ class AirtablePartnerFields(BaseModel):
 
         _ids = []
         _records = []
-        for id_or_record in self.schools_partner_guiding:
-            if isinstance(id_or_record, airtable_guides_schools_models.AirtableGuidesSchoolsResponse):
-                _records.append(id_or_record)
-            elif isinstance(id_or_record, str):
-                _ids.append(id_or_record)
+        if self.schools_partner_guiding is not None:
+            for id_or_record in self.schools_partner_guiding:
+                if isinstance(id_or_record, airtable_guides_schools_models.AirtableGuidesSchoolsResponse):
+                    _records.append(id_or_record)
+                elif isinstance(id_or_record, str):
+                    _ids.append(id_or_record)
 
         list_airtable_guides_schools = airtable_client.list_guide_schools_by_ids(guide_school_ids=_ids)
         _records += list_airtable_guides_schools.__root__

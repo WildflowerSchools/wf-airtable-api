@@ -1,7 +1,7 @@
 from datetime import date, datetime
 from typing import Optional
 
-from pydantic import AnyUrl, Field, validator
+from pydantic import HttpUrl, Field, validator
 
 from app.airtable.attachment import AirtableAttachment
 from app.airtable.base_model import BaseModel
@@ -25,7 +25,7 @@ class AirtableSchoolFields(BaseModel):
     school_schedule: Optional[list[str]] = Field(alias="School schedule")
     school_phone: Optional[str] = Field(alias="School Phone")
     school_email: Optional[str] = Field(alias="School Email")
-    website: Optional[AnyUrl] = Field(alias="Website")
+    website: Optional[HttpUrl] = Field(alias="Website")
 
     hub: Optional[str] = Field(alias="Hub")
     hub_name: Optional[str] = Field(alias="Hub Name")
@@ -46,7 +46,7 @@ class AirtableSchoolFields(BaseModel):
     opened_at: Optional[date] = Field(alias="Opened")
     projected_open: Optional[date] = Field(alias="Projected Open")
     affiliation_status: Optional[str] = Field(alias="Affiliation status")
-    affiliated_at: Optional[datetime] = Field(alias="Affiliation date")
+    affiliated_at: Optional[date] = Field(alias="Affiliation date")
     affiliation_agreement: Optional[AirtableAttachment] = Field(alias="Signed Affiliation Agreement", default={})
     nonprofit_status: Optional[str] = Field(alias="Nonprofit status")
     left_network_reason: Optional[str] = Field(alias="Left Network Reason")
