@@ -25,7 +25,7 @@ class CreateAirtableEducatorFields(BaseModel):
 
     first_name: Optional[str] = Field(alias="First Name")
     last_name: Optional[str] = Field(alias="Last Name")
-    details: Optional[str] = Field(alias="Details")
+    details: Optional[str] = Field(alias="Contact Form Details")
     home_address: Optional[str] = Field(alias="Home Address")
 
     stage: Optional[str] = Field(alias="Stage")
