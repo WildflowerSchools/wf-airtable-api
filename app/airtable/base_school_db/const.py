@@ -2,7 +2,7 @@ from app import const
 
 BASE_ID = const.AIRTABLE_SCHOOL_DB_BASE_ID
 
-HUBS_TABLE_NAME = "Hubs"
+HUBS_TABLE_NAME = "Growth Initiatives"
 PODS_TABLE_NAME = "Pods"
 SCHOOLS_TABLE_NAME = "Schools"
 EDUCATORS_TABLE_NAME = "Educators"
