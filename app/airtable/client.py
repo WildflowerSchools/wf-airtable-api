@@ -578,12 +578,12 @@ class AirtableClient(metaclass=Singleton):
 
     @cached(cache=TTLCache(maxsize=1, ttl=600))
     def list_field_categories(self) -> ListAirtableFieldCategoriesResponse:
-        raw = self.client_api.table(base_id=BASE_ID, table_name=FIELD_CATEGORIES_TABLE_NAME)
+        raw = self.client_api.table(base_id=BASE_ID, table_name=FIELD_CATEGORIES_TABLE_NAME).all()
         return ListAirtableFieldCategoriesResponse.parse_obj(raw)
 
     @cached(cache=TTLCache(maxsize=1, ttl=600))
     def list_field_mappings(self) -> ListAirtableFieldMappingResponse:
-        raw = self.client_api.table(base_id=BASE_ID, table_name=FIELD_MAPPING_TABLE_NAME)
+        raw = self.client_api.table(base_id=BASE_ID, table_name=FIELD_MAPPING_TABLE_NAME).all()
         return ListAirtableFieldMappingResponse.parse_obj(raw)
 
     def map_response_to_field_category_values(
