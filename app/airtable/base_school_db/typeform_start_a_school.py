@@ -26,6 +26,7 @@ class CreateAirtableSSJTypeformStartASchool(BaseModel):
     has_interest_in_joining_another_school: bool = Field(alias="Has Interest in Joining Another School", default=False)
     is_willing_to_move: bool = Field(alias="Is Willing to Move", default=False)
     age_classrooms_interested_in_offering: Optional[str] = Field(alias="Age Classrooms Interested In Offering")
+    is_interested_in_charter: bool = Field(alias="Is Interested in Charter", default=False)
     socio_economic_race_and_ethnicity: Optional[str] = Field(alias="Socio-Economic: Race & Ethnicity")
     socio_economic_race_and_ethnicity_other: Optional[str] = Field(alias="Socio-Economic: Race & Ethnicity Other")
     socio_economic_lgbtqia_identifying: Optional[str] = Field(alias="Socio-Economic: LGBTQIA Identifying")

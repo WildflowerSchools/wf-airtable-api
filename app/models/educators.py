@@ -59,6 +59,7 @@ class CreateAPIEducatorFields(educators.CreateAPIEducatorFields):
             first_name=self.first_name,
             last_name=self.last_name,
             details=self.details,
+            initial_interest_in_governance_model=self.initial_interest_in_governance_model,
             stage=self.stage,
             home_address=self.home_address,
             assigned_partner=assigned_partner,
@@ -270,6 +271,7 @@ class APIEducatorData(educators.APIEducatorData):
             lgbtqia_identifying=airtable_educator.fields.lgbtqia_identifying,
             pronouns=airtable_educator.fields.pronouns,
             montessori_certified=airtable_educator.fields.montessori_certified,
+            initial_interest_in_governance_model=airtable_educator.fields.initial_interest_in_governance_model,
             discovery_newsletter=any(
                 n.fields.slug == airtable_newsletters_models.NewsletterSlugs.DISCOVERY_GROUP.value
                 for n in airtable_educator.fields.newsletters
