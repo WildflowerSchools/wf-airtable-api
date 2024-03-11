@@ -13,8 +13,8 @@ from .base_map_by_geographic_area import (
 
 
 class AirtableClient(metaclass=Singleton):
-    def __init__(self, api_key=const.AIRTABLE_API_KEY):
-        self.client_api = Api(api_key)
+    def __init__(self, access_token=const.AIRTABLE_ACCESS_TOKEN):
+        self.client_api = Api(access_token)
 
     @cached(cache=TTLCache(maxsize=32, ttl=600))
     def list_hubs(self) -> ListAirtableHubResponse:

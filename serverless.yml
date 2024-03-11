@@ -17,7 +17,7 @@ provider:
   stage: ${opt:stage, 'dev'}
   timeout: 30
   environment:
-    AIRTABLE_API_KEY: ${env:AIRTABLE_API_KEY}
+    AIRTABLE_ACCESS_TOKEN: ${env:AIRTABLE_ACCESS_TOKEN}
     AUTH0_AUDIENCE: ${env:AUTH0_AUDIENCE}
     AUTH0_DOMAIN: ${env:AUTH0_DOMAIN}
     GOOGLE_CLOUD_API_KEY: ${env:GOOGLE_CLOUD_API_KEY}

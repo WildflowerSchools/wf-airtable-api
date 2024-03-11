@@ -5,7 +5,7 @@
 Before deploying:
 
 1. Create a .env file locally from `.env.example`
-2. Set `AIRTABLE_API_KEY` with a read+write Wildflower Airtable API key
+2. Set `AIRTABLE_ACCESS_TOKEN` with a read+write Wildflower Airtable Personal Access Token
 5. Deploy:
 
 

@@ -1,6 +1,6 @@
 import os
 
-AIRTABLE_API_KEY = os.getenv("AIRTABLE_API_KEY", None)
+AIRTABLE_ACCESS_TOKEN = os.getenv("AIRTABLE_ACCESS_TOKEN", None)
 
 AIRTABLE_SCHOOL_DB_BASE_ID = os.getenv(
     "AIRTABLE_SCHOOL_DB_BASE_ID", "appbCFmUWRbfY2DLR"  # Defaults to the STAGING instance
