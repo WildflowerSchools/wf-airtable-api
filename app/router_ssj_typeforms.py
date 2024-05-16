@@ -24,7 +24,7 @@ async def create_start_a_school_response(
     airtable_client = get_airtable_client(request)
 
     airtable_payload = payload.to_airtable()
-    airtable_response = airtable_client.create_start_a_school_response(payload=airtable_payload)
+    airtable_response = airtable_client.create_typeform_start_a_school_response(payload=airtable_payload)
 
     data = ssj_typeform_start_a_school_models.ApiSSJTypeformStartASchoolData.from_airtable(
         airtable_start_a_school=airtable_response, url_path_for=request.app.url_path_for

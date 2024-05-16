@@ -36,8 +36,10 @@ class CreateAirtableEducatorFields(BaseModel):
     source_other: Optional[str] = Field(alias="Source - Other")
 
     ssj_typeforms_start_a_school: Optional[list[str]] = Field(alias="SSJ Typeforms: Start a School", default=[])
+    ssj_fillout_forms_get_involved: Optional[list[str]] = Field(alias="SSJ Fillout Forms: Get Involved", default=[])
     newsletters: Optional[list[str]] = Field(alias="Newsletter and Group Subscriptions", default=[])
 
+    initial_interest_in_age_classrooms: Optional[list[str]] = Field(alias="Initial Interest in Classroom Levels", default=[])
     initial_interest_in_governance_model: Optional[str] = Field(alias="Initial Interest in Governance Model")
 
     class Config:

@@ -24,6 +24,7 @@ class CreateAPIEducatorFields(educators.CreateAPIEducatorFields):
         self,  # , contact_info_id: Optional[str] = None
     ) -> airtable_educator_models.CreateAirtableEducatorFields:
         from ..airtable.client import AirtableClient
+        from ..airtable.base_school_db.field_categories import FieldCategoryType
 
         airtable_client = AirtableClient()
 
@@ -54,17 +55,35 @@ class CreateAPIEducatorFields(educators.CreateAPIEducatorFields):
         if self.start_a_school_response_id:
             start_a_school_response = [self.start_a_school_response_id]
 
+        get_involved_response = None
+        if self.get_involved_response_id:
+            get_involved_response = [self.get_involved_response_id]
+
+        age_classrooms_set = set()
+        age_classrooms = None
+        if self.initial_interest_in_age_classrooms:
+            age_classrooms_mapping = airtable_client.map_response_to_field_category_values(
+                FieldCategoryType.classroom_levels, self.initial_interest_in_age_classrooms
+            )
+
+            for m in age_classrooms_mapping:
+                if m['is_custom_value'] is False:
+                    age_classrooms_set.add(m['mapped_value'])
+            age_classrooms = list(age_classrooms_set)
+
         return airtable_educator_models.CreateAirtableEducatorFields(
             primary_personal_email=self.email,
             first_name=self.first_name,
             last_name=self.last_name,
             details=self.details,
             initial_interest_in_governance_model=self.initial_interest_in_governance_model,
+            initial_interest_in_age_classrooms=age_classrooms,
             stage=self.stage,
             home_address=self.home_address,
             assigned_partner=assigned_partner,
             target_community=target_community,
             ssj_typeforms_start_a_school=start_a_school_response,
+            ssj_fillout_forms_get_involved=get_involved_response,
             newsletters=newsletter_ids,
         )
 
@@ -87,67 +106,93 @@ class CreateAPIEducatorFields(educators.CreateAPIEducatorFields):
 
         airtable_client = AirtableClient()
 
+        set_race_and_ethnicity = set()
+        set_race_and_ethnicity_other = set()
         race_and_ethnicity = None
         race_and_ethnicity_other = None
         if self.race_and_ethnicity is not None:
-            (
-                race_and_ethnicity,
-                race_and_ethnicity_includes_non_specific_category,
-            ) = airtable_client.map_response_to_field_category_values(
+            race_and_ethnicity_mapping = airtable_client.map_response_to_field_category_values(
                 FieldCategoryType.race_ethnicity, self.race_and_ethnicity
             )
 
-            if race_and_ethnicity_includes_non_specific_category:
-                race_and_ethnicity_other = ";".join(self.race_and_ethnicity)
+            for m in race_and_ethnicity_mapping:
+                if m['is_custom_value'] is True:
+                    set_race_and_ethnicity_other.add(m['mapped_value'])
+                else:
+                    set_race_and_ethnicity.add(m['mapped_value'])
+
+        if len(set_race_and_ethnicity) > 0:
+            race_and_ethnicity = list(set_race_and_ethnicity)
+        if len(set_race_and_ethnicity_other) > 0:
+            race_and_ethnicity_other = ";".join(set_race_and_ethnicity_other)
+
 
         educational_attainment = None
         if self.educational_attainment is not None:
-            education_categories, _ = airtable_client.map_response_to_field_category_values(
+            education_mapping = airtable_client.map_response_to_field_category_values(
                 FieldCategoryType.educational_attainment, str(self.educational_attainment)
             )
-            if len(education_categories) > 0:
-                educational_attainment = education_categories[0]
+            if len(education_mapping) > 0:
+                if not education_mapping[0]['is_custom_value'] is True:
+                    educational_attainment = education_mapping[0]['mapped_value']
 
         household_income = None
         if self.household_income is not None:
-            income_categories, _ = airtable_client.map_response_to_field_category_values(
+            household_income_mapping = airtable_client.map_response_to_field_category_values(
                 FieldCategoryType.household_income, str(self.household_income)
             )
-            if len(income_categories) > 0:
-                household_income = income_categories[0]
+            if len(household_income_mapping) > 0:
+                if not household_income_mapping[0]['is_custom_value'] is True:
+                    household_income = household_income_mapping[0]['mapped_value']
 
+        set_gender = set()
+        set_gender_other = set()
         gender = None
         gender_other = None
         if self.gender is not None:
-            genders, gender_includes_non_specific_category = airtable_client.map_response_to_field_category_values(
+            gender_mapping = airtable_client.map_response_to_field_category_values(
                 FieldCategoryType.gender, self.gender
             )
-            if len(genders) > 0:
-                gender = genders[0]
-            if gender_includes_non_specific_category:
-                gender_other = self.gender
+            for m in gender_mapping:
+                if m['is_custom_value'] is True:
+                    set_gender_other.add(m['mapped_value'])
+                else:
+                    set_gender.add(m['mapped_value'])
+
+        if len(set_gender) > 0:
+            gender = list(set_gender)[0]
+        if len(set_gender_other) > 0:
+            gender_other = ";".join(set_gender_other)
 
         # TODO: Use Enums
         lgbtqia = None
         if self.lgbtqia_identifying is not None:
-            lgbtqia_categories, _ = airtable_client.map_response_to_field_category_values(
+            lgbtqia_mapping = airtable_client.map_response_to_field_category_values(
                 FieldCategoryType.lgbtqia, str(self.lgbtqia_identifying)
             )
-
-            if len(lgbtqia_categories) > 0:
-                lgbtqia = lgbtqia_categories[0]
+            if len(lgbtqia_mapping) > 0:
+                if not lgbtqia_mapping[0]['is_custom_value'] is True:
+                    lgbtqia = lgbtqia_mapping[0]['mapped_value']
 
         # TODO: Use Enums
+        set_pronouns = set()
+        set_pronouns_other = set()
         pronouns = None
         pronouns_other = None
         if self.pronouns is not None:
-            _pronouns, pronouns_includes_non_specific_category = airtable_client.map_response_to_field_category_values(
+            pronoun_mapping = airtable_client.map_response_to_field_category_values(
                 FieldCategoryType.pronouns, self.pronouns
             )
-            if len(_pronouns) > 0:
-                pronouns = _pronouns[0]
-            if pronouns_includes_non_specific_category:
-                pronouns_other = self.pronouns
+            for m in pronoun_mapping:
+                if m['is_custom_value'] is True:
+                    set_pronouns_other.add(m['mapped_value'])
+                else:
+                    set_pronouns.add(m['mapped_value'])
+
+        if len(set_pronouns) > 0:
+            pronouns = list(set_pronouns)[0]
+        if len(set_pronouns_other) > 0:
+            pronouns_other = ";".join(set_pronouns_other)
 
         return airtable_socio_economic_backgrounds_models.CreateAirtableSocioEconomicBackgroundFields(
             educator=[educator_id],
@@ -167,26 +212,41 @@ class CreateAPIEducatorFields(educators.CreateAPIEducatorFields):
         from ..airtable.base_school_db.field_categories import FieldCategoryType
 
         airtable_client = AirtableClient()
-
         airtable_languages = []
-        for l in self.languages:
-            languages, language_includes_non_specific_category = airtable_client.map_response_to_field_category_values(
-                FieldCategoryType.languages, l.language
-            )
-            language = None
-            if len(languages) > 0:
-                language = languages[0]
-            language_other = None
-            if language_includes_non_specific_category:
-                language_other = l.language
 
-            airtable_language = airtable_languages_models.CreateAirtableLanguageFields(
-                socio_economic_background=[socio_economic_id],
-                language_dropdown=language,
-                language_other=language_other,
-                is_primary_language=True,
+        for language in self.languages:
+            set_languages = set()
+            set_languages_other = set()
+
+            languages_mapping = airtable_client.map_response_to_field_category_values(
+                FieldCategoryType.languages, language.language
             )
-            airtable_languages.append(airtable_language)
+            for m in languages_mapping:
+                if m['is_custom_value'] is True:
+                    set_languages_other.add(m['mapped_value'])
+                else:
+                    if m['mapped_value'].lower() != 'other':
+                        set_languages.add(m['mapped_value'])
+
+            if len(set_languages) > 0:
+                for l in list(set_languages):
+                    airtable_language = airtable_languages_models.CreateAirtableLanguageFields(
+                        socio_economic_background=[socio_economic_id],
+                        language_dropdown=l,
+                        language_other=None,
+                        is_primary_language=language.is_primary_language,
+                    )
+                    airtable_languages.append(airtable_language)
+
+            if len(set_languages_other) > 0:
+                for l in list(set_languages_other):
+                    airtable_language = airtable_languages_models.CreateAirtableLanguageFields(
+                        socio_economic_background=[socio_economic_id],
+                        language_dropdown="Other",
+                        language_other=l,
+                        is_primary_language=language.is_primary_language,
+                    )
+                    airtable_languages.append(airtable_language)
 
         return airtable_languages
 
@@ -199,34 +259,52 @@ class CreateAPIEducatorFields(educators.CreateAPIEducatorFields):
         airtable_client = AirtableClient()
 
         airtable_montessori_certifications = []
-        for m in self.montessori_certifications:
-            certification_levels, _ = airtable_client.map_response_to_field_category_values(
-                FieldCategoryType.montessori_certification_levels, m.certification_levels
+        for certification in self.montessori_certifications:
+            set_certification_levels = set()
+            mapped_certification_levels = airtable_client.map_response_to_field_category_values(
+                FieldCategoryType.montessori_certification_levels, certification.certification_levels
             )
+            for m in mapped_certification_levels:
+                if m['is_custom_value'] is True:
+                    set_certification_levels.add("Unknown")
+                else:
+                    set_certification_levels.add(m['mapped_value'])
+            certification_levels = list(set_certification_levels)
 
-            (
-                certifiers,
-                certifier_includes_non_specific_category,
-            ) = airtable_client.map_response_to_field_category_values(
-                FieldCategoryType.montessori_certifiers, m.certifier
+            mapped_certifiers = airtable_client.map_response_to_field_category_values(
+                FieldCategoryType.montessori_certifiers, certification.certifier
             )
+            # set_certifier = set()
+            # set_certifier_other = set()
+            # certifier = None
+            # certifier_other = None
+            # for m in mapped_certifiers:
+            #     if m['is_custom_value'] is True:
+            #         set_certifier_other.add(m['mapped_value'])
+            #     else:
+            #         set_certifier.add(m['mapped_value'])
+            # if len(set_certifier) > 0:
+            #     certifier = list(set_certifier)
+            # if len(set_certifier_other) > 0:
+            #     certifier_other = list(set_certifier_other)
             certifier = None
-            if len(certifiers) > 0:
-                certifier = certifiers[0]
             certifier_other = None
-            if certifier_includes_non_specific_category:
-                certifier_other = m.certifier
+            for m in mapped_certifiers:
+                if m['is_custom_value']:
+                    certifier_other = m['mapped_value']
+                else:
+                    certifier = m['mapped_value']
 
             certification_status = None
-            if m.is_montessori_certified:
+            if certification.is_montessori_certified:
                 certification_status = CertificationStatus.CERTIFIED
-            elif m.is_seeking_montessori_certification:
+            elif certification.is_seeking_montessori_certification:
                 certification_status = CertificationStatus.TRAINING
 
             airtable_montessori_certification = (
                 airtable_montessori_certifications_models.CreateAirtableMontessoriCertificationFields(
                     educator=[educator_id],
-                    year_certified=m.year_certified,
+                    year_certified=certification.year_certified,
                     certification_levels=certification_levels,
                     certifier=certifier,
                     certifier_other=certifier_other,

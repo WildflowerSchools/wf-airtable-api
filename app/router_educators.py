@@ -103,9 +103,14 @@ async def create_educator(payload: educator_models.CreateAPIEducatorFields, requ
     # Is educator pre-existing? Return 409, but add the typeform response to the educator record first
     existing_educator = fetch_educator_by_email_wrapper(email=payload.email, airtable_client=airtable_client)
     if existing_educator is not None:
-        airtable_client.add_typeform_start_a_school_response_to_educator(
-            educator_id=existing_educator.id, typeform_start_a_school_response_id=payload.start_a_school_response_id
-        )
+        if payload.start_a_school_response_id:
+            airtable_client.add_typeform_start_a_school_response_to_educator(
+                educator_id=existing_educator.id, typeform_start_a_school_response_id=payload.start_a_school_response_id
+            )
+        else:
+            airtable_client.add_fillout_get_involved_response_to_educator(
+                educator_id=existing_educator.id, fillout_get_involved_response_id=payload.get_involved_response_id
+            )
         raise HTTPException(status_code=409, detail="Educator already exists")
 
     # 1. Create the Contact Info record

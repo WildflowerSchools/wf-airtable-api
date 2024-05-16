@@ -1,14 +1,17 @@
 from cachetools import cached, TTLCache
 from typing import Generator
 
+from .base_map_by_geographic_area.auto_response_email_template import AirtableAutoResponseEmailTemplateResponse
 from ..utils.singleton import Singleton
 from .api import Api
 from . import formulas
 from .base_school_db import *
 from .base_map_by_geographic_area import (
     const as map_by_geographic_area_base,
+    geo_areas as geo_areas_models,
     geo_area_contacts as geo_area_contacts_models,
     geo_area_target_communities as geo_area_target_communities_models,
+    auto_response_email_template as auto_response_email_template_models
 )
 
 
@@ -322,6 +325,27 @@ class AirtableClient(metaclass=Singleton):
 
         return response
 
+    def add_fillout_get_involved_response_to_educator(
+            self, educator_id, fillout_get_involved_response_id, load_relationships=True
+    ) -> AirtableEducatorResponse:
+        educator = self.get_educator_by_id(educator_id)
+        get_involved_fillout_forms = educator.fields.ssj_fillout_forms_get_involved
+
+        if fillout_get_involved_response_id in get_involved_fillout_forms:
+            return educator
+
+        get_involved_fillout_forms.append(fillout_get_involved_response_id)
+
+        raw = self.client_api.table(base_id=BASE_ID, table_name=EDUCATORS_TABLE_NAME).update(
+            record_id=educator_id,
+            fields={AirtableEducatorFields.__fields__["ssj_fillout_forms_get_involved"].alias: get_involved_fillout_forms},
+        )
+        response = AirtableEducatorResponse.parse_obj(raw)
+        if load_relationships:
+            response.load_relationships()
+
+        return response
+
     @cached(cache=TTLCache(maxsize=1024, ttl=600))
     def get_educators_by_guide_id(self, partner_id, load_relationships=True) -> ListAirtableEducatorResponse:
         formula = formulas.INCLUDE(formulas.STR_VALUE(partner_id), formulas.FIELD("Assigned Partner Record ID"))
@@ -495,6 +519,20 @@ class AirtableClient(metaclass=Singleton):
         return ListAirtableLanguageResponse.parse_obj(raw)
 
     @cached(cache=TTLCache(maxsize=1, ttl=600))
+    def list_geo_areas(self) -> geo_areas_models.ListAirtableGeoAreaResponse:
+        raw = self.client_api.table(
+            base_id=map_by_geographic_area_base.BASE_ID, table_name=map_by_geographic_area_base.GEOGRAPHIC_AREAS_TABLE_NAME
+        ).all()
+        return geo_areas_models.ListAirtableGeoAreaResponse.parse_obj(raw)
+
+    @cached(cache=TTLCache(maxsize=1, ttl=600))
+    def get_geo_area_by_id(self,  geo_area_id) -> geo_areas_models.AirtableGeoAreaResponse:
+        raw = self.client_api.table(
+            base_id=map_by_geographic_area_base.BASE_ID, table_name=map_by_geographic_area_base.GEOGRAPHIC_AREAS_TABLE_NAME
+        ).get(record_id=geo_area_id)
+        return geo_areas_models.AirtableGeoAreaResponse.parse_obj(raw)
+
+    @cached(cache=TTLCache(maxsize=1, ttl=600))
     def list_geo_area_contacts(self) -> geo_area_contacts_models.ListAirtableGeoAreaContactResponse:
         raw = self.client_api.table(
             base_id=map_by_geographic_area_base.BASE_ID, table_name=map_by_geographic_area_base.AREA_CONTACT_TABLE_NAME
@@ -533,13 +571,39 @@ class AirtableClient(metaclass=Singleton):
         )
         return geo_area_target_communities_models.AirtableGeoAreaTargetCommunityResponse.parse_obj(raw)
 
-    def create_start_a_school_response(
+    @cached(cache=TTLCache(maxsize=1, ttl=600))
+    def list_auto_response_email_templates(
+            self,
+    ) -> auto_response_email_template_models.ListAirtableAutoResponseEmailTemplateResponse:
+        raw = self.client_api.table(
+            base_id=map_by_geographic_area_base.BASE_ID,
+            table_name=map_by_geographic_area_base.AUTO_RESPONSE_EMAIL_TEMPLATE,
+        ).all()
+        return auto_response_email_template_models.ListAirtableAutoResponseEmailTemplateResponse.parse_obj(raw)
+
+    @cached(cache=TTLCache(maxsize=1024, ttl=600))
+    def get_auto_response_email_template_by_id(self, auto_response_email_template_id) -> auto_response_email_template_models.AirtableAutoResponseEmailTemplateResponse:
+        raw = self.client_api.table(
+            base_id=map_by_geographic_area_base.BASE_ID,
+            table_name=map_by_geographic_area_base.AUTO_RESPONSE_EMAIL_TEMPLATE
+        ).get(record_id=auto_response_email_template_id)
+        return AirtableAutoResponseEmailTemplateResponse.parse_obj(raw)
+
+    def create_typeform_start_a_school_response(
         self, payload: CreateAirtableSSJTypeformStartASchool
     ) -> AirtableSSJTypeformStartASchoolResponse:
-        raw = self.client_api.table(base_id=BASE_ID, table_name=SSJ_TYPEFORM_RESPONSES_TABLE_NAME).create(
+        raw = self.client_api.table(base_id=BASE_ID, table_name=SSJ_TYPEFORM_START_A_SCHOOL_RESPONSES_TABLE_NAME).create(
             fields=payload.dict(by_alias=True)
         )
         return AirtableSSJTypeformStartASchoolResponse.parse_obj(raw)
+
+    def create_fillout_get_involved_response(
+            self, payload: CreateAirtableSSJFilloutGetInvolved
+    ) -> AirtableSSJFilloutGetInvolvedResponse:
+        raw = self.client_api.table(base_id=BASE_ID, table_name=SSJ_FILLOUT_GET_INVOLVED_RESPONSES_TABLE_NAME).create(
+            fields=payload.dict(by_alias=True)
+        )
+        return AirtableSSJFilloutGetInvolvedResponse.parse_obj(raw)
 
     # 7/15/2022 - Moved away from Contact Info for a more flat structure in the Educator table itself
     # def create_contact_info(self, payload: CreateAirtableContactInfoFields) -> AirtableContactInfoResponse:
@@ -588,45 +652,49 @@ class AirtableClient(metaclass=Singleton):
 
     def map_response_to_field_category_values(
         self, field_category_type: FieldCategoryType, response_value: Union[str, list[str]]
-    ) -> (list[str], bool):
+    ) -> (list[str], list[str], Union[str, list[str]]):
         if response_value is None:
-            return [], False
+            return []
 
         field_categories = self.list_field_categories()
         field_mappings = self.list_field_mappings()
 
         if isinstance(response_value, list):
-            all_categories = []
-            includes_non_specific_category = False
+            response_mappings = []
             for v in response_value:
-                categories, _includes_non_specific_category = self.map_response_to_field_category_values(
+                response_mapping = self.map_response_to_field_category_values(
                     field_category_type, v
                 )
-                if includes_non_specific_category is False and _includes_non_specific_category is True:
-                    includes_non_specific_category = True
+                response_mappings.extend(response_mapping)
 
-                all_categories.extend(categories)
+            return response_mappings
 
-            # Return a unique list of category values and a boolean denoting whether
-            # any category is a 'non_specific_category' type
-            return list(set(all_categories)), includes_non_specific_category
-
+        all_matches = []
         mapping = field_mappings.map_response_value(field_category_type, response_value)
         if mapping is None:
-            # If response_value isn't found, try to return the 'Other' option for the given field_category_type
-            mapping = field_mappings.map_response_value(field_category_type, "Other")
-        if mapping is None:
-            # If response_value is still None, return empty category list and a True
-            # flag denoting the 'otherness' of the given response_value
-            return [], True
+            # Append a match with a lookup_value that equals the mapped_value
+            all_matches.append({
+                "lookup_value": response_value,
+                "is_custom_value": True,
+                "is_non_specific_category": False,
+                "mapped_value": response_value
+            })
 
-        # Convert the mapping record to it's associated categories
-        category_matches = field_categories.get_records_for_field_category_ids(mapping.fields.field_categories)
-        # Check if any of the matching categories are a 'non_specific_category' type
-        includes_non_specific_category = (
-            len(list(filter(lambda c: c.fields.non_specific_category, category_matches.__root__))) > 0
-        )
-        return list(map(lambda c: c.fields.value, category_matches.__root__)), includes_non_specific_category
+            # When the mapping is None, or there isn't a match, we try to add an "Other" category if one exists for the particular field_category_type
+            mapping = field_mappings.map_response_value(field_category_type, "Other")
+
+        if mapping is not None:
+            # Convert the mapping record to it's associated categories
+            category_matches = field_categories.get_records_for_field_category_ids(mapping.fields.field_categories)
+            for category_match in category_matches.__root__:
+                all_matches.append({
+                    "lookup_value": response_value,
+                    "is_custom_value": False,
+                    "is_non_specific_category": category_match.fields.non_specific_category,
+                    "mapped_value": category_match.fields.value
+                })
+
+        return all_matches
 
 
 def get_airtable_client_generator() -> Generator:

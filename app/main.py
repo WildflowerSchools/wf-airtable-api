@@ -23,6 +23,8 @@ from . import (
     router_geo_area_mapping,
     router_ssj_typeforms,
     router_educators_schools,
+    router_ssj_fillout,
+    router_auto_response_email_templates
 )
 from .airtable.client import AirtableClient
 
@@ -41,6 +43,7 @@ app = FastAPI(
         router_partners.OPENAPI_TAG_METADATA,
         *router_geo_area_mapping.OPENAPI_TAG_METADATA,
         router_educators_schools.OPENAPI_TAG_METADATA,
+        router_auto_response_email_templates.OPENAPI_TAG_METADATA,
     ],
 )
 
@@ -118,7 +121,9 @@ add_routers(
         router_educators.router,
         router_geo_area_mapping.router,
         router_ssj_typeforms.router,
+        router_ssj_fillout.router,
         router_educators_schools.router,
+        router_auto_response_email_templates.router
     ]
 )
 

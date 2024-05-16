@@ -19,6 +19,7 @@ class FieldCategoryType(str, Enum):
     montessori_certifiers = "Montessori Certifiers"
     montessori_certification_status = "Montessori Certification Status"
     lgbtqia = "LGBTQIA"
+    classroom_levels = "Classroom Levels"
 
 
 class AirtableFieldCategoriesFields(BaseModel):

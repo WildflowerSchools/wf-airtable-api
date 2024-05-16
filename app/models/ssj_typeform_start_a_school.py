@@ -77,12 +77,12 @@ class ApiSSJTypeformStartASchoolData(ssj_typeform_start_a_school.ApiSSJTypeformS
 
         age_classrooms = None
         if airtable_start_a_school.fields.age_classrooms_interested_in_offering is not None:
-            age_classrooms = [ac.strip() for ac in airtable_start_a_school.fields.age_classrooms_interested_in_offering]
+            age_classrooms = [ac.strip() for ac in airtable_start_a_school.fields.age_classrooms_interested_in_offering.split(', ')]
 
         socio_economic_race_and_ethnicity = None
         if airtable_start_a_school.fields.socio_economic_race_and_ethnicity is not None:
             socio_economic_race_and_ethnicity = [
-                re.strip() for re in airtable_start_a_school.fields.socio_economic_race_and_ethnicity
+                re.strip() for re in airtable_start_a_school.fields.socio_economic_race_and_ethnicity.split(', ')
             ]
 
         fields = ApiSSJTypeformStartASchoolFields(

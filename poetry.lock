@@ -866,16 +866,18 @@ name = "wf-airtable-api-schema"
 version = "0.5.0"
 description = "Simple package defining a schema translation layer between the client and Airtable bases"
 optional = false
-python-versions = ">=3.9,<4.0"
-files = [
-    {file = "wf_airtable_api_schema-0.5.0-py3-none-any.whl", hash = "sha256:f02d0e12f09ebdc7ebb4d6b2680ef54ab8a9028939ce7e1f899312c1dc926a0d"},
-    {file = "wf_airtable_api_schema-0.5.0.tar.gz", hash = "sha256:048604f4de6a3d91d5c8dea2cbe9868a11047d10df394c1c630ff505bfe01065"},
-]
+python-versions = "^3.9"
+files = []
+develop = true
 
 [package.dependencies]
-pydantic = ">=1.9.0,<2.0.0"
+pydantic = "^1.9.0"
+
+[package.source]
+type = "directory"
+url = "../wf-airtable-api-schema"
 
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "57479ff566e64e22cfbfa8225830a13b03d5dc76f7f2d429d7a8786fb4cec739"
+content-hash = "b05da0b8d11608fd24558d04e29d0f7ba330cb0e3d9fab8f3e298c7f4628a77d"
