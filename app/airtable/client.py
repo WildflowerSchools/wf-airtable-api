@@ -601,7 +601,8 @@ class AirtableClient(metaclass=Singleton):
             self, payload: CreateAirtableSSJFilloutGetInvolved
     ) -> AirtableSSJFilloutGetInvolvedResponse:
         raw = self.client_api.table(base_id=BASE_ID, table_name=SSJ_FILLOUT_GET_INVOLVED_RESPONSES_TABLE_NAME).create(
-            fields=payload.dict(by_alias=True)
+            fields=payload.dict(by_alias=True),
+            typecast=True
         )
         return AirtableSSJFilloutGetInvolvedResponse.parse_obj(raw)
 

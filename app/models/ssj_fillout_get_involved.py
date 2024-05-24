@@ -9,17 +9,17 @@ from ..airtable.base_school_db import fillout_get_involved as airtable_fillout_g
 
 class CreateApiSSJFilloutGetInvolvedFields(ssj_fillout_get_involved.CreateApiSSJFilloutGetInvolvedFields):
     def to_airtable(self) -> ssj_fillout_get_involved.CreateApiSSJFilloutGetInvolvedFields:
-        age_classrooms_interested_in_offering = None
-        if self.age_classrooms_interested_in_offering is not None:
-            age_classrooms_interested_in_offering = ", ".join(self.age_classrooms_interested_in_offering)
-
-        educator_interests = None
-        if self.educator_interests is not None:
-            educator_interests = ", ".join(self.educator_interests)
-
-        socio_economic_race_and_ethnicity = None
-        if self.socio_economic_race_and_ethnicity is not None:
-            socio_economic_race_and_ethnicity = ", ".join(self.socio_economic_race_and_ethnicity)
+        # age_classrooms_interested_in_offering = None
+        # if self.age_classrooms_interested_in_offering is not None:
+        #     age_classrooms_interested_in_offering = ", ".join(self.age_classrooms_interested_in_offering)
+        #
+        # educator_interests = None
+        # if self.educator_interests is not None:
+        #     educator_interests = ", ".join(self.educator_interests)
+        #
+        # socio_economic_race_and_ethnicity = None
+        # if self.socio_economic_race_and_ethnicity is not None:
+        #     socio_economic_race_and_ethnicity = ", ".join(self.socio_economic_race_and_ethnicity)
 
         entry_date = datetime.now()
         if self.entry_date is not None:
@@ -47,14 +47,14 @@ class CreateApiSSJFilloutGetInvolvedFields(ssj_fillout_get_involved.CreateApiSSJ
             city=self.city,
             state=self.state,
             country=self.country,
-            age_classrooms_interested_in_offering=age_classrooms_interested_in_offering,
-            educator_interests=educator_interests,
+            age_classrooms_interested_in_offering=self.age_classrooms_interested_in_offering,
+            educator_interests=self.educator_interests,
             educator_interests_other=self.educator_interests_other,
             community_member_interest=self.community_member_interest,
             community_member_support_finding_teachers=self.community_member_support_finding_teachers,
             community_member_community_info=self.community_member_community_info,
             community_member_self_info=self.community_member_self_info,
-            socio_economic_race_and_ethnicity=socio_economic_race_and_ethnicity,
+            socio_economic_race_and_ethnicity=self.socio_economic_race_and_ethnicity,
             socio_economic_race_and_ethnicity_other=self.socio_economic_race_and_ethnicity_other,
             socio_economic_pronouns=self.socio_economic_pronouns,
             socio_economic_pronouns_other=self.socio_economic_pronouns_other,
@@ -79,16 +79,16 @@ class ApiSSJFilloutGetInvolvedData(ssj_fillout_get_involved.ApiSSJFilloutGetInvo
     ):
         educator_interests = None
         if airtable_get_involved.fields.educator_interests is not None:
-            educator_interests = [ei.strip() for ei in airtable_get_involved.fields.educator_interests.split(', ')]
+            educator_interests = [ei.strip() for ei in airtable_get_involved.fields.educator_interests]
 
         age_classrooms = None
         if airtable_get_involved.fields.age_classrooms_interested_in_offering is not None:
-            age_classrooms = [ac.strip() for ac in airtable_get_involved.fields.age_classrooms_interested_in_offering.split(', ')]
+            age_classrooms = [ac.strip() for ac in airtable_get_involved.fields.age_classrooms_interested_in_offering]
 
         socio_economic_race_and_ethnicity = None
         if airtable_get_involved.fields.socio_economic_race_and_ethnicity is not None:
             socio_economic_race_and_ethnicity = [
-                re.strip() for re in airtable_get_involved.fields.socio_economic_race_and_ethnicity.split(', ')
+                re.strip() for re in airtable_get_involved.fields.socio_economic_race_and_ethnicity
             ]
 
         fields = ApiSSJFilloutGetInvolvedFields(
