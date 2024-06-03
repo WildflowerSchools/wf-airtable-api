@@ -10,6 +10,7 @@ from ..airtable.base_map_by_geographic_area import (
     auto_response_email_template as airtable_auto_response_email_template_models,
 )
 from . import hubs as hub_models
+
 # from . import partners as partner_models
 # from ..geocode.geocode_models import Place
 # from ..geocode.google_maps_client import GoogleMapsAPI
@@ -81,7 +82,8 @@ class APIAutoResponseEmailTemplateData(auto_response_email_template.APIAutoRespo
         links = response_models.APILinks(
             links={
                 "self": url_path_for(
-                    "get_auto_response_email_template", auto_response_email_template_id=airtable_auto_response_email_template.id
+                    "get_auto_response_email_template",
+                    auto_response_email_template_id=airtable_auto_response_email_template.id,
                 )
             }
         )
@@ -89,7 +91,7 @@ class APIAutoResponseEmailTemplateData(auto_response_email_template.APIAutoRespo
             id=airtable_auto_response_email_template.id,
             type=MODEL_TYPE,
             fields=fields,
-            relationships=[], # relationships,
+            relationships=[],  # relationships,
             links=links.links,
         )
 
@@ -100,19 +102,19 @@ class APIAutoResponseEmailTemplateData(auto_response_email_template.APIAutoRespo
     #     return Place.parse_obj(self.fields.geocode)
 
 
-class ListAPIGeoAreaTargetCommunityData(auto_response_email_template.ListAPIAutoResponseEmailTemplateData):
+class ListAPIAutoResponseEmailTemplateData(auto_response_email_template.ListAPIAutoResponseEmailTemplateData):
     @classmethod
-    def from_airtable_geo_area_target_communities(
+    def from_airtable_auto_response_email_templates(
         cls,
-        airtable_auto_response_email_templates: auto_response_email_template.ListAPIAutoResponseEmailTemplateResponse,
+        airtable_auto_response_email_templates: airtable_auto_response_email_template_models.ListAirtableAutoResponseEmailTemplateResponse,
         url_path_for: Callable,
-    ):
+    ) -> ListAPIAutoResponseEmailTemplateData:
         responses = []
-        for aet in airtable_auto_response_email_templates.__root__:
+        for aet in airtable_auto_response_email_templates.root:
             responses.append(
                 APIAutoResponseEmailTemplateData.from_airtable_auto_response_email_template(
                     airtable_auto_response_email_template=aet, url_path_for=url_path_for
                 )
             )
 
-        return cls(__root__=responses)
+        return cls(root=responses)

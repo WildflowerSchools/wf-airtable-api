@@ -1,24 +1,23 @@
 from typing import Optional
 
-from pydantic import Field, validator
+from pydantic import Field
 
 from app.airtable.base_model import BaseModel
 from app.airtable.response import AirtableResponse, ListAirtableResponse
-from app.airtable.validators import get_first_or_default_none
 
 
 class AirtableAutoResponseEmailTemplate(BaseModel):
     # area_contacts: Optional[list[str]] = Field(alias="Area Contacts")
-    geographic_areas: Optional[list[str]] = Field(alias="Geographic Areas")
-    sendgrid_template_id: Optional[str] = Field(alias="Sendgrid Template ID")
-    contact_type: Optional[str] = Field(alias="Contact Type")
-    language: Optional[str] = Field(alias="Language")
+    geographic_areas: Optional[list[str]] = Field(None, alias="Geographic Areas")
+    sendgrid_template_id: Optional[str] = Field(None, alias="Sendgrid Template ID")
+    contact_type: Optional[str] = Field(None, alias="Contact Type")
+    language: Optional[str] = Field(None, alias="Language")
 
     # area_name: Optional[str] = Field(alias="Area Name")
     # area_type: Optional[str] = Field(alias="Area Type")
     # city_radius: Optional[int] = Field(alias="City Radius", default=30)
     # polygon_coordinates: Optional[str] = Field(alias="Polygon Coordinates")
-    first_contact_email: Optional[str] = Field(alias="First Contact Email")
+    first_contact_email: Optional[str] = Field(None, alias="First Contact Email")
     # assigned_rse: Optional[str] = Field(alias="Assigned RSE")
     # assigned_rse_synced_record_id: Optional[str] = Field(alias="Assigned RSE Synced Record ID")
     # assigned_rse_name: Optional[str] = Field(alias="Assigned RSE Name")
@@ -59,4 +58,4 @@ class AirtableAutoResponseEmailTemplateResponse(AirtableResponse):
 
 
 class ListAirtableAutoResponseEmailTemplateResponse(ListAirtableResponse):
-    __root__: list[AirtableAutoResponseEmailTemplateResponse]
+    root: list[AirtableAutoResponseEmailTemplateResponse]

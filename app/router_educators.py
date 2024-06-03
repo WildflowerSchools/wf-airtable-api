@@ -49,7 +49,7 @@ def find_educators_wrapper(
         airtable_educators = airtable_client.find_educators(filters, load_relationships=load_relationships)
     except requests.exceptions.HTTPError as ex:
         if ex.response.status_code == 404:
-            return ListAirtableEducatorResponse(__root__=[])
+            return ListAirtableEducatorResponse(root=[])
         else:
             raise
 
@@ -59,10 +59,10 @@ def find_educators_wrapper(
 def fetch_educator_by_email_wrapper(email, airtable_client: AirtableClient) -> Optional[AirtableEducatorResponse]:
     try:
         airtable_educators = find_educators_wrapper(email=email, airtable_client=airtable_client)
-        if airtable_educators is None or len(airtable_educators.__root__) == 0:
+        if airtable_educators is None or len(airtable_educators.root) == 0:
             return None
 
-        return airtable_educators.__root__[0]
+        return airtable_educators.root[0]
     except requests.exceptions.HTTPError as ex:
         if ex.response.status_code == 404:
             return None
@@ -79,7 +79,7 @@ async def list_educators(request: Request, page_size: str = 100, offset: str = "
 
     data = educator_models.ListAPIEducatorData.from_airtable_educators(
         airtable_educators=airtable_educators, url_path_for=request.app.url_path_for
-    ).__root__
+    ).root
 
     links = {
         "self": f'{request.app.url_path_for("list_educators")}?{urlencode({"page_size": page_size, "offset": offset})}'
@@ -94,7 +94,7 @@ async def list_educators(request: Request, page_size: str = 100, offset: str = "
 
 @router.post("/", response_model=educator_models.APIEducatorResponse, include_in_schema=False)
 @router.post("", response_model=educator_models.APIEducatorResponse)
-async def create_educator(payload: educator_models.CreateAPIEducatorFields, request: Request):
+async def create_educator(payload: educator_models.CreateUpdateAPIEducatorFields, request: Request):
     airtable_client = get_airtable_client(request)
 
     if payload.email is None or payload.email == "":
@@ -153,7 +153,7 @@ async def find_educators(request: Request, email: Optional[list[str]] = Query(No
 
     data = educator_models.ListAPIEducatorData.from_airtable_educators(
         airtable_educators=airtable_educators, url_path_for=request.app.url_path_for
-    ).__root__
+    ).root
 
     # Strip http://<<url>> from request.url, return just the <<path>>?<<query>>
     self_url = str(request.url)[(str(request.url).find(request.url.path)) :]
@@ -174,6 +174,29 @@ async def get_educator(educator_id, request: Request):
     )
 
 
+@router.patch("/{educator_id}", response_model=educator_models.APIEducatorResponse)
+async def update_educator(educator_id, request: Request, payload: educator_models.CreateUpdateAPIEducatorFields):
+    airtable_client = get_airtable_client(request)
+    airtable_educator = fetch_educator_wrapper(educator_id, airtable_client)
+
+    if airtable_educator is None:
+        raise HTTPException(status_code=400, detail=f"Educator '{educator_id}' doesn't exists")
+
+    airtable_educator_payload = payload.to_airtable_educator(exclude_unset=True)
+
+    airtable_educator_response = airtable_client.update_educator(
+        record_id=educator_id, payload=airtable_educator_payload
+    )
+
+    data = educator_models.APIEducatorData.from_airtable_educator(
+        airtable_educator=airtable_educator_response, url_path_for=request.app.url_path_for
+    )
+
+    return educator_models.APIEducatorResponse(
+        data=data, links={"self": request.app.url_path_for("get_educator", educator_id=educator_id)}
+    )
+
+
 @router.get("/{educator_id}/schools", response_model=school_models.ListAPISchoolResponse)
 async def get_educator_schools(educator_id, request: Request):
     airtable_client = get_airtable_client(request)
@@ -182,7 +205,7 @@ async def get_educator_schools(educator_id, request: Request):
 
     data = school_models.ListAPISchoolData.from_airtable_schools(
         airtable_schools=airtable_schools, url_path_for=request.app.url_path_for
-    ).__root__
+    ).root
 
     return school_models.ListAPISchoolResponse(
         data=data, links={"self": request.app.url_path_for("get_educator_schools", educator_id=educator_id)}
@@ -197,7 +220,7 @@ async def get_educator_guides(educator_id, request: Request):
 
     data = partner_models.ListAPIPartnerData.from_airtable_partners(
         airtable_partners=airtable_partners, url_path_for=request.app.url_path_for
-    ).__root__
+    ).root
 
     return partner_models.ListAPIPartnerResponse(
         data=data, links={"self": request.app.url_path_for("get_educator_guides", educator_id=educator_id)}

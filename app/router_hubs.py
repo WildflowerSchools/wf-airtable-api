@@ -40,7 +40,7 @@ async def list_hubs(request: Request):
 
     data = hub_models.ListAPIHubData.from_airtable_hubs(
         airtable_hubs=airtable_hubs, url_path_for=request.app.url_path_for
-    ).__root__
+    ).root
 
     return hub_models.ListAPIHubResponse(data=data, links={"self": request.app.url_path_for("list_hubs")})
 
@@ -63,7 +63,7 @@ async def get_hub_site_entrepreneurs(hub_id, request: Request):
 
     data = partner_models.ListAPIPartnerData.from_airtable_partners(
         airtable_partners=airtable_partners, url_path_for=request.app.url_path_for
-    ).__root__
+    ).root
 
     return partner_models.ListAPIPartnerResponse(
         data=data, links={"self": request.app.url_path_for("get_hub_site_entrepreneurs", hub_id=hub_id)}
@@ -78,7 +78,7 @@ async def get_hub_pods(hub_id, request: Request):
 
     data = pod_models.ListAPIPodData.from_airtable_pods(
         airtable_pods=airtable_pods, url_path_for=request.app.url_path_for
-    ).__root__
+    ).root
 
     return pod_models.ListAPIPodResponse(
         data=data, links={"self": request.app.url_path_for("get_hub_pods", hub_id=hub_id)}
@@ -93,7 +93,7 @@ async def get_hub_schools(hub_id, request: Request):
 
     data = school_models.ListAPISchoolData.from_airtable_schools(
         airtable_schools=airtable_schools, url_path_for=request.app.url_path_for
-    ).__root__
+    ).root
 
     return school_models.ListAPISchoolResponse(
         data=data, links={"self": request.app.url_path_for("get_hub_schools", hub_id=hub_id)}

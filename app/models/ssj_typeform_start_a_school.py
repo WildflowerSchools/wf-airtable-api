@@ -26,6 +26,7 @@ class CreateApiSSJTypeformStartASchoolFields(ssj_typeform_start_a_school.CreateA
             entry_date = self.entry_date
 
         return airtable_start_a_school_models.CreateAirtableSSJTypeformStartASchool(
+            educator=self.educator_id,
             first_name=self.first_name,
             last_name=self.last_name,
             email=self.email,
@@ -77,15 +78,18 @@ class ApiSSJTypeformStartASchoolData(ssj_typeform_start_a_school.ApiSSJTypeformS
 
         age_classrooms = None
         if airtable_start_a_school.fields.age_classrooms_interested_in_offering is not None:
-            age_classrooms = [ac.strip() for ac in airtable_start_a_school.fields.age_classrooms_interested_in_offering.split(', ')]
+            age_classrooms = [
+                ac.strip() for ac in airtable_start_a_school.fields.age_classrooms_interested_in_offering.split(", ")
+            ]
 
         socio_economic_race_and_ethnicity = None
         if airtable_start_a_school.fields.socio_economic_race_and_ethnicity is not None:
             socio_economic_race_and_ethnicity = [
-                re.strip() for re in airtable_start_a_school.fields.socio_economic_race_and_ethnicity.split(', ')
+                re.strip() for re in airtable_start_a_school.fields.socio_economic_race_and_ethnicity.split(", ")
             ]
 
         fields = ApiSSJTypeformStartASchoolFields(
+            educator_id=airtable_start_a_school.fields.educator,
             response_id=airtable_start_a_school.fields.response_id,
             first_name=airtable_start_a_school.fields.first_name,
             last_name=airtable_start_a_school.fields.last_name,

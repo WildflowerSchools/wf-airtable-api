@@ -50,7 +50,7 @@ def find_educator_schools_wrapper(
         educator_schools = airtable_client.find_educator_schools(filters=filters)
     except requests.exceptions.HTTPError as ex:
         if ex.response.status_code == 404:
-            return ListAirtableEducatorsSchoolsResponse(__root__=[])
+            return ListAirtableEducatorsSchoolsResponse(root=[])
         else:
             raise
 
@@ -69,7 +69,7 @@ async def find_educator_schools(
 
     data = educator_school_models.ListAPIEducatorSchoolData.from_airtable_educator_schools(
         airtable_educator_schools=matches, url_path_for=request.app.url_path_for
-    ).__root__
+    ).root
 
     # Strip http://<<url>> from request.url, return just the <<path>>?<<query>>
     self_url = str(request.url)[(str(request.url).find(request.url.path)) :]
@@ -103,7 +103,7 @@ async def create_educator_school(request: Request, payload: educator_school_mode
     matches = find_educator_schools_wrapper(
         educator_id=payload.educator_id, school_id=payload.school_id, airtable_client=airtable_client
     )
-    if matches is not None and len(matches.__root__) > 0:
+    if matches is not None and len(matches.root) > 0:
         raise HTTPException(status_code=409, detail="Educator and school are already linked")
 
     airtable_educator_schools_payload = payload.to_airtable_educator_schools()

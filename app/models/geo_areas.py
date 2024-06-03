@@ -69,22 +69,30 @@ class APIGeoAreaData(geo_areas.APIGeoAreaData):
         auto_response_template_links = []
         if airtable_geo_area.fields.auto_response_email_templates:
             for auto_response_template_id in airtable_geo_area.fields.auto_response_email_templates:
-                auto_response_template_record = airtable_client.get_auto_response_email_template_by_id(auto_response_template_id)
-                auto_response_template_data = APIDataWithFields(id=auto_response_template_record.id, type=auto_response_email_template_models.MODEL_TYPE, fields=auto_response_template_record.fields)
+                auto_response_template_record = airtable_client.get_auto_response_email_template_by_id(
+                    auto_response_template_id
+                )
+                auto_response_template_data = APIDataWithFields(
+                    id=auto_response_template_record.id,
+                    type=auto_response_email_template_models.MODEL_TYPE,
+                    fields=auto_response_template_record.fields,
+                )
                 auto_response_template_links.append(
                     response_models.APILinksAndData(
-                        links={"self": url_path_for("get_auto_response_email_template", auto_response_email_template_id=auto_response_template_data.id)}, data=auto_response_template_data
+                        links={
+                            "self": url_path_for(
+                                "get_auto_response_email_template",
+                                auto_response_email_template_id=auto_response_template_data.id,
+                            )
+                        },
+                        data=auto_response_template_data,
                     )
                 )
 
         relationships = APIGeoAreaRelationships(
-            hub=hub_link,
-            assigned_rse=rse_link,
-            auto_response_email_templates=auto_response_template_links
+            hub=hub_link, assigned_rse=rse_link, auto_response_email_templates=auto_response_template_links
         )
-        links = response_models.APILinks(
-            links={"self": url_path_for("get_geo_area", geo_area_id=airtable_geo_area.id)}
-        )
+        links = response_models.APILinks(links={"self": url_path_for("get_geo_area", geo_area_id=airtable_geo_area.id)})
         return cls(
             id=airtable_geo_area.id,
             type=MODEL_TYPE,
@@ -108,11 +116,7 @@ class ListAPIGeoAreaData(geo_areas.ListAPIGeoAreaData):
         url_path_for: Callable,
     ):
         responses = []
-        for gac in airtable_geo_areas.__root__:
-            responses.append(
-                APIGeoAreaData.from_airtable_geo_area(
-                    airtable_geo_area=gac, url_path_for=url_path_for
-                )
-            )
+        for gac in airtable_geo_areas.root:
+            responses.append(APIGeoAreaData.from_airtable_geo_area(airtable_geo_area=gac, url_path_for=url_path_for))
 
-        return cls(__root__=responses)
+        return cls(root=responses)

@@ -19,19 +19,38 @@ from ..airtable.base_school_db import (
 from ..airtable.base_school_db.languages import CertificationStatus
 
 
-class CreateAPIEducatorFields(educators.CreateAPIEducatorFields):
-    def to_airtable_educator(
-        self,  # , contact_info_id: Optional[str] = None
-    ) -> airtable_educator_models.CreateAirtableEducatorFields:
+class CreateUpdateAPIEducatorFields(educators.CreateUpdateAPIEducatorFields):
+    def to_airtable_educator(self, exclude_unset=False) -> airtable_educator_models.CreateAirtableEducatorFields:
         from ..airtable.client import AirtableClient
         from ..airtable.base_school_db.field_categories import FieldCategoryType
 
         airtable_client = AirtableClient()
 
+        record = airtable_educator_models.CreateAirtableEducatorFields()
+
         # 7/15/2022 - Moved away from Contact Info for a more flat structure in the Educator table itself
         # contact_info = []
         # if contact_info_id:
         #    contact_info.append(contact_info_id)
+
+        if exclude_unset is False or (exclude_unset and "email" in self.model_fields_set):
+            record.primary_personal_email = self.email
+        if exclude_unset is False or (exclude_unset and "first_name" in self.model_fields_set):
+            record.first_name = self.first_name
+        if exclude_unset is False or (exclude_unset and "last_name" in self.model_fields_set):
+            record.last_name = self.last_name
+        if exclude_unset is False or (exclude_unset and "details" in self.model_fields_set):
+            record.details = self.details
+        if exclude_unset is False or (
+            exclude_unset and "initial_interest_in_governance_model" in self.model_fields_set
+        ):
+            record.initial_interest_in_governance_model = self.initial_interest_in_governance_model
+        if exclude_unset is False or (exclude_unset and "stage" in self.model_fields_set):
+            record.stage = self.stage
+        if exclude_unset is False or (exclude_unset and "home_address" in self.model_fields_set):
+            record.home_address = self.home_address
+        if exclude_unset is False or (exclude_unset and "status" in self.model_fields_set):
+            record.status = self.status
 
         newsletter_ids = []
         newsletter_slugs = []
@@ -41,23 +60,34 @@ class CreateAPIEducatorFields(educators.CreateAPIEducatorFields):
             newsletter_slugs.append(airtable_newsletters_models.NewsletterSlugs.EMERGING_TEACHER_LEADER_GROUP)
         if len(newsletter_slugs) > 0:
             newsletters = airtable_client.get_newsletters_by_slug(newsletter_slugs)
-            newsletter_ids = list(map(lambda n: n.id, newsletters.__root__))
+            newsletter_ids = list(map(lambda n: n.id, newsletters.root))
 
-        assigned_partner = None
-        if self.assigned_partner_id:
-            assigned_partner = [self.assigned_partner_id]
+        if exclude_unset is False or (exclude_unset and len(newsletter_ids) > 0):
+            record.newsletters = newsletter_ids
 
-        target_community = None
-        if self.target_community_id:
-            target_community = [self.target_community_id]
+        if exclude_unset is False or (exclude_unset and "assigned_partner_id" in self.model_fields_set):
+            assigned_partner = None
+            if self.assigned_partner_id:
+                assigned_partner = [self.assigned_partner_id]
+            record.assigned_partner = assigned_partner
 
-        start_a_school_response = None
-        if self.start_a_school_response_id:
-            start_a_school_response = [self.start_a_school_response_id]
+        if exclude_unset is False or (exclude_unset and "target_community_id" in self.model_fields_set):
+            target_community = None
+            if self.target_community_id:
+                target_community = [self.target_community_id]
+            record.target_community = target_community
 
-        get_involved_response = None
-        if self.get_involved_response_id:
-            get_involved_response = [self.get_involved_response_id]
+        if exclude_unset is False or (exclude_unset and "start_a_school_response_id" in self.model_fields_set):
+            start_a_school_response = None
+            if self.start_a_school_response_id:
+                start_a_school_response = [self.start_a_school_response_id]
+            record.ssj_typeforms_start_a_school = start_a_school_response
+
+        if exclude_unset is False or (exclude_unset and "get_involved_response_id" in self.model_fields_set):
+            get_involved_response = None
+            if self.get_involved_response_id:
+                get_involved_response = [self.get_involved_response_id]
+            record.ssj_fillout_forms_get_involved = get_involved_response
 
         age_classrooms_set = set()
         age_classrooms = None
@@ -67,25 +97,12 @@ class CreateAPIEducatorFields(educators.CreateAPIEducatorFields):
             )
 
             for m in age_classrooms_mapping:
-                if m['is_custom_value'] is False:
-                    age_classrooms_set.add(m['mapped_value'])
+                if m["is_custom_value"] is False:
+                    age_classrooms_set.add(m["mapped_value"])
             age_classrooms = list(age_classrooms_set)
+        record.initial_interest_in_age_classrooms = age_classrooms
 
-        return airtable_educator_models.CreateAirtableEducatorFields(
-            primary_personal_email=self.email,
-            first_name=self.first_name,
-            last_name=self.last_name,
-            details=self.details,
-            initial_interest_in_governance_model=self.initial_interest_in_governance_model,
-            initial_interest_in_age_classrooms=age_classrooms,
-            stage=self.stage,
-            home_address=self.home_address,
-            assigned_partner=assigned_partner,
-            target_community=target_community,
-            ssj_typeforms_start_a_school=start_a_school_response,
-            ssj_fillout_forms_get_involved=get_involved_response,
-            newsletters=newsletter_ids,
-        )
+        return record
 
     # 7/15/2022 - Moved away from Contact Info for a more flat structure in the Educator table itself
     # def to_airtable_contact_info(
@@ -116,16 +133,15 @@ class CreateAPIEducatorFields(educators.CreateAPIEducatorFields):
             )
 
             for m in race_and_ethnicity_mapping:
-                if m['is_custom_value'] is True:
-                    set_race_and_ethnicity_other.add(m['mapped_value'])
+                if m["is_custom_value"] is True:
+                    set_race_and_ethnicity_other.add(m["mapped_value"])
                 else:
-                    set_race_and_ethnicity.add(m['mapped_value'])
+                    set_race_and_ethnicity.add(m["mapped_value"])
 
         if len(set_race_and_ethnicity) > 0:
             race_and_ethnicity = list(set_race_and_ethnicity)
         if len(set_race_and_ethnicity_other) > 0:
             race_and_ethnicity_other = ";".join(set_race_and_ethnicity_other)
-
 
         educational_attainment = None
         if self.educational_attainment is not None:
@@ -133,8 +149,8 @@ class CreateAPIEducatorFields(educators.CreateAPIEducatorFields):
                 FieldCategoryType.educational_attainment, str(self.educational_attainment)
             )
             if len(education_mapping) > 0:
-                if not education_mapping[0]['is_custom_value'] is True:
-                    educational_attainment = education_mapping[0]['mapped_value']
+                if not education_mapping[0]["is_custom_value"] is True:
+                    educational_attainment = education_mapping[0]["mapped_value"]
 
         household_income = None
         if self.household_income is not None:
@@ -142,8 +158,8 @@ class CreateAPIEducatorFields(educators.CreateAPIEducatorFields):
                 FieldCategoryType.household_income, str(self.household_income)
             )
             if len(household_income_mapping) > 0:
-                if not household_income_mapping[0]['is_custom_value'] is True:
-                    household_income = household_income_mapping[0]['mapped_value']
+                if not household_income_mapping[0]["is_custom_value"] is True:
+                    household_income = household_income_mapping[0]["mapped_value"]
 
         set_gender = set()
         set_gender_other = set()
@@ -154,10 +170,10 @@ class CreateAPIEducatorFields(educators.CreateAPIEducatorFields):
                 FieldCategoryType.gender, self.gender
             )
             for m in gender_mapping:
-                if m['is_custom_value'] is True:
-                    set_gender_other.add(m['mapped_value'])
+                if m["is_custom_value"] is True:
+                    set_gender_other.add(m["mapped_value"])
                 else:
-                    set_gender.add(m['mapped_value'])
+                    set_gender.add(m["mapped_value"])
 
         if len(set_gender) > 0:
             gender = list(set_gender)[0]
@@ -171,8 +187,8 @@ class CreateAPIEducatorFields(educators.CreateAPIEducatorFields):
                 FieldCategoryType.lgbtqia, str(self.lgbtqia_identifying)
             )
             if len(lgbtqia_mapping) > 0:
-                if not lgbtqia_mapping[0]['is_custom_value'] is True:
-                    lgbtqia = lgbtqia_mapping[0]['mapped_value']
+                if not lgbtqia_mapping[0]["is_custom_value"] is True:
+                    lgbtqia = lgbtqia_mapping[0]["mapped_value"]
 
         # TODO: Use Enums
         set_pronouns = set()
@@ -184,10 +200,10 @@ class CreateAPIEducatorFields(educators.CreateAPIEducatorFields):
                 FieldCategoryType.pronouns, self.pronouns
             )
             for m in pronoun_mapping:
-                if m['is_custom_value'] is True:
-                    set_pronouns_other.add(m['mapped_value'])
+                if m["is_custom_value"] is True:
+                    set_pronouns_other.add(m["mapped_value"])
                 else:
-                    set_pronouns.add(m['mapped_value'])
+                    set_pronouns.add(m["mapped_value"])
 
         if len(set_pronouns) > 0:
             pronouns = list(set_pronouns)[0]
@@ -222,11 +238,11 @@ class CreateAPIEducatorFields(educators.CreateAPIEducatorFields):
                 FieldCategoryType.languages, language.language
             )
             for m in languages_mapping:
-                if m['is_custom_value'] is True:
-                    set_languages_other.add(m['mapped_value'])
+                if m["is_custom_value"] is True:
+                    set_languages_other.add(m["mapped_value"])
                 else:
-                    if m['mapped_value'].lower() != 'other':
-                        set_languages.add(m['mapped_value'])
+                    if m["mapped_value"].lower() != "other":
+                        set_languages.add(m["mapped_value"])
 
             if len(set_languages) > 0:
                 for l in list(set_languages):
@@ -265,10 +281,10 @@ class CreateAPIEducatorFields(educators.CreateAPIEducatorFields):
                 FieldCategoryType.montessori_certification_levels, certification.certification_levels
             )
             for m in mapped_certification_levels:
-                if m['is_custom_value'] is True:
+                if m["is_custom_value"] is True:
                     set_certification_levels.add("Unknown")
                 else:
-                    set_certification_levels.add(m['mapped_value'])
+                    set_certification_levels.add(m["mapped_value"])
             certification_levels = list(set_certification_levels)
 
             mapped_certifiers = airtable_client.map_response_to_field_category_values(
@@ -290,10 +306,10 @@ class CreateAPIEducatorFields(educators.CreateAPIEducatorFields):
             certifier = None
             certifier_other = None
             for m in mapped_certifiers:
-                if m['is_custom_value']:
-                    certifier_other = m['mapped_value']
+                if m["is_custom_value"]:
+                    certifier_other = m["mapped_value"]
                 else:
-                    certifier = m['mapped_value']
+                    certifier = m["mapped_value"]
 
             certification_status = None
             if certification.is_montessori_certified:
@@ -335,6 +351,7 @@ class APIEducatorData(educators.APIEducatorData):
             home_address=airtable_educator.fields.home_address,
             target_community=airtable_educator.fields.target_community_name,
             stage=airtable_educator.fields.stage,
+            status=airtable_educator.fields.status,
             visioning_album_complete=airtable_educator.fields.visioning_album_complete,
             visioning_album=airtable_educator.fields.visioning_album,
             current_roles=airtable_educator.fields.current_roles,
@@ -458,9 +475,9 @@ class ListAPIEducatorData(educators.ListAPIEducatorData):
         cls, airtable_educators: airtable_educator_models.ListAirtableEducatorResponse, url_path_for: Callable
     ):
         educator_responses = []
-        for e in airtable_educators.__root__:
+        for e in airtable_educators.root:
             educator_responses.append(
                 APIEducatorData.from_airtable_educator(airtable_educator=e, url_path_for=url_path_for)
             )
 
-        return cls(__root__=educator_responses)
+        return cls(root=educator_responses)

@@ -92,9 +92,9 @@ class ListAPIPartnerData(partners.ListAPIPartnerData):
         cls, airtable_partners: airtable_partner_models.ListAirtablePartnerResponse, url_path_for: Callable
     ):
         partner_responses = []
-        for p in airtable_partners.__root__:
+        for p in airtable_partners.root:
             partner_responses.append(
                 APIPartnerData.from_airtable_partner(airtable_partner=p, url_path_for=url_path_for)
             )
 
-        return cls(__root__=partner_responses)
+        return cls(root=partner_responses)

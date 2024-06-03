@@ -26,6 +26,7 @@ class CreateApiSSJFilloutGetInvolvedFields(ssj_fillout_get_involved.CreateApiSSJ
             entry_date = self.entry_date
 
         return airtable_fillout_get_involved.CreateAirtableSSJFilloutGetInvolved(
+            educator=self.educator_id,
             first_name=self.first_name,
             last_name=self.last_name,
             email=self.email,
@@ -92,6 +93,7 @@ class ApiSSJFilloutGetInvolvedData(ssj_fillout_get_involved.ApiSSJFilloutGetInvo
             ]
 
         fields = ApiSSJFilloutGetInvolvedFields(
+            educator_id=airtable_get_involved.fields.educator,
             response_id=airtable_get_involved.fields.response_id,
             first_name=airtable_get_involved.fields.first_name,
             last_name=airtable_get_involved.fields.last_name,

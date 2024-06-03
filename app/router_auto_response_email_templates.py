@@ -8,7 +8,10 @@ from .models import partners as partner_models
 from . import auth
 from .utils.utils import get_airtable_client
 
-OPENAPI_TAG_METADATA = {"name": auto_response_email_template_models.MODEL_TYPE, "description": "Auto-response email mapping data"}
+OPENAPI_TAG_METADATA = {
+    "name": auto_response_email_template_models.MODEL_TYPE,
+    "description": "Auto-response email mapping data",
+}
 
 router = APIRouter(
     prefix="/auto_response_email_templates",
@@ -20,7 +23,9 @@ router = APIRouter(
 
 def fetch_auto_response_email_template_wrapper(auto_response_email_template_id, airtable_client: AirtableClient):
     try:
-        airtable_auto_response_email_template = airtable_client.get_auto_response_email_template_by_id(auto_response_email_template_id)
+        airtable_auto_response_email_template = airtable_client.get_auto_response_email_template_by_id(
+            auto_response_email_template_id
+        )
     except requests.exceptions.HTTPError as ex:
         if ex.response.status_code == 404:
             raise HTTPException(status_code=404, detail="Auto-Response Email Template not found")
@@ -30,28 +35,54 @@ def fetch_auto_response_email_template_wrapper(auto_response_email_template_id, 
     return airtable_auto_response_email_template
 
 
-# Dupe the root route to solve this issue: https://github.com/tiangolo/fastapi/issues/2060
-@router.get("/", response_model=auto_response_email_template_models.ListAPIAutoResponseEmailTemplateResponse, include_in_schema=False)
+# Dupe the root route: https://github.com/tiangolo/fastapi/issues/2060
+@router.get(
+    "/",
+    response_model=auto_response_email_template_models.ListAPIAutoResponseEmailTemplateResponse,
+    include_in_schema=False,
+)
 @router.get("", response_model=auto_response_email_template_models.ListAPIAutoResponseEmailTemplateResponse)
 async def list_auto_response_email_templates(request: Request):
     airtable_client = get_airtable_client(request)
     airtable_auto_response_templates = airtable_client.list_auto_response_email_templates()
 
-    data = auto_response_email_template_models.ListAPIGeoAreaTargetCommunityData.from_airtable_geo_area_target_communities(
+    data = auto_response_email_template_models.ListAPIAutoResponseEmailTemplateData.from_airtable_auto_response_email_templates(
         airtable_auto_response_email_templates=airtable_auto_response_templates, url_path_for=request.app.url_path_for
-    ).__root__
+    ).root
 
-    return auto_response_email_template_models.ListAPIAutoResponseEmailTemplateResponse(data=data, links={"self": request.app.url_path_for("list_auto_response_email_templates")})
+    # auto_response_email_template_models.ListAPIAutoResponseEmailTemplateData(data)
+
+    return auto_response_email_template_models.ListAPIAutoResponseEmailTemplateResponse(
+        data=data, links={"self": request.app.url_path_for("list_auto_response_email_templates")}
+    )
 
 
-@router.get("/{auto_response_email_template_id}", response_model=auto_response_email_template_models.APIAutoResponseEmailTemplateResponse)
+@router.get(
+    "/{auto_response_email_template_id}",
+    response_model=auto_response_email_template_models.APIAutoResponseEmailTemplateResponse,
+)
 async def get_auto_response_email_template(auto_response_email_template_id, request: Request):
     airtable_client = get_airtable_client(request)
-    airtable_auto_response_email_template = fetch_auto_response_email_template_wrapper(auto_response_email_template_id, airtable_client)
+    airtable_auto_response_email_template = fetch_auto_response_email_template_wrapper(
+        auto_response_email_template_id, airtable_client
+    )
 
-    data = auto_response_email_template_models.APIAutoResponseEmailTemplateData.from_airtable_auto_response_email_template(airtable_auto_response_email_template=airtable_auto_response_email_template, url_path_for=request.app.url_path_for)
+    data = (
+        auto_response_email_template_models.APIAutoResponseEmailTemplateData.from_airtable_auto_response_email_template(
+            airtable_auto_response_email_template=airtable_auto_response_email_template,
+            url_path_for=request.app.url_path_for,
+        )
+    )
 
-    return auto_response_email_template_models.APIAutoResponseEmailTemplateResponse(data=data, links={"self": request.app.url_path_for("get_auto_response_email_template", auto_response_email_template_id=auto_response_email_template_id)})
+    return auto_response_email_template_models.APIAutoResponseEmailTemplateResponse(
+        data=data,
+        links={
+            "self": request.app.url_path_for(
+                "get_auto_response_email_template", auto_response_email_template_id=auto_response_email_template_id
+            )
+        },
+    )
+
 
 #
 # @router.get("/{auto_response_email_template_id}/hub", response_model=hub_models.APIHubResponse)

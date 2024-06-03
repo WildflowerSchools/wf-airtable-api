@@ -109,11 +109,11 @@ class ListAPIGeoAreaContactData(geo_area_contacts.ListAPIGeoAreaContactData):
         url_path_for: Callable,
     ):
         responses = []
-        for lc in airtable_geo_area_contacts.__root__:
+        for lc in airtable_geo_area_contacts.root:
             responses.append(
                 APIGeoAreaContactData.from_airtable_geo_area_contact(
                     airtable_geo_area_contact=lc, url_path_for=url_path_for
                 )
             )
 
-        return cls(__root__=responses)
+        return cls(root=responses)

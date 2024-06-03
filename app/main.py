@@ -24,7 +24,7 @@ from . import (
     router_ssj_typeforms,
     router_educators_schools,
     router_ssj_fillout,
-    router_auto_response_email_templates
+    router_auto_response_email_templates,
 )
 from .airtable.client import AirtableClient
 
@@ -123,7 +123,7 @@ add_routers(
         router_ssj_typeforms.router,
         router_ssj_fillout.router,
         router_educators_schools.router,
-        router_auto_response_email_templates.router
+        router_auto_response_email_templates.router,
     ]
 )
 

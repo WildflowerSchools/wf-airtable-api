@@ -49,7 +49,7 @@ class ListAPIPodData(pods.ListAPIPodData):
     @classmethod
     def from_airtable_pods(cls, airtable_pods: airtable_pod_models.ListAirtablePodResponse, url_path_for: Callable):
         pod_responses = []
-        for p in airtable_pods.__root__:
+        for p in airtable_pods.root:
             pod_responses.append(APIPodData.from_airtable_pod(airtable_pod=p, url_path_for=url_path_for))
 
-        return cls(__root__=pod_responses)
+        return cls(root=pod_responses)

@@ -52,7 +52,7 @@ class ListAPIHubData(hubs.ListAPIHubData):
     @classmethod
     def from_airtable_hubs(cls, airtable_hubs: airtable_hub_models.ListAirtableHubResponse, url_path_for: Callable):
         hub_responses = []
-        for h in airtable_hubs.__root__:
+        for h in airtable_hubs.root:
             hub_responses.append(APIHubData.from_airtable_hub(airtable_hub=h, url_path_for=url_path_for))
 
-        return cls(__root__=hub_responses)
+        return cls(root=hub_responses)

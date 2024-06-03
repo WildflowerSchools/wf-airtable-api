@@ -17,6 +17,6 @@ class GoogleMapsAPI(metaclass=Singleton):
     def geocode_address(self, address) -> Optional[Place]:
         response = self.client_api.geocode(address)
         if len(response) > 0:
-            return ListPlace.parse_obj(response).__root__[0]
+            return ListPlace.parse_obj(response).root[0]
 
         return None

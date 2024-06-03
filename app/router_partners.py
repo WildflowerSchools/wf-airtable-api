@@ -46,7 +46,7 @@ async def list_partners(request: Request, page_size: str = 100, offset: str = ""
 
     data = partner_models.ListAPIPartnerData.from_airtable_partners(
         airtable_partners=airtable_partners, url_path_for=request.app.url_path_for
-    ).__root__
+    ).root
 
     links = {
         "self": f'{request.app.url_path_for("list_partners")}?{urlencode({"page_size": page_size, "offset": offset})}'
@@ -81,7 +81,7 @@ async def get_partner_hubs_as_entrepreneur(partner_id, request: Request):
 
     data = hub_models.ListAPIHubData.from_airtable_hubs(
         airtable_hubs=airtable_hubs, url_path_for=request.app.url_path_for
-    ).__root__
+    ).root
 
     return hub_models.ListAPIHubResponse(
         data=data, links={"self": request.app.url_path_for("get_partner_hubs_as_entrepreneur", partner_id=partner_id)}
@@ -96,7 +96,7 @@ async def get_partner_pods_as_contact(partner_id, request: Request):
 
     data = pod_models.ListAPIPodData.from_airtable_pods(
         airtable_pods=airtable_pods, url_path_for=request.app.url_path_for
-    ).__root__
+    ).root
 
     return pod_models.ListAPIPodResponse(
         data=data, links={"self": request.app.url_path_for("get_partner_pods_as_contact", partner_id=partner_id)}
@@ -111,7 +111,7 @@ async def get_guides_schools(partner_id, request: Request):
 
     data = school_models.ListAPISchoolData.from_airtable_schools(
         airtable_schools=airtable_schools, url_path_for=request.app.url_path_for
-    ).__root__
+    ).root
 
     return school_models.ListAPISchoolResponse(
         data=data, links={"self": request.app.url_path_for("get_guides_schools", partner_id=partner_id)}
@@ -126,7 +126,7 @@ async def get_guides_educators(partner_id, request: Request):
 
     data = educator_models.ListAPIEducatorData.from_airtable_educators(
         airtable_educators=airtable_educators, url_path_for=request.app.url_path_for
-    ).__root__
+    ).root
 
     return educator_models.ListAPIEducatorResponse(
         data=data, links={"self": request.app.url_path_for("get_guides_educators", partner_id=partner_id)}
