@@ -1,3 +1,5 @@
+import re
+from typing import Union
 from urllib.parse import urlencode
 
 from fastapi import APIRouter, Depends, HTTPException, Request
@@ -7,10 +9,14 @@ from .airtable.client import AirtableClient
 from .geocode.google_maps_client import GoogleMapsAPI
 from .geocode import utils as geocode_utils
 from .log import logger
+from .models import auto_response_email_template
+from .models import geo_areas as geo_area_models
 from .models import geo_area_contacts as geo_area_contact_models
 from .models import geo_area_target_communities as geo_area_target_community_models
 from . import auth
 from .utils.utils import get_airtable_client
+
+from . import router_auto_response_email_templates
 
 OPENAPI_TAG_METADATA = [
     {
@@ -21,11 +27,22 @@ OPENAPI_TAG_METADATA = [
         "name": geo_area_target_community_models.MODEL_TYPE,
         "description": "Map Target Communities to given cities/states/regions/countries/polygons",
     },
+    {
+        "name": geo_area_models.MODEL_TYPE,
+        "description": "Map Geo Areas to given cities/states/regions/countries/polygons",
+    },
 ]
 
 router = APIRouter(
     prefix="/geo_mapping",
     tags=[],
+    dependencies=[Depends(auth.JWTBearer(any_scope=["read:all", "read:educators"]))],
+    responses={404: {"description": "Not found"}},
+)
+
+geo_area_router = APIRouter(
+    prefix="/geographic_areas",
+    tags=[geo_area_models.MODEL_TYPE],
     dependencies=[Depends(auth.JWTBearer(any_scope=["read:all", "read:educators"]))],
     responses={404: {"description": "Not found"}},
 )
@@ -43,6 +60,25 @@ geo_area_target_community_router = APIRouter(
     dependencies=[Depends(auth.JWTBearer(any_scope=["read:all", "read:educators"]))],
     responses={404: {"description": "Not found"}},
 )
+
+geo_area_auto_response_email_template_router = APIRouter(
+    prefix="/auto_response_email_templates",
+    tags=[auto_response_email_template.MODEL_TYPE],
+    dependencies=[Depends(auth.JWTBearer(any_scope=["read:all", "read:educators"]))],
+    responses={404: {"description": "Not found"}},
+)
+
+
+def fetch_geo_area_wrapper(geo_area_id, airtable_client: AirtableClient):
+    try:
+        airtable_geo_area = airtable_client.get_geo_area_by_id(geo_area_id)
+    except requests.exceptions.HTTPError as ex:
+        if ex.response.status_code == 404:
+            raise HTTPException(status_code=404, detail="Geographic Area not found")
+        else:
+            raise
+
+    return airtable_geo_area
 
 
 def fetch_geo_area_contact_wrapper(geo_area_contact_id, airtable_client: AirtableClient):
@@ -71,6 +107,53 @@ def fetch_geo_area_target_community_wrapper(geo_area_target_community_id, airtab
     return airtable_geo_area_target_community
 
 
+@geo_area_router.get("/", response_model=geo_area_models.ListAPIGeoAreaResponse, include_in_schema=False)
+@geo_area_router.get("", response_model=geo_area_models.ListAPIGeoAreaResponse)
+async def list_geo_areas(
+    request: Request,
+) -> geo_area_models.ListAPIGeoAreaResponse:
+    airtable_client = get_airtable_client(request)
+    airtable_geo_areas = airtable_client.list_geo_areas()
+
+    data = geo_area_models.ListAPIGeoAreaData.from_airtable_geo_areas(
+        airtable_geo_areas=airtable_geo_areas, url_path_for=request.app.url_path_for
+    ).root
+
+    return geo_area_models.ListAPIGeoAreaResponse(data=data, links={"self": request.app.url_path_for("list_geo_areas")})
+
+
+@geo_area_router.get("/for_address", response_model=geo_area_models.APIGeoAreaResponse)
+async def get_geo_area_given_address(request: Request, address: str):
+    gmaps_client = GoogleMapsAPI()
+    place = gmaps_client.geocode_address(address)
+
+    if place is None:
+        logger.warning(f"Unable to geocode address: {address}")
+
+    geo_areas = await list_geo_areas(request)
+    geo_area = geocode_utils.get_geo_area_nearest_to_place(place, geo_areas.data)
+
+    return geo_area_models.APIGeoAreaResponse(
+        data=geo_area,
+        links={"self": f'{request.app.url_path_for("get_geo_area_given_address")}?{urlencode({"address": address})}'},
+    )
+
+
+@geo_area_router.get("/{geo_area_id}", response_model=geo_area_models.APIGeoAreaResponse)
+async def get_geo_area(geo_area_id, request: Request):
+    airtable_client = get_airtable_client(request)
+    airtable_geo_area = fetch_geo_area_wrapper(geo_area_id, airtable_client)
+
+    data = geo_area_models.APIGeoAreaData.from_airtable_geo_area(
+        airtable_geo_area=airtable_geo_area, url_path_for=request.app.url_path_for
+    )
+
+    return geo_area_models.APIGeoAreaResponse(
+        data=data,
+        links={"self": request.app.url_path_for("get_geo_area", geo_area_id=geo_area_id)},
+    )
+
+
 @geo_area_target_community_router.get(
     "/", response_model=geo_area_contact_models.ListAPIGeoAreaContactResponse, include_in_schema=False
 )
@@ -81,7 +164,7 @@ async def list_geo_area_contacts(request: Request) -> geo_area_contact_models.Li
 
     data = geo_area_contact_models.ListAPIGeoAreaContactData.from_airtable_geo_area_contacts(
         airtable_geo_area_contacts=airtable_geo_area_contacts, url_path_for=request.app.url_path_for
-    ).__root__
+    ).root
 
     return geo_area_contact_models.ListAPIGeoAreaContactResponse(
         data=data, links={"self": request.app.url_path_for("list_geo_area_contacts")}
@@ -138,7 +221,7 @@ async def list_geo_area_target_communities(
 
     data = geo_area_target_community_models.ListAPIGeoAreaTargetCommunityData.from_airtable_geo_area_target_communities(
         airtable_geo_area_target_communities=airtable_geo_area_target_communities, url_path_for=request.app.url_path_for
-    ).__root__
+    ).root
 
     return geo_area_target_community_models.ListAPIGeoAreaTargetCommunityResponse(
         data=data, links={"self": request.app.url_path_for("list_geo_area_target_communities")}
@@ -189,5 +272,108 @@ async def get_geo_area_target_community(geo_area_target_community_id, request: R
     )
 
 
+@geo_area_auto_response_email_template_router.get(
+    "/for_address", response_model=auto_response_email_template.APIAutoResponseEmailTemplateResponse
+)
+async def get_auto_response_email_templates_given_address(
+    request: Request, address: str, contact_type: Union[str, None] = None, language: Union[str, None] = None
+):
+    gmaps_client = GoogleMapsAPI()
+    place = gmaps_client.geocode_address(address)
+
+    def lower_and_remove_special_characters(string: str) -> str:
+        return re.sub(r"[\W_]", "", string).lower()
+
+    if place is None:
+        logger.warning(f"Unable to geocode address: {address}")
+
+    auto_response_email_templates = await router_auto_response_email_templates.list_auto_response_email_templates(
+        request
+    )
+    all_geo_areas = await list_geo_areas(request)
+
+    filtered_auto_response_email_templates = []
+    for auto_response in auto_response_email_templates.data:
+        if (
+            contact_type is None
+            or (
+                lower_and_remove_special_characters(contact_type)
+                == lower_and_remove_special_characters(auto_response.fields.contact_type)
+            )
+        ) and (
+            (
+                language is not None
+                and lower_and_remove_special_characters(language)
+                == lower_and_remove_special_characters(auto_response.fields.language)
+            )
+            or lower_and_remove_special_characters(auto_response.fields.language) in ["any", "english"]
+        ):
+            filtered_auto_response_email_templates.append(auto_response)
+
+    filtered_geo_areas = []
+    for geo_area in all_geo_areas.data:
+        for auto_response in filtered_auto_response_email_templates:
+            if geo_area.id in auto_response.fields.geographic_areas:
+                filtered_geo_areas.append(geo_area)
+
+    auto_response_template = None
+    if len(filtered_geo_areas) > 0:
+        geo_area = geocode_utils.get_geo_area_nearest_to_place(place, filtered_geo_areas)
+
+        if geo_area is not None:
+            auto_response_template = list(
+                filter(lambda r: geo_area.id in r.fields.geographic_areas, filtered_auto_response_email_templates)
+            )
+            if len(auto_response_template) > 0:
+                auto_response_template = auto_response_template[0]
+
+    if auto_response_template is None:
+        for auto_response in auto_response_email_templates.data:
+            if (
+                (
+                    contact_type is not None
+                    and lower_and_remove_special_characters(contact_type)
+                    == lower_and_remove_special_characters(auto_response.fields.contact_type)
+                )
+                or lower_and_remove_special_characters(auto_response.fields.contact_type) == "any"
+            ) and (
+                language is not None
+                and lower_and_remove_special_characters(language)
+                == lower_and_remove_special_characters(auto_response.fields.language)
+            ):
+                auto_response_template = auto_response
+                break
+
+    if auto_response_template is None:
+        for auto_response in auto_response_email_templates.data:
+            if (
+                (
+                    contact_type is not None
+                    and lower_and_remove_special_characters(contact_type)
+                    == lower_and_remove_special_characters(auto_response.fields.contact_type)
+                )
+                or lower_and_remove_special_characters(auto_response.fields.contact_type) == "any"
+            ) and (
+                (
+                    language is not None
+                    and lower_and_remove_special_characters(language)
+                    == lower_and_remove_special_characters(auto_response.fields.language)
+                )
+                or lower_and_remove_special_characters(auto_response.fields.language) in ["any", "english"]
+            ):
+                auto_response_template = auto_response
+                break
+
+    if auto_response_template is None:
+        raise HTTPException(status_code=404, detail="No valid auto-response email template found for given address")
+
+    return auto_response_email_template.APIAutoResponseEmailTemplateResponse(
+        data=auto_response_template,
+        links={"self": f'{request.app.url_path_for("get_geo_area_given_address")}?{urlencode({"address": address})}'},
+    )
+
+
+router.include_router(geo_area_router)
 router.include_router(geo_area_contacts_router)
 router.include_router(geo_area_target_community_router)
+router.include_router(geo_area_auto_response_email_template_router)

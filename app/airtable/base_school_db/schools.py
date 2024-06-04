@@ -1,7 +1,7 @@
-from datetime import date, datetime
-from typing import Optional
+from datetime import date
+from typing import Optional, Union
 
-from pydantic import HttpUrl, Field, validator
+from pydantic import HttpUrl, Field, field_validator, RootModel
 
 from app.airtable.attachment import AirtableAttachment
 from app.airtable.base_model import BaseModel
@@ -10,56 +10,65 @@ from app.airtable.validators import get_first_or_default_none, get_first_or_defa
 
 
 class AirtableSchoolFields(BaseModel):
-    name: Optional[str] = Field(alias="Name")
-    short_name: Optional[str] = Field(alias="Short Name")
-    details: Optional[str] = Field(alias="Details")
+    name: Optional[str] = Field(None, alias="Name")
+    short_name: Optional[str] = Field(None, alias="Short Name")
+    details: Optional[str] = Field(None, alias="Details")
     logo: Optional[AirtableAttachment] = Field(alias="Logo", default={})
-    domain_name: Optional[str] = Field(alias="Email Domain")
-    address: Optional[str] = Field(alias="Address")
-    latitude: Optional[float] = Field(alias="Latitude")
-    longitude: Optional[float] = Field(alias="Longitude")
-    organizational_unit: Optional[str] = Field(alias="Google Workspace Org Unit Path")
+    domain_name: Optional[str] = Field(None, alias="Email Domain")
+    address: Optional[str] = Field(None, alias="Address")
+    latitude: Optional[float] = Field(None, alias="Latitude")
+    longitude: Optional[float] = Field(None, alias="Longitude")
+    organizational_unit: Optional[str] = Field(None, alias="Google Workspace Org Unit Path")
 
-    ages_served: Optional[list[str]] = Field(alias="Ages served")
-    school_calendar: Optional[str] = Field(alias="School calendar")
-    school_schedule: Optional[list[str]] = Field(alias="School schedule")
-    school_phone: Optional[str] = Field(alias="School Phone")
-    school_email: Optional[str] = Field(alias="School Email")
-    website: Optional[HttpUrl] = Field(alias="Website")
+    ages_served: Optional[list[str]] = Field(None, alias="Ages served")
+    school_calendar: Optional[str] = Field(None, alias="School calendar")
+    school_schedule: Optional[list[str]] = Field(None, alias="School schedule")
+    school_phone: Optional[str] = Field(None, alias="School Phone")
+    school_email: Optional[str] = Field(None, alias="School Email")
+    website: Optional[HttpUrl] = Field(None, alias="Website")
 
-    hub: Optional[str] = Field(alias="Hub")
-    hub_name: Optional[str] = Field(alias="Hub Name")
-    pod: Optional[str] = Field(alias="Pod")
-    pod_name: Optional[str] = Field(alias="Pod Name")
-    guides_entrepreneurs: Optional[list[str]] = Field(alias="Guides and Entrepreneurs")
-    primary_contacts: Optional[list[str]] = Field(alias="Primary Contacts")
-    all_educators: Optional[list[str]] = Field(alias="All Educator Record IDs")
-    current_educators: Optional[list[str]] = Field(alias="Current Educator Record IDs")
-    current_tls: Optional[list[str]] = Field(alias="Current TL Record IDs")
-    founders: Optional[list[str]] = Field(alias="Founder Record IDs")
+    hub: Optional[str] = Field(None, alias="Hub")
+    hub_name: Optional[str] = Field(None, alias="Hub Name")
+    pod: Optional[str] = Field(None, alias="Pod")
+    pod_name: Optional[str] = Field(None, alias="Pod Name")
+    guides_entrepreneurs: Optional[list[str]] = Field(None, alias="Guides and Entrepreneurs")
+    primary_contacts: Optional[list[str]] = Field(None, alias="Primary Contacts")
+    all_educators: Optional[list[str]] = Field(None, alias="All Educator Record IDs")
+    current_educators: Optional[list[str]] = Field(None, alias="Current Educator Record IDs")
+    current_tls: Optional[list[str]] = Field(None, alias="Current TL Record IDs")
+    founders: Optional[list[str]] = Field(None, alias="Founder Record IDs")
 
-    status: Optional[str] = Field(alias="School Status")
-    ssj_stage: Optional[str] = Field(alias="School Startup Stage")
-    began_ssj_at: Optional[date] = Field(alias="Began Startup Journey")
-    entered_planning_at: Optional[date] = Field(alias="Entered Planning")
-    entered_startup_at: Optional[date] = Field(alias="Entered Startup")
-    opened_at: Optional[date] = Field(alias="Opened")
-    projected_open: Optional[date] = Field(alias="Projected Open")
-    affiliation_status: Optional[str] = Field(alias="Affiliation status")
-    affiliated_at: Optional[date] = Field(alias="Affiliation date")
+    status: Optional[str] = Field(None, alias="School Status")
+    ssj_stage: Optional[str] = Field(None, alias="School Startup Stage")
+    began_ssj_at: Optional[date] = Field(None, alias="Began Startup Journey")
+    entered_planning_at: Optional[date] = Field(None, alias="Entered Planning")
+    entered_startup_at: Optional[date] = Field(None, alias="Entered Startup")
+    opened_at: Optional[date] = Field(None, alias="Opened")
+    projected_open: Optional[date] = Field(None, alias="Projected Open")
+    affiliation_status: Optional[str] = Field(None, alias="Affiliation status")
+    affiliated_at: Optional[date] = Field(None, alias="Affiliation date")
     affiliation_agreement: Optional[AirtableAttachment] = Field(alias="Signed Affiliation Agreement", default={})
-    nonprofit_status: Optional[str] = Field(alias="Nonprofit status")
-    left_network_reason: Optional[str] = Field(alias="Left Network Reason")
-    left_network_date: Optional[date] = Field(alias="Left Network Date")
+    nonprofit_status: Optional[str] = Field(None, alias="Nonprofit status")
+    left_network_reason: Optional[str] = Field(None, alias="Left Network Reason")
+    left_network_date: Optional[date] = Field(None, alias="Left Network Date")
 
-    # reusable validator
-    _get_first_or_default_none = validator(
-        "hub", "hub_name", "pod", "pod_name", "address", "latitude", "longitude", pre=True, allow_reuse=True
-    )(get_first_or_default_none)
+    @field_validator("hub", "hub_name", "pod", "pod_name", "address", "latitude", "longitude", mode="before")
+    def _get_first_or_default_none(cls, v: Union[str, int, float]) -> Optional[Union[str, int, float]]:
+        return get_first_or_default_none(v)
 
-    _get_first_or_default_dict = validator("affiliation_agreement", "logo", pre=True, allow_reuse=True)(
-        get_first_or_default_dict
-    )
+    @field_validator("affiliation_agreement", "logo", mode="before")
+    def _get_first_or_default_dict(cls, v: Union[str, int, float]) -> Union[str, int, float, dict]:
+        return get_first_or_default_dict(v)
+
+    #
+    # # reusable validator
+    # _get_first_or_default_none = validator(
+    #     "hub", "hub_name", "pod", "pod_name", "address", "latitude", "longitude", pre=True, allow_reuse=True
+    # )(get_first_or_default_none)
+    #
+    # _get_first_or_default_dict = validator("affiliation_agreement", "logo", pre=True, allow_reuse=True)(
+    #     get_first_or_default_dict
+    # )
 
     def get_logo_url(self, default=None):
         if isinstance(self.logo, AirtableAttachment):
@@ -78,5 +87,5 @@ class AirtableSchoolResponse(AirtableResponse):
     fields: AirtableSchoolFields
 
 
-class ListAirtableSchoolResponse(BaseModel):
-    __root__: list[AirtableSchoolResponse]
+class ListAirtableSchoolResponse(RootModel):
+    root: list[AirtableSchoolResponse]

@@ -26,6 +26,7 @@ class CreateApiSSJTypeformStartASchoolFields(ssj_typeform_start_a_school.CreateA
             entry_date = self.entry_date
 
         return airtable_start_a_school_models.CreateAirtableSSJTypeformStartASchool(
+            educator=[self.educator_id],
             first_name=self.first_name,
             last_name=self.last_name,
             email=self.email,
@@ -47,7 +48,7 @@ class CreateApiSSJTypeformStartASchoolFields(ssj_typeform_start_a_school.CreateA
             age_classrooms_interested_in_offering=age_classrooms_interested_in_offering,
             socio_economic_race_and_ethnicity=socio_economic_race_and_ethnicity,
             socio_economic_race_and_ethnicity_other=self.socio_economic_race_and_ethnicity_other,
-            socio_economic_lgbtqia_identifying=self.socio_economic_lgbtqia_identifying,
+            socio_economic_lgbtqia_identifying=str(self.socio_economic_lgbtqia_identifying) if self.socio_economic_lgbtqia_identifying else None,
             socio_economic_pronouns=self.socio_economic_pronouns,
             socio_economic_pronouns_other=self.socio_economic_pronouns_other,
             socio_economic_gender=self.socio_economic_gender,
@@ -77,15 +78,22 @@ class ApiSSJTypeformStartASchoolData(ssj_typeform_start_a_school.ApiSSJTypeformS
 
         age_classrooms = None
         if airtable_start_a_school.fields.age_classrooms_interested_in_offering is not None:
-            age_classrooms = [ac.strip() for ac in airtable_start_a_school.fields.age_classrooms_interested_in_offering]
+            age_classrooms = [
+                ac.strip() for ac in airtable_start_a_school.fields.age_classrooms_interested_in_offering.split(", ")
+            ]
 
         socio_economic_race_and_ethnicity = None
         if airtable_start_a_school.fields.socio_economic_race_and_ethnicity is not None:
             socio_economic_race_and_ethnicity = [
-                re.strip() for re in airtable_start_a_school.fields.socio_economic_race_and_ethnicity
+                re.strip() for re in airtable_start_a_school.fields.socio_economic_race_and_ethnicity.split(", ")
             ]
 
+        educator_id = None
+        if isinstance(airtable_start_a_school.fields.educator, list) and len(airtable_start_a_school.fields.educator) > 0:
+            educator_id = airtable_start_a_school.fields.educator[0]
+
         fields = ApiSSJTypeformStartASchoolFields(
+            educator_id=educator_id,
             response_id=airtable_start_a_school.fields.response_id,
             first_name=airtable_start_a_school.fields.first_name,
             last_name=airtable_start_a_school.fields.last_name,

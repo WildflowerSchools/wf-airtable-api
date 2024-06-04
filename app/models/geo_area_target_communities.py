@@ -91,11 +91,11 @@ class ListAPIGeoAreaTargetCommunityData(geo_area_target_communities.ListAPIGeoAr
         url_path_for: Callable,
     ):
         responses = []
-        for lc in airtable_geo_area_target_communities.__root__:
+        for lc in airtable_geo_area_target_communities.root:
             responses.append(
                 APIGeoAreaTargetCommunityData.from_airtable_geo_area_target_community(
                     airtable_geo_area_target_community=lc, url_path_for=url_path_for
                 )
             )
 
-        return cls(__root__=responses)
+        return cls(root=responses)

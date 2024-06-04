@@ -1,6 +1,6 @@
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, RootModel
 
 
 class AddressComponent(BaseModel):
@@ -25,15 +25,15 @@ class Bounds(BaseModel):
 class Geometry(BaseModel):
     location: LatLngLiteral
     viewport: Bounds
-    location_type: Optional[str]
+    location_type: Optional[str] = None
 
 
 class Place(BaseModel):
-    address_components: Optional[list[AddressComponent]]
-    formatted_address: Optional[str]
-    geometry: Optional[Geometry]
-    place_id: Optional[str]
-    types: Optional[list[str]]
+    address_components: Optional[list[AddressComponent]] = None
+    formatted_address: Optional[str] = None
+    geometry: Optional[Geometry] = None
+    place_id: Optional[str] = None
+    types: Optional[list[str]] = None
 
     def get_locality_component(self):
         for ac in self.address_components:
@@ -64,5 +64,5 @@ class Place(BaseModel):
         return None
 
 
-class ListPlace(BaseModel):
-    __root__: list[Place]
+class ListPlace(RootModel):
+    root: list[Place]

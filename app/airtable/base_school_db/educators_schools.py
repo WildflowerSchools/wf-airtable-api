@@ -1,7 +1,7 @@
 from datetime import date
 from typing import Optional, Union
 
-from pydantic import Field, validator
+from pydantic import ConfigDict, Field, field_validator, RootModel
 
 
 from . import educators as educators_models
@@ -12,30 +12,32 @@ from app.airtable.validators import get_first_or_default_none
 
 
 class CreateUpdateAirtableEducatorsSchoolsFields(BaseModel):
-    educator: Optional[list[str]] = Field(alias="Educator")
-    school: Optional[list[str]] = Field(alias="School")
+    educator: Optional[list[str]] = Field(None, alias="Educator")
+    school: Optional[list[str]] = Field(None, alias="School")
 
-    email: Optional[str] = Field(alias="Email at School")
-    roles: Optional[list[str]] = Field(alias="Roles (staging)")
-    currently_active: Optional[bool] = Field(alias="Currently Active")
-    start_date: Optional[date] = Field(alias="Start Date")
-    end_date: Optional[date] = Field(alias="End Date")
-    mark_for_deletion: Optional[bool] = Field(alias="Mark for deletion")
-
-    class Config:
-        allow_population_by_field_name = True
+    email: Optional[str] = Field(None, alias="Email at School")
+    roles: Optional[list[str]] = Field(None, alias="Roles (staging)")
+    currently_active: Optional[bool] = Field(None, alias="Currently Active")
+    start_date: Optional[date] = Field(None, alias="Start Date")
+    end_date: Optional[date] = Field(None, alias="End Date")
+    mark_for_deletion: Optional[bool] = Field(None, alias="Mark for deletion")
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class AirtableFindEducatorsSchoolsFields(CreateUpdateAirtableEducatorsSchoolsFields):
-    educator_id: Optional[list[str]] = Field(alias="Educator Record ID")
-    school_id: Optional[list[str]] = Field(alias="School Record ID")
+    educator_id: Optional[list[str]] = Field(None, alias="Educator Record ID")
+    school_id: Optional[list[str]] = Field(None, alias="School Record ID")
 
 
 class AirtableEducatorsSchoolsFields(CreateUpdateAirtableEducatorsSchoolsFields):
-    educator: Optional[Union[str, object]] = Field(alias="Educator")
-    school: Optional[Union[str, object]] = Field(alias="School")
+    educator: Optional[Union[str, object]] = Field(None, alias="Educator")
+    school: Optional[Union[str, object]] = Field(None, alias="School")
 
-    _get_first_or_default_none = validator("educator", "school", pre=True, allow_reuse=True)(get_first_or_default_none)
+    @field_validator("educator", "school", mode="before")
+    def _get_first_or_default_none(cls, v: Union[str, int, float]) -> Optional[Union[str, int, float]]:
+        return get_first_or_default_none(v)
+
+    # _get_first_or_default_none = validator("educator", "school", pre=True, allow_reuse=True)(get_first_or_default_none)
 
     def load_educator_relationship(self):
         from ..client import AirtableClient
@@ -93,9 +95,9 @@ class AirtableEducatorsSchoolsResponse(AirtableResponse):
         self.fields.load_relationships()
 
 
-class ListAirtableEducatorsSchoolsResponse(BaseModel):
-    __root__: list[AirtableEducatorsSchoolsResponse]
+class ListAirtableEducatorsSchoolsResponse(RootModel):
+    root: list[AirtableEducatorsSchoolsResponse]
 
     def load_relationships(self):
-        for r in self.__root__:
+        for r in self.root:
             r.load_relationships()

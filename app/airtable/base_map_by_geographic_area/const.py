@@ -2,8 +2,10 @@ from app import const
 
 BASE_ID = const.AIRTABLE_MAP_BY_GEOGRAPHIC_AREA_BASE_ID
 
+GEOGRAPHIC_AREAS_TABLE_NAME = "Geographic Areas"
 AREA_CONTACT_TABLE_NAME = "Area Contact"
 AREA_TARGET_COMMUNITY_TABLE_NAME = "Area Target Community"
+AUTO_RESPONSE_EMAIL_TEMPLATE = "Auto-Response Email Template"
 
 
 class AirtableGeographicAreaTypes:

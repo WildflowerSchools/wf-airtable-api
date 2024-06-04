@@ -58,7 +58,7 @@ async def list_schools(request: Request, page_size: str = 100, offset: str = "")
 
     data = school_models.ListAPISchoolData.from_airtable_schools(
         airtable_schools=airtable_schools, url_path_for=request.app.url_path_for
-    ).__root__
+    ).root
 
     links = {
         "self": f'{request.app.url_path_for("list_schools")}?{urlencode({"page_size": page_size, "offset": offset})}'
@@ -85,7 +85,7 @@ async def find_schools(request: Request, organizational_unit: Optional[str] = No
 
     data = school_models.ListAPISchoolData.from_airtable_schools(
         airtable_schools=airtable_schools, url_path_for=request.app.url_path_for
-    ).__root__
+    ).root
 
     # Strip http://<<url>> from request.url, return just the <<path>>?<<query>>
     self_url = str(request.url)[(str(request.url).find(request.url.path)) :]
@@ -149,7 +149,7 @@ async def get_school_guides_and_entrepreneurs(school_id, request: Request):
 
     data = partner_models.ListAPIPartnerData.from_airtable_partners(
         airtable_partners=airtable_partners, url_path_for=request.app.url_path_for
-    ).__root__
+    ).root
 
     return partner_models.ListAPIPartnerResponse(
         data=data, links={"self": request.app.url_path_for("get_school_guides_and_entrepreneurs", school_id=school_id)}
@@ -164,7 +164,7 @@ async def get_school_primary_contacts(school_id, request: Request):
 
     data = educator_models.ListAPIEducatorData.from_airtable_educators(
         airtable_educators=airtable_educators, url_path_for=request.app.url_path_for
-    ).__root__
+    ).root
 
     return educator_models.ListAPIEducatorResponse(
         data=data, links={"self": request.app.url_path_for("get_school_primary_contacts", school_id=school_id)}
@@ -179,7 +179,7 @@ async def get_school_educators(school_id, request: Request):
 
     data = educator_models.ListAPIEducatorData.from_airtable_educators(
         airtable_educators=airtable_educators, url_path_for=request.app.url_path_for
-    ).__root__
+    ).root
 
     return educator_models.ListAPIEducatorResponse(
         data=data, links={"self": request.app.url_path_for("get_school_educators", school_id=school_id)}
@@ -194,7 +194,7 @@ async def get_school_current_educators(school_id, request: Request):
 
     data = educator_models.ListAPIEducatorData.from_airtable_educators(
         airtable_educators=airtable_educators, url_path_for=request.app.url_path_for
-    ).__root__
+    ).root
 
     return educator_models.ListAPIEducatorResponse(
         data=data, links={"self": request.app.url_path_for("get_school_current_educators", school_id=school_id)}
@@ -209,7 +209,7 @@ async def get_school_current_tls(school_id, request: Request):
 
     data = educator_models.ListAPIEducatorData.from_airtable_educators(
         airtable_educators=airtable_educators, url_path_for=request.app.url_path_for
-    ).__root__
+    ).root
 
     return educator_models.ListAPIEducatorResponse(
         data=data, links={"self": request.app.url_path_for("get_school_current_tls", school_id=school_id)}
@@ -224,7 +224,7 @@ async def get_school_founders(school_id, request: Request):
 
     data = educator_models.ListAPIEducatorData.from_airtable_educators(
         airtable_educators=airtable_educators, url_path_for=request.app.url_path_for
-    ).__root__
+    ).root
 
     return educator_models.ListAPIEducatorResponse(
         data=data, links={"self": request.app.url_path_for("get_school_founders", school_id=school_id)}

@@ -19,15 +19,16 @@ class FieldCategoryType(str, Enum):
     montessori_certifiers = "Montessori Certifiers"
     montessori_certification_status = "Montessori Certification Status"
     lgbtqia = "LGBTQIA"
+    classroom_levels = "Classroom Levels"
 
 
 class AirtableFieldCategoriesFields(BaseModel):
-    category: Optional[str] = Field(alias="Category ID")
-    value: Optional[str] = Field(alias="Value")
-    slug: Optional[str] = Field(alias="Slug")
+    category: Optional[str] = Field(None, alias="Category ID")
+    value: Optional[str] = Field(None, alias="Value")
+    slug: Optional[str] = Field(None, alias="Slug")
     non_specific_category: Optional[bool] = Field(alias="Non-Specific Category", default=False)
-    type: Optional[str] = Field(alias="Type")
-    field_mappings: Optional[list[str]] = Field(alias="Field Mappings")
+    type: Optional[str] = Field(None, alias="Type")
+    field_mappings: Optional[list[str]] = Field(None, alias="Field Mappings")
 
 
 class AirtableFieldCategoriesResponse(AirtableResponse):
@@ -35,8 +36,8 @@ class AirtableFieldCategoriesResponse(AirtableResponse):
 
 
 class ListAirtableFieldCategoriesResponse(ListAirtableResponse):
-    __root__: list[AirtableFieldCategoriesResponse]
+    root: list[AirtableFieldCategoriesResponse]
 
     def get_records_for_field_category_ids(self, field_category_ids) -> "ListAirtableFieldCategoriesResponse":
-        category_match = list(filter(lambda c: c.id in field_category_ids, self.__root__))
-        return ListAirtableFieldCategoriesResponse(__root__=category_match)
+        category_match = list(filter(lambda c: c.id in field_category_ids, self.root))
+        return ListAirtableFieldCategoriesResponse(root=category_match)

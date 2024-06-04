@@ -7,10 +7,10 @@ from app.airtable.response import AirtableResponse, ListAirtableResponse
 
 
 class AirtableHubFields(BaseModel):
-    name: Optional[str] = Field(alias="Name")
-    regional_site_entrepreneurs: Optional[list[str]] = Field(alias="Regional entrepreneur")
-    pods: Optional[list[str]] = Field(alias="Pod Assignments")
-    schools: Optional[list[str]] = Field(alias="Schools")
+    name: Optional[str] = Field(None, alias="Name")
+    regional_site_entrepreneurs: Optional[list[str]] = Field(None, alias="Regional entrepreneur")
+    pods: Optional[list[str]] = Field(None, alias="Pod Assignments")
+    schools: Optional[list[str]] = Field(None, alias="Schools")
 
 
 class AirtableHubResponse(AirtableResponse):
@@ -18,4 +18,4 @@ class AirtableHubResponse(AirtableResponse):
 
 
 class ListAirtableHubResponse(ListAirtableResponse):
-    __root__: list[AirtableHubResponse]
+    root: list[AirtableHubResponse]

@@ -99,11 +99,11 @@ class ListAPIEducatorSchoolData(educators_schools.ListAPIEducatorSchoolData):
         url_path_for: Callable,
     ):
         responses = []
-        for es in airtable_educator_schools.__root__:
+        for es in airtable_educator_schools.root:
             responses.append(
                 APIEducatorSchoolData.from_airtable_educator_school(
                     airtable_educator_school=es, url_path_for=url_path_for
                 )
             )
 
-        return cls(__root__=responses)
+        return cls(root=responses)

@@ -41,7 +41,7 @@ async def list_pods(request: Request):
 
     data = pod_models.ListAPIPodData.from_airtable_pods(
         airtable_pods=airtable_pods, url_path_for=request.app.url_path_for
-    ).__root__
+    ).root
 
     return response_models.ListAPIResponse(data=data, links={"self": request.app.url_path_for("list_pods")})
 
@@ -78,7 +78,7 @@ async def get_pod_contacts(pod_id, request: Request):
 
     data = partner_models.ListAPIPartnerData.from_airtable_partners(
         airtable_partners=airtable_partners, url_path_for=request.app.url_path_for
-    ).__root__
+    ).root
 
     return partner_models.ListAPIPartnerResponse(
         data=data, links={"self": request.app.url_path_for("get_pod_contacts", pod_id=pod_id)}
@@ -93,7 +93,7 @@ async def get_pod_schools(pod_id, request: Request):
 
     data = school_models.ListAPISchoolData.from_airtable_schools(
         airtable_schools=airtable_schools, url_path_for=request.app.url_path_for
-    ).__root__
+    ).root
 
     return school_models.ListAPISchoolResponse(
         data=data, links={"self": request.app.url_path_for("get_pod_schools", pod_id=pod_id)}

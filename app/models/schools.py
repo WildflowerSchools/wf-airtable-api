@@ -133,7 +133,7 @@ class ListAPISchoolData(schools.ListAPISchoolData):
     ):
 
         school_responses = []
-        for s in airtable_schools.__root__:
+        for s in airtable_schools.root:
             school_responses.append(APISchoolData.from_airtable_school(airtable_school=s, url_path_for=url_path_for))
 
-        return cls(__root__=school_responses)
+        return cls(root=school_responses)
