@@ -5,11 +5,11 @@ from pydantic import ConfigDict, Field, field_validator
 
 from app.airtable.base_model import BaseModel
 from app.airtable.response import AirtableResponse
-from app.airtable.validators import get_first_or_default_none
+from app.airtable.validators import get_first_or_default_provided
 
 
 class CreateAirtableSSJTypeformStartASchool(BaseModel):
-    educator: Optional[str] = Field(default=None, alias="Educator")
+    educator: Optional[list[str]] = Field([], alias="Educator")
     first_name: str = Field(alias="First Name")
     last_name: str = Field(alias="Last Name")
     email: str = Field(alias="Email")
@@ -45,9 +45,9 @@ class CreateAirtableSSJTypeformStartASchool(BaseModel):
     entry_date: datetime = Field(alias="Entry Date")
     model_config = ConfigDict(populate_by_name=True)
 
-    @field_validator("educator", mode="before")
-    def _get_first_or_default_none(cls, v: Union[str, int, float]) -> Optional[Union[str, int, float]]:
-        return get_first_or_default_none(v)
+    # @field_validator("educator", mode="before")
+    # def _get_first_or_default_none(cls, v: Union[str, int, float]) -> Optional[Union[str, int, float]]:
+    #     return get_first_or_default_provided(v)
 
 
 class AirtableSSJTypeformStartASchoolFields(CreateAirtableSSJTypeformStartASchool):
