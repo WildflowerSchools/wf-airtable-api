@@ -51,6 +51,11 @@ class CreateUpdateAPIEducatorFields(educators.CreateUpdateAPIEducatorFields):
             record.home_address = self.home_address
         if exclude_unset is False or (exclude_unset and "status" in self.model_fields_set):
             record.status = self.status
+        if exclude_unset is False or (exclude_unset and "individual_type" in self.model_fields_set):
+            if self.individual_type == APIEducatorIndividualTypes.COMMUNITY_MEMBER:
+                record.individual_type = "Community Member"
+            else:
+                record.individual_type = "Educator"
 
         newsletter_ids = []
         newsletter_slugs = []

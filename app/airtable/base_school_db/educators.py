@@ -18,6 +18,7 @@ class CreateAirtableEducatorFields(BaseModel):
     # deprecated
     # contact: Optional[list[str]] = Field(alias="Contact Info")
 
+    individual_type: Optional[str] = Field("Educator", alias="Individual Type")
     primary_personal_email: Optional[str] = Field(None, alias="Primary Personal Email")
     other_personal_emails: Optional[str] = Field(None, alias="Other Personal Emails")
     primary_wildflower_email: Optional[str] = Field(None, alias="Primary Wildflower Email")
