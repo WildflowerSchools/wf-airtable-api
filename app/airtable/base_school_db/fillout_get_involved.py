@@ -51,7 +51,7 @@ class CreateAirtableSSJFilloutGetInvolved(BaseModel):
     socio_economic_household_income: Optional[str] = Field(None, alias="Socio-Economic: Household Income")
     socio_economic_primary_language: Optional[str] = Field(None, alias="Socio-Economic: Primary Language")
     socio_economic_primary_language_other: Optional[str] = Field(None, alias="Socio-Economic: Primary Language Other")
-    message: str = Field(alias="Message")
+    message: Optional[str] = Field(None, alias="Message")
     receive_communications: bool = Field(alias="Receive Communications", default=False)
     source: Optional[str] = Field(None, alias="Source")
     entry_date: datetime = Field(alias="Entry Date")
