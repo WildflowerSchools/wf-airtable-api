@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import Callable
 
 from wf_airtable_api_schema.models.ssj_fillout_get_involved import *
@@ -67,6 +66,8 @@ class CreateApiSSJFilloutGetInvolvedFields(ssj_fillout_get_involved.CreateApiSSJ
             message=self.message,
             receive_communications=self.receive_communications,
             source=self.source,
+            marketing_source=self.marketing_source,
+            marketing_campaign=self.marketing_campaign,
             entry_date=entry_date,
         )
 
@@ -135,6 +136,8 @@ class ApiSSJFilloutGetInvolvedData(ssj_fillout_get_involved.ApiSSJFilloutGetInvo
             message=airtable_get_involved.fields.message,
             receive_communications=airtable_get_involved.fields.receive_communications,
             source=airtable_get_involved.fields.source,
+            marketing_source=airtable_get_involved.fields.marketing_source,
+            marketing_campaign=airtable_get_involved.fields.marketing_campaign,
             entry_date=airtable_get_involved.fields.entry_date,
         )
 

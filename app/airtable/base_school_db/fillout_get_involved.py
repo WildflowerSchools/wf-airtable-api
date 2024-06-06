@@ -56,6 +56,9 @@ class CreateAirtableSSJFilloutGetInvolved(BaseModel):
     source: Optional[str] = Field(None, alias="Source")
     entry_date: datetime = Field(alias="Entry Date")
 
+    marketing_source: Optional[str] = Field(None, alias="Marketing Source")
+    marketing_campaign: Optional[str] = Field(None, alias="Marketing Campaign")
+
     model_config = ConfigDict(populate_by_name=True)
 
     @field_validator("educator", mode="before")
