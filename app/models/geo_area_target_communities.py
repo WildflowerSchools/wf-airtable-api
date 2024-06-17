@@ -1,8 +1,8 @@
 import json
 from typing import Callable
 
-from wf_airtable_api_schema.models.geo_area_target_communities import *
-from wf_airtable_api_schema.models import geo_area_target_communities
+from wf_airtable_api_client.models.geo_area_target_communities import *
+from wf_airtable_api_client.models import geo_area_target_communities
 
 from . import response as response_models
 from .response import APIDataBase

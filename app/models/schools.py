@@ -1,7 +1,7 @@
 from typing import Callable
 
-from wf_airtable_api_schema.models.schools import *
-from wf_airtable_api_schema.models import schools
+from wf_airtable_api_client.models.schools import *
+from wf_airtable_api_client.models import schools
 
 from . import response as response_models
 from . import educators as educator_models

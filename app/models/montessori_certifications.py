@@ -1,1 +1,1 @@
-from wf_airtable_api_schema.models.montessori_certifications import *
+from wf_airtable_api_client.models.montessori_certifications import *

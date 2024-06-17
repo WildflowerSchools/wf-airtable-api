@@ -1,5 +1,6 @@
+import copy
 import re
-from typing import Union
+from typing import Union, Optional
 from urllib.parse import urlencode
 
 from fastapi import APIRouter, Depends, HTTPException, Request
@@ -276,12 +277,14 @@ async def get_geo_area_target_community(geo_area_target_community_id, request: R
     "/for_address", response_model=auto_response_email_template.APIAutoResponseEmailTemplateResponse
 )
 async def get_auto_response_email_templates_given_address(
-    request: Request, address: str, contact_type: Union[str, None] = None, language: Union[str, None] = None
+    request: Request, address: str, contact_type: Union[str, None] = None, language: Union[str, None] = None, marketing_source: Union[str, None] = None
 ):
     gmaps_client = GoogleMapsAPI()
     place = gmaps_client.geocode_address(address)
 
-    def lower_and_remove_special_characters(string: str) -> str:
+    def lower_and_remove_special_characters(string: Optional[str]) -> Optional[str]:
+        if string is None:
+            return None
         return re.sub(r"[\W_]", "", string).lower()
 
     if place is None:
@@ -292,83 +295,101 @@ async def get_auto_response_email_templates_given_address(
     )
     all_geo_areas = await list_geo_areas(request)
 
-    filtered_auto_response_email_templates = []
-    for auto_response in auto_response_email_templates.data:
-        if (
-            contact_type is None
-            or (
-                lower_and_remove_special_characters(contact_type)
-                == lower_and_remove_special_characters(auto_response.fields.contact_type)
-            )
-        ) and (
-            (
-                language is not None
-                and lower_and_remove_special_characters(language)
-                == lower_and_remove_special_characters(auto_response.fields.language)
-            )
-            or lower_and_remove_special_characters(auto_response.fields.language) in ["any", "english"]
-        ):
-            filtered_auto_response_email_templates.append(auto_response)
+    def match_auto_response_email_templates(
+            auto_responses: list[auto_response_email_template.APIAutoResponseEmailTemplateData],
+            match_marketing_source: bool = True,
+            match_language: bool = True,
+            match_contact_type: bool = True):
 
-    filtered_geo_areas = []
-    for geo_area in all_geo_areas.data:
-        for auto_response in filtered_auto_response_email_templates:
-            if geo_area.id in auto_response.fields.geographic_areas:
-                filtered_geo_areas.append(geo_area)
+        _contact_type = copy.copy(contact_type)
+        _language = copy.copy(language)
+        _marketing_source = copy.copy(marketing_source)
 
-    auto_response_template = None
-    if len(filtered_geo_areas) > 0:
-        geo_area = geocode_utils.get_geo_area_nearest_to_place(place, filtered_geo_areas)
+        if match_contact_type is False:
+            _contact_type = None
 
-        if geo_area is not None:
-            auto_response_template = list(
-                filter(lambda r: geo_area.id in r.fields.geographic_areas, filtered_auto_response_email_templates)
-            )
-            if len(auto_response_template) > 0:
-                auto_response_template = auto_response_template[0]
+        if match_language is False:
+            _language = None
 
-    if auto_response_template is None:
-        for auto_response in auto_response_email_templates.data:
+        if match_marketing_source is False:
+            _marketing_source = None
+
+        filtered_auto_response_email_templates = []
+        for auto_response in auto_responses:
             if (
                 (
-                    contact_type is not None
-                    and lower_and_remove_special_characters(contact_type)
-                    == lower_and_remove_special_characters(auto_response.fields.contact_type)
-                )
-                or lower_and_remove_special_characters(auto_response.fields.contact_type) == "any"
-            ) and (
-                language is not None
-                and lower_and_remove_special_characters(language)
-                == lower_and_remove_special_characters(auto_response.fields.language)
-            ):
-                auto_response_template = auto_response
-                break
-
-    if auto_response_template is None:
-        for auto_response in auto_response_email_templates.data:
-            if (
-                (
-                    contact_type is not None
-                    and lower_and_remove_special_characters(contact_type)
+                    _contact_type is not None
+                    and lower_and_remove_special_characters(_contact_type)
                     == lower_and_remove_special_characters(auto_response.fields.contact_type)
                 )
                 or lower_and_remove_special_characters(auto_response.fields.contact_type) == "any"
             ) and (
                 (
-                    language is not None
-                    and lower_and_remove_special_characters(language)
+                    _language is not None
+                    and lower_and_remove_special_characters(_language)
                     == lower_and_remove_special_characters(auto_response.fields.language)
                 )
                 or lower_and_remove_special_characters(auto_response.fields.language) in ["any", "english"]
+            ) and (
+                lower_and_remove_special_characters(_marketing_source)
+                == lower_and_remove_special_characters(auto_response.fields.marketing_source)
             ):
-                auto_response_template = auto_response
-                break
+                filtered_auto_response_email_templates.append(auto_response)
 
-    if auto_response_template is None:
+        filtered_geo_areas = []
+        for geo_area in all_geo_areas.data:
+            for auto_response in filtered_auto_response_email_templates:
+                if geo_area.id in auto_response.fields.geographic_areas:
+                    filtered_geo_areas.append(geo_area)
+
+        auto_response_template = None
+        if len(filtered_geo_areas) > 0:
+            geo_area = geocode_utils.get_geo_area_nearest_to_place(place, filtered_geo_areas)
+
+            if geo_area is not None:
+                auto_response_template = list(
+                    filter(lambda r: geo_area.id in r.fields.geographic_areas, filtered_auto_response_email_templates)
+                )
+                if len(auto_response_template) > 0:
+                    auto_response_template = auto_response_template[0]
+        return auto_response_template
+
+    matched_template = match_auto_response_email_templates(
+        auto_responses=auto_response_email_templates.data,
+        match_marketing_source=True,
+        match_language=True,
+        match_contact_type=True
+    )
+
+    if matched_template is None:
+        matched_template = match_auto_response_email_templates(
+            auto_responses=auto_response_email_templates.data,
+            match_marketing_source=False,
+            match_language=True,
+            match_contact_type=True
+        )
+
+    if matched_template is None:
+        matched_template = match_auto_response_email_templates(
+            auto_responses=auto_response_email_templates.data,
+            match_marketing_source=False,
+            match_language=False,
+            match_contact_type=True
+        )
+
+    if matched_template is None:
+        matched_template = match_auto_response_email_templates(
+            auto_responses=auto_response_email_templates.data,
+            match_marketing_source=False,
+            match_language=False,
+            match_contact_type=False
+        )
+
+    if matched_template is None:
         raise HTTPException(status_code=404, detail="No valid auto-response email template found for given address")
 
     return auto_response_email_template.APIAutoResponseEmailTemplateResponse(
-        data=auto_response_template,
+        data=matched_template,
         links={"self": f'{request.app.url_path_for("get_geo_area_given_address")}?{urlencode({"address": address})}'},
     )
 

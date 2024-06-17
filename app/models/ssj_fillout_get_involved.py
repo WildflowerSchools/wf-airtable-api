@@ -1,7 +1,7 @@
 from typing import Callable
 
-from wf_airtable_api_schema.models.ssj_fillout_get_involved import *
-from wf_airtable_api_schema.models import ssj_fillout_get_involved
+from wf_airtable_api_client.models.ssj_fillout_get_involved import *
+from wf_airtable_api_client.models import ssj_fillout_get_involved
 
 from ..airtable.base_school_db import fillout_get_involved as airtable_fillout_get_involved
 

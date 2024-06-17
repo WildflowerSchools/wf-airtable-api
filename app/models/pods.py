@@ -1,7 +1,7 @@
 from typing import Callable
 
-from wf_airtable_api_schema.models.pods import *
-from wf_airtable_api_schema.models import pods
+from wf_airtable_api_client.models.pods import *
+from wf_airtable_api_client.models import pods
 
 from . import response as response_models
 from .response import APIDataBase

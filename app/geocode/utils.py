@@ -146,7 +146,8 @@ def get_geo_area_nearest_to_place(
     if geo_area is None:
         if place.get_country_component().short_name == "US":
             geo_area = default_geo_area
-        else:
-            geo_area = default_international_geo_area
+
+    if geo_area is None:
+        geo_area = default_international_geo_area
 
     return geo_area
