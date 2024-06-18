@@ -31,5 +31,4 @@ functions:
           method: ANY
 
 plugins:
-  - serverless-offline
   - serverless-python-requirements
