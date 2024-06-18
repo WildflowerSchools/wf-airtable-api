@@ -52,9 +52,9 @@ async def list_partners(request: Request, page_size: str = 100, offset: str = ""
         "self": f'{request.app.url_path_for("list_partners")}?{urlencode({"page_size": page_size, "offset": offset})}'
     }
     if next_offset != "" and next_offset is not None:
-        links[
-            "next"
-        ] = f'{request.app.url_path_for("list_partners")}?{urlencode({"page_size": page_size, "offset": next_offset})}'
+        links["next"] = (
+            f'{request.app.url_path_for("list_partners")}?{urlencode({"page_size": page_size, "offset": next_offset})}'
+        )
 
     return response_models.ListAPIResponse(data=data, links=links, meta={"offset": next_offset})
 

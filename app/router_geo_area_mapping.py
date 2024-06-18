@@ -277,7 +277,11 @@ async def get_geo_area_target_community(geo_area_target_community_id, request: R
     "/for_address", response_model=auto_response_email_template.APIAutoResponseEmailTemplateResponse
 )
 async def get_auto_response_email_templates_given_address(
-    request: Request, address: str, contact_type: Union[str, None] = None, language: Union[str, None] = None, marketing_source: Union[str, None] = None
+    request: Request,
+    address: str,
+    contact_type: Union[str, None] = None,
+    language: Union[str, None] = None,
+    marketing_source: Union[str, None] = None,
 ):
     gmaps_client = GoogleMapsAPI()
     place = gmaps_client.geocode_address(address)
@@ -296,10 +300,11 @@ async def get_auto_response_email_templates_given_address(
     all_geo_areas = await list_geo_areas(request)
 
     def match_auto_response_email_templates(
-            auto_responses: list[auto_response_email_template.APIAutoResponseEmailTemplateData],
-            match_marketing_source: bool = True,
-            match_language: bool = True,
-            match_contact_type: bool = True):
+        auto_responses: list[auto_response_email_template.APIAutoResponseEmailTemplateData],
+        match_marketing_source: bool = True,
+        match_language: bool = True,
+        match_contact_type: bool = True,
+    ):
 
         _contact_type = copy.copy(contact_type)
         _language = copy.copy(language)
@@ -318,21 +323,25 @@ async def get_auto_response_email_templates_given_address(
         for auto_response in auto_responses:
             if (
                 (
-                    _contact_type is not None
-                    and lower_and_remove_special_characters(_contact_type)
-                    == lower_and_remove_special_characters(auto_response.fields.contact_type)
+                    (
+                        _contact_type is not None
+                        and lower_and_remove_special_characters(_contact_type)
+                        == lower_and_remove_special_characters(auto_response.fields.contact_type)
+                    )
+                    or lower_and_remove_special_characters(auto_response.fields.contact_type) == "any"
                 )
-                or lower_and_remove_special_characters(auto_response.fields.contact_type) == "any"
-            ) and (
-                (
-                    _language is not None
-                    and lower_and_remove_special_characters(_language)
-                    == lower_and_remove_special_characters(auto_response.fields.language)
+                and (
+                    (
+                        _language is not None
+                        and lower_and_remove_special_characters(_language)
+                        == lower_and_remove_special_characters(auto_response.fields.language)
+                    )
+                    or lower_and_remove_special_characters(auto_response.fields.language) in ["any", "english"]
                 )
-                or lower_and_remove_special_characters(auto_response.fields.language) in ["any", "english"]
-            ) and (
-                lower_and_remove_special_characters(_marketing_source)
-                == lower_and_remove_special_characters(auto_response.fields.marketing_source)
+                and (
+                    lower_and_remove_special_characters(_marketing_source)
+                    == lower_and_remove_special_characters(auto_response.fields.marketing_source)
+                )
             ):
                 filtered_auto_response_email_templates.append(auto_response)
 
@@ -358,7 +367,7 @@ async def get_auto_response_email_templates_given_address(
         auto_responses=auto_response_email_templates.data,
         match_marketing_source=True,
         match_language=True,
-        match_contact_type=True
+        match_contact_type=True,
     )
 
     if matched_template is None:
@@ -366,7 +375,7 @@ async def get_auto_response_email_templates_given_address(
             auto_responses=auto_response_email_templates.data,
             match_marketing_source=False,
             match_language=True,
-            match_contact_type=True
+            match_contact_type=True,
         )
 
     if matched_template is None:
@@ -374,7 +383,7 @@ async def get_auto_response_email_templates_given_address(
             auto_responses=auto_response_email_templates.data,
             match_marketing_source=False,
             match_language=False,
-            match_contact_type=True
+            match_contact_type=True,
         )
 
     if matched_template is None:
@@ -382,7 +391,7 @@ async def get_auto_response_email_templates_given_address(
             auto_responses=auto_response_email_templates.data,
             match_marketing_source=False,
             match_language=False,
-            match_contact_type=False
+            match_contact_type=False,
         )
 
     if matched_template is None:

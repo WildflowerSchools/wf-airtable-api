@@ -6,7 +6,7 @@ install:
     poetry install
 
 fmt:
-    black app
+    poetry run black app
 
 test:
     PYTHONPATH=./ pytest -s

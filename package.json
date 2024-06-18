@@ -3,8 +3,7 @@
   "version": "1.9.2",
   "description": "Python FastAPI for easier interaction with Airtable",
   "author": "Benjamin Jaffe-Talberg",
-  "devDependencies": {
-    "serverless-python-requirements": "^6.1.0",
-    "serverless-offline": "^13.6.0"
+  "dependencies": {
+    "serverless-python-requirements": "github:serverless/serverless-python-requirements#master"
   }
 }

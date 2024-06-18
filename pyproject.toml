@@ -7,20 +7,20 @@ license = "MIT"
 
 [tool.poetry.dependencies]
 python = "^3.9"
+Shapely = "^2.0.4"
 cachetools = ">=5.0.0"
 fastapi = ">=0.75.0"
 googlemaps = ">=4.6.0"
 haversine = ">=2.5.1"
+mangum = ">=0.14.1"
 pyAirtable = '>=1.1.0'
 pyjwt = {extras = ["crypto"], version = ">=2.3.0"}
 python-jose = ">=3.3.0"
-mangum = ">=0.14.1"
 uvicorn = ">=0.17.5"
-Shapely = "^1.8.1"
 wf-airtable-api-client = "^1.5.0"
 
 [tool.poetry.dev-dependencies]
-black = "^22.3.0"
+black = "^24.4.2"
 pytest = '>=6.2.2'
 
 [build-system]

@@ -85,9 +85,9 @@ async def list_educators(request: Request, page_size: str = 100, offset: str = "
         "self": f'{request.app.url_path_for("list_educators")}?{urlencode({"page_size": page_size, "offset": offset})}'
     }
     if next_offset != "" and next_offset is not None:
-        links[
-            "next"
-        ] = f'{request.app.url_path_for("list_educators")}?{urlencode({"page_size": page_size, "offset": next_offset})}'
+        links["next"] = (
+            f'{request.app.url_path_for("list_educators")}?{urlencode({"page_size": page_size, "offset": next_offset})}'
+        )
 
     return educator_models.ListAPIEducatorResponse(data=data, links=links, meta={"offset": next_offset})
 

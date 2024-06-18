@@ -48,9 +48,9 @@ class CreateApiSSJTypeformStartASchoolFields(ssj_typeform_start_a_school.CreateA
             age_classrooms_interested_in_offering=age_classrooms_interested_in_offering,
             socio_economic_race_and_ethnicity=socio_economic_race_and_ethnicity,
             socio_economic_race_and_ethnicity_other=self.socio_economic_race_and_ethnicity_other,
-            socio_economic_lgbtqia_identifying=str(self.socio_economic_lgbtqia_identifying)
-            if self.socio_economic_lgbtqia_identifying
-            else None,
+            socio_economic_lgbtqia_identifying=(
+                str(self.socio_economic_lgbtqia_identifying) if self.socio_economic_lgbtqia_identifying else None
+            ),
             socio_economic_pronouns=self.socio_economic_pronouns,
             socio_economic_pronouns_other=self.socio_economic_pronouns_other,
             socio_economic_gender=self.socio_economic_gender,

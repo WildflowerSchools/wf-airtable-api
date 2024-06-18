@@ -64,9 +64,9 @@ async def list_schools(request: Request, page_size: str = 100, offset: str = "")
         "self": f'{request.app.url_path_for("list_schools")}?{urlencode({"page_size": page_size, "offset": offset})}'
     }
     if next_offset != "" and next_offset is not None:
-        links[
-            "next"
-        ] = f'{request.app.url_path_for("list_schools")}?{urlencode({"page_size": page_size, "offset": next_offset})}'
+        links["next"] = (
+            f'{request.app.url_path_for("list_schools")}?{urlencode({"page_size": page_size, "offset": next_offset})}'
+        )
 
     return school_models.ListAPISchoolResponse(data=data, links=links, meta={"offset": next_offset})
 
@@ -77,9 +77,9 @@ async def find_schools(request: Request, organizational_unit: Optional[str] = No
 
     filters = {}
     if organizational_unit:
-        filters[
-            airtable_school_models.AirtableSchoolFields.__fields__["organizational_unit"].alias
-        ] = organizational_unit
+        filters[airtable_school_models.AirtableSchoolFields.__fields__["organizational_unit"].alias] = (
+            organizational_unit
+        )
 
     airtable_schools = find_schools_wrapper(filters, airtable_client)
 
