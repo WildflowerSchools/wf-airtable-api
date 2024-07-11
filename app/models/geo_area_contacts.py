@@ -8,7 +8,7 @@ from . import response as response_models
 from .response import APIDataBase, APIDataWithFields
 from ..airtable.base_map_by_geographic_area import geo_area_contacts as airtable_geo_area_contacts_models
 from . import auto_response_email_template as auto_response_email_template_models
-from . import hubs as hub_models
+# from . import hubs as hub_models
 from . import partners as partner_models
 from ..geocode.geocode_models import Place
 from ..geocode.google_maps_client import GoogleMapsAPI
@@ -36,17 +36,18 @@ class APIGeoAreaContactData(geo_area_contacts.APIGeoAreaContactData):
             polygon_coordinates=airtable_geo_area_contact.fields.polygon_coordinates,
             first_contact_email=airtable_geo_area_contact.fields.first_contact_email,
             assigned_rse_name=airtable_geo_area_contact.fields.assigned_rse_name,
-            hub_name=airtable_geo_area_contact.fields.hub_name,
+            # hub_name=airtable_geo_area_contact.fields.hub_name,
             sendgrid_template_id=airtable_geo_area_contact.fields.sendgrid_template_id,
             latitude=airtable_geo_area_contact.fields.latitude,
             longitude=airtable_geo_area_contact.fields.longitude,
             geocode=geocode_dict,
+            marketing_source=airtable_geo_area_contact.fields.marketing_source,
             # auto_response_email_template_ids=airtable_geo_area_contact.fields.auto_response_email_template_ids,
         )
 
-        hub_data = None
-        if airtable_geo_area_contact.fields.hub_synced_record_id:
-            hub_data = APIDataBase(id=airtable_geo_area_contact.fields.hub_synced_record_id, type=hub_models.MODEL_TYPE)
+        # hub_data = None
+        # if airtable_geo_area_contact.fields.hub_synced_record_id:
+        #     hub_data = APIDataBase(id=airtable_geo_area_contact.fields.hub_synced_record_id, type=hub_models.MODEL_TYPE)
 
         rse_data = None
         if airtable_geo_area_contact.fields.assigned_rse_synced_record_id:
@@ -59,11 +60,11 @@ class APIGeoAreaContactData(geo_area_contacts.APIGeoAreaContactData):
 
             rse_data = APIDataBase(id=partner_record.id, type=partner_models.MODEL_TYPE)
 
-        hub_link = None
-        if hub_data and hasattr(hub_data, "id"):
-            hub_link = response_models.APILinksAndData(
-                links={"self": url_path_for("get_hub", hub_id=hub_data.id)}, data=hub_data
-            )
+        # hub_link = None
+        # if hub_data and hasattr(hub_data, "id"):
+        #     hub_link = response_models.APILinksAndData(
+        #         links={"self": url_path_for("get_hub", hub_id=hub_data.id)}, data=hub_data
+        #     )
 
         # auto_response_template_links = []
         # if airtable_geo_area_contact.fields.auto_response_email_template_ids:
@@ -77,7 +78,7 @@ class APIGeoAreaContactData(geo_area_contacts.APIGeoAreaContactData):
         #         )
 
         relationships = APIGeoAreaContactRelationships(
-            hub=hub_link,
+            # hub=hub_link,
             assigned_rse=response_models.APILinksAndData(
                 links={"self": url_path_for("get_partner", partner_id=rse_data.id)}, data=rse_data
             ),
