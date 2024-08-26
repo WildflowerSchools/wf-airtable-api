@@ -16,7 +16,7 @@ from . import (
     const,
     log,
     router_hubs,
-    router_pods,
+    # router_pods,
     router_schools,
     router_partners,
     router_educators,
@@ -37,7 +37,7 @@ app = FastAPI(
     root_path=root_path,
     openapi_tags=[
         router_hubs.OPENAPI_TAG_METADATA,
-        router_pods.OPENAPI_TAG_METADATA,
+        # router_pods.OPENAPI_TAG_METADATA,
         router_schools.OPENAPI_TAG_METADATA,
         router_educators.OPENAPI_TAG_METADATA,
         router_partners.OPENAPI_TAG_METADATA,
@@ -115,7 +115,7 @@ def add_routers(routers):
 add_routers(
     [
         router_hubs.router,
-        router_pods.router,
+        # router_pods.router,
         router_schools.router,
         router_partners.router,
         router_educators.router,
