@@ -1024,13 +1024,13 @@ standard = ["colorama (>=0.4)", "httptools (>=0.5.0)", "python-dotenv (>=0.13)",
 
 [[package]]
 name = "wf-airtable-api-client"
-version = "1.5.1"
+version = "1.6.0"
 description = "WF Airtable API client"
 optional = false
 python-versions = "<4.0,>=3.9"
 files = [
-    {file = "wf_airtable_api_client-1.5.1-py3-none-any.whl", hash = "sha256:668ef105a660278d4c62000acc9e0504d84c16e5c9db4aadb0c82edb0104a967"},
-    {file = "wf_airtable_api_client-1.5.1.tar.gz", hash = "sha256:119c5355ed6eaf8ff371959bf82282b3169d7e9fca0fe05545676fe82c14a550"},
+    {file = "wf_airtable_api_client-1.6.0-py3-none-any.whl", hash = "sha256:829fddd047baab018913c0b94b54d37151dde9192efe9e1d0897813e2decc764"},
+    {file = "wf_airtable_api_client-1.6.0.tar.gz", hash = "sha256:d149b33364bc30e9a170788d06f1c0660d1fd94780bcca3cae58913963cf6e45"},
 ]
 
 [package.dependencies]
@@ -1039,4 +1039,4 @@ requests = ">=2.31.0,<3.0.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "fdc6170bbe3c625fdf2cf02a2525ff6664372139c0c7f662bfcaac24fff38ba2"
+content-hash = "2b78e8f0ecdb143bf9fe356b2bb14301655fc681b36065b5c12aef4a70db6d9a"

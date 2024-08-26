@@ -17,7 +17,7 @@ pyAirtable = '>=1.1.0'
 pyjwt = {extras = ["crypto"], version = ">=2.3.0"}
 python-jose = ">=3.3.0"
 uvicorn = ">=0.17.5"
-wf-airtable-api-client = "^1.5.1"
+wf-airtable-api-client = "^1.6.0"
 
 [tool.poetry.dev-dependencies]
 black = "^24.4.2"
