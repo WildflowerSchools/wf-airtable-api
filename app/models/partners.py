@@ -6,7 +6,8 @@ from wf_airtable_api_client.models import partners
 from . import response as response_models
 from . import guides_schools as guides_schools_models
 from . import hubs as hubs_model
-from . import pods as pods_model
+
+# from . import pods as pods_model
 from ..airtable.base_school_db import (
     guides_schools as airtable_guides_schools_models,
     partners as airtable_partner_models,
@@ -31,10 +32,10 @@ class APIPartnerData(partners.APIPartnerData):
             for p_id in airtable_partner.fields.hubs:
                 hubs_data.append(response_models.APIDataBase(id=p_id, type=hubs_model.MODEL_TYPE))
 
-        pods_data = []
-        if airtable_partner.fields.pods is not None:
-            for p_id in airtable_partner.fields.pods:
-                pods_data.append(response_models.APIDataBase(id=p_id, type=pods_model.MODEL_TYPE))
+        # pods_data = []
+        # if airtable_partner.fields.pods is not None:
+        #     for p_id in airtable_partner.fields.pods:
+        #         pods_data.append(response_models.APIDataBase(id=p_id, type=pods_model.MODEL_TYPE))
 
         guides_schools_data = []
         if airtable_partner.fields.schools_partner_guiding is not None:
@@ -67,10 +68,10 @@ class APIPartnerData(partners.APIPartnerData):
                 links={"self": url_path_for("get_partner_hubs_as_entrepreneur", partner_id=airtable_partner.id)},
                 data=hubs_data,
             ),
-            pods_as_contact=response_models.APILinksAndData(
-                links={"self": url_path_for("get_partner_pods_as_contact", partner_id=airtable_partner.id)},
-                data=pods_data,
-            ),
+            # pods_as_contact=response_models.APILinksAndData(
+            #     links={"self": url_path_for("get_partner_pods_as_contact", partner_id=airtable_partner.id)},
+            #     data=pods_data,
+            # ),
             schools_partner_guiding=response_models.APILinksAndData(
                 links={"self": url_path_for("get_guides_schools", partner_id=airtable_partner.id)},
                 data=guides_schools_data,

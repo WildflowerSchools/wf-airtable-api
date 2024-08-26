@@ -8,7 +8,8 @@ from . import response as response_models
 from .response import APIDataBase
 from ..airtable.base_school_db import hubs as airtable_hub_models
 from . import partners as partner_models
-from . import pods as pod_models
+
+# from . import pods as pod_models
 from . import schools as school_models
 
 
@@ -22,10 +23,10 @@ class APIHubData(hubs.APIHubData):
             for rs_id in airtable_hub.fields.regional_site_entrepreneurs:
                 regional_site_entrepreneurs_data.append(APIDataBase(id=rs_id, type=partner_models.MODEL_TYPE))
 
-        pods_data = []
-        if airtable_hub.fields.pods is not None:
-            for p_id in airtable_hub.fields.pods:
-                pods_data.append(APIDataBase(id=p_id, type=pod_models.MODEL_TYPE))
+        # pods_data = []
+        # if airtable_hub.fields.pods is not None:
+        #     for p_id in airtable_hub.fields.pods:
+        #         pods_data.append(APIDataBase(id=p_id, type=pod_models.MODEL_TYPE))
 
         schools_data = []
         if airtable_hub.fields.schools is not None:
@@ -37,9 +38,9 @@ class APIHubData(hubs.APIHubData):
                 links={"self": url_path_for("get_hub_site_entrepreneurs", hub_id=airtable_hub.id)},
                 data=regional_site_entrepreneurs_data,
             ),
-            pods=response_models.APILinksAndData(
-                links={"self": url_path_for("get_hub_pods", hub_id=airtable_hub.id)}, data=pods_data
-            ),
+            # pods=response_models.APILinksAndData(
+            #     links={"self": url_path_for("get_hub_pods", hub_id=airtable_hub.id)}, data=pods_data
+            # ),
             schools=response_models.APILinksAndData(
                 links={"self": url_path_for("get_hub_schools", hub_id=airtable_hub.id)}, data=schools_data
             ),

@@ -8,7 +8,8 @@ from .models import response as response_models
 from .models import educators as educator_models
 from .models import hubs as hub_models
 from .models import partners as partner_models
-from .models import pods as pod_models
+
+# from .models import pods as pod_models
 from .models import schools as school_models
 from . import auth
 
@@ -88,19 +89,19 @@ async def get_partner_hubs_as_entrepreneur(partner_id, request: Request):
     )
 
 
-@router.get("/{partner_id}/pods_as_contact", response_model=pod_models.ListAPIPodResponse)
-async def get_partner_pods_as_contact(partner_id, request: Request):
-    airtable_client = request.state.airtable_client
-    fetch_partner_wrapper(partner_id, airtable_client)
-    airtable_pods = airtable_client.get_pods_by_contact_id(partner_id)
-
-    data = pod_models.ListAPIPodData.from_airtable_pods(
-        airtable_pods=airtable_pods, url_path_for=request.app.url_path_for
-    ).root
-
-    return pod_models.ListAPIPodResponse(
-        data=data, links={"self": request.app.url_path_for("get_partner_pods_as_contact", partner_id=partner_id)}
-    )
+# @router.get("/{partner_id}/pods_as_contact", response_model=pod_models.ListAPIPodResponse)
+# async def get_partner_pods_as_contact(partner_id, request: Request):
+#     airtable_client = request.state.airtable_client
+#     fetch_partner_wrapper(partner_id, airtable_client)
+#     airtable_pods = airtable_client.get_pods_by_contact_id(partner_id)
+#
+#     data = pod_models.ListAPIPodData.from_airtable_pods(
+#         airtable_pods=airtable_pods, url_path_for=request.app.url_path_for
+#     ).root
+#
+#     return pod_models.ListAPIPodResponse(
+#         data=data, links={"self": request.app.url_path_for("get_partner_pods_as_contact", partner_id=partner_id)}
+#     )
 
 
 @router.get("/{partner_id}/schools_guiding", response_model=school_models.ListAPISchoolResponse)

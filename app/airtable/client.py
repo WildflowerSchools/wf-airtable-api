@@ -42,18 +42,18 @@ class AirtableClient(metaclass=Singleton):
 
         return AirtableHubResponse.model_validate(raw_item)
 
-    @cached(cache=TTLCache(maxsize=1024, ttl=600))
-    def get_hub_by_pod_id(self, pod_id) -> Optional[AirtableHubResponse]:
-        formula = formulas.INCLUDE(formulas.STR_VALUE(pod_id), formulas.FIELD("Pod Record IDs"))
-
-        raw = self.client_api.table(base_id=BASE_ID, table_name=HUBS_TABLE_NAME).all(formula=formula)
-
-        if len(raw) > 0:
-            raw_item = raw[0]
-        else:
-            return None
-
-        return AirtableHubResponse.model_validate(raw_item)
+    # @cached(cache=TTLCache(maxsize=1024, ttl=600))
+    # def get_hub_by_pod_id(self, pod_id) -> Optional[AirtableHubResponse]:
+    #     formula = formulas.INCLUDE(formulas.STR_VALUE(pod_id), formulas.FIELD("Pod Record IDs"))
+    #
+    #     raw = self.client_api.table(base_id=BASE_ID, table_name=HUBS_TABLE_NAME).all(formula=formula)
+    #
+    #     if len(raw) > 0:
+    #         raw_item = raw[0]
+    #     else:
+    #         return None
+    #
+    #     return AirtableHubResponse.model_validate(raw_item)
 
     @cached(cache=TTLCache(maxsize=1024, ttl=600))
     def get_hubs_by_entrepreneur_id(self, partner_id) -> ListAirtableHubResponse:
@@ -62,41 +62,41 @@ class AirtableClient(metaclass=Singleton):
         raw = self.client_api.table(base_id=BASE_ID, table_name=HUBS_TABLE_NAME).all(formula=formula)
         return ListAirtableHubResponse.model_validate(raw)
 
-    @cached(cache=TTLCache(maxsize=32, ttl=600))
-    def list_pods(self) -> ListAirtablePodResponse:
-        raw = self.client_api.table(base_id=BASE_ID, table_name=PODS_TABLE_NAME).all()
-        return ListAirtablePodResponse.model_validate(raw)
-
-    @cached(cache=TTLCache(maxsize=1024, ttl=600))
-    def get_pod_by_id(self, pod_id) -> AirtablePodResponse:
-        raw = self.client_api.table(base_id=BASE_ID, table_name=PODS_TABLE_NAME).get(record_id=pod_id)
-        return AirtablePodResponse.model_validate(raw)
-
-    @cached(cache=TTLCache(maxsize=1024, ttl=600))
-    def get_pod_by_school_id(self, school_id) -> Optional[AirtablePodResponse]:
-        formula = formulas.INCLUDE(formulas.STR_VALUE(school_id), formulas.FIELD("School Record IDs"))
-
-        raw = self.client_api.table(base_id=BASE_ID, table_name=PODS_TABLE_NAME).all(formula=formula)
-
-        if len(raw) > 0:
-            raw_item = raw[0]
-            return AirtablePodResponse.model_validate(raw_item)
-
-        return None
-
-    @cached(cache=TTLCache(maxsize=32, ttl=600))
-    def get_pods_by_hub_id(self, hub_id) -> ListAirtablePodResponse:
-        formula = formulas.INCLUDE(formulas.STR_VALUE(hub_id), formulas.FIELD("Hub Record ID"))
-
-        raw = self.client_api.table(base_id=BASE_ID, table_name=PODS_TABLE_NAME).all(formula=formula)
-        return ListAirtablePodResponse.model_validate(raw)
-
-    @cached(cache=TTLCache(maxsize=1024, ttl=600))
-    def get_pods_by_contact_id(self, partner_id) -> ListAirtablePodResponse:
-        formula = formulas.INCLUDE(formulas.STR_VALUE(partner_id), formulas.FIELD("Pod Contact Record ID"))
-
-        raw = self.client_api.table(base_id=BASE_ID, table_name=PODS_TABLE_NAME).all(formula=formula)
-        return ListAirtablePodResponse.model_validate(raw)
+    # @cached(cache=TTLCache(maxsize=32, ttl=600))
+    # def list_pods(self) -> ListAirtablePodResponse:
+    #     raw = self.client_api.table(base_id=BASE_ID, table_name=PODS_TABLE_NAME).all()
+    #     return ListAirtablePodResponse.model_validate(raw)
+    #
+    # @cached(cache=TTLCache(maxsize=1024, ttl=600))
+    # def get_pod_by_id(self, pod_id) -> AirtablePodResponse:
+    #     raw = self.client_api.table(base_id=BASE_ID, table_name=PODS_TABLE_NAME).get(record_id=pod_id)
+    #     return AirtablePodResponse.model_validate(raw)
+    #
+    # @cached(cache=TTLCache(maxsize=1024, ttl=600))
+    # def get_pod_by_school_id(self, school_id) -> Optional[AirtablePodResponse]:
+    #     formula = formulas.INCLUDE(formulas.STR_VALUE(school_id), formulas.FIELD("School Record IDs"))
+    #
+    #     raw = self.client_api.table(base_id=BASE_ID, table_name=PODS_TABLE_NAME).all(formula=formula)
+    #
+    #     if len(raw) > 0:
+    #         raw_item = raw[0]
+    #         return AirtablePodResponse.model_validate(raw_item)
+    #
+    #     return None
+    #
+    # @cached(cache=TTLCache(maxsize=32, ttl=600))
+    # def get_pods_by_hub_id(self, hub_id) -> ListAirtablePodResponse:
+    #     formula = formulas.INCLUDE(formulas.STR_VALUE(hub_id), formulas.FIELD("Hub Record ID"))
+    #
+    #     raw = self.client_api.table(base_id=BASE_ID, table_name=PODS_TABLE_NAME).all(formula=formula)
+    #     return ListAirtablePodResponse.model_validate(raw)
+    #
+    # @cached(cache=TTLCache(maxsize=1024, ttl=600))
+    # def get_pods_by_contact_id(self, partner_id) -> ListAirtablePodResponse:
+    #     formula = formulas.INCLUDE(formulas.STR_VALUE(partner_id), formulas.FIELD("Pod Contact Record ID"))
+    #
+    #     raw = self.client_api.table(base_id=BASE_ID, table_name=PODS_TABLE_NAME).all(formula=formula)
+    #     return ListAirtablePodResponse.model_validate(raw)
 
     @cached(cache=TTLCache(maxsize=32, ttl=600))
     def list_schools(self, page_size=100, offset=None) -> (ListAirtableSchoolResponse, str):
@@ -130,12 +130,12 @@ class AirtableClient(metaclass=Singleton):
         raw = self.client_api.table(base_id=BASE_ID, table_name=SCHOOLS_TABLE_NAME).all(formula=formula)
         return ListAirtableSchoolResponse.model_validate(raw)
 
-    @cached(cache=TTLCache(maxsize=32, ttl=600))
-    def get_schools_by_pod_id(self, pod_id) -> ListAirtableSchoolResponse:
-        formula = formulas.INCLUDE(formulas.STR_VALUE(pod_id), formulas.FIELD("Pod Record ID"))
-
-        raw = self.client_api.table(base_id=BASE_ID, table_name=SCHOOLS_TABLE_NAME).all(formula=formula)
-        return ListAirtableSchoolResponse.model_validate(raw)
+    # @cached(cache=TTLCache(maxsize=32, ttl=600))
+    # def get_schools_by_pod_id(self, pod_id) -> ListAirtableSchoolResponse:
+    #     formula = formulas.INCLUDE(formulas.STR_VALUE(pod_id), formulas.FIELD("Pod Record ID"))
+    #
+    #     raw = self.client_api.table(base_id=BASE_ID, table_name=SCHOOLS_TABLE_NAME).all(formula=formula)
+    #     return ListAirtableSchoolResponse.model_validate(raw)
 
     @cached(cache=TTLCache(maxsize=1024, ttl=600))
     def get_schools_by_educator_id(self, educator_id) -> ListAirtableSchoolResponse:
@@ -213,16 +213,16 @@ class AirtableClient(metaclass=Singleton):
 
         return response
 
-    @cached(cache=TTLCache(maxsize=32, ttl=600))
-    def get_partners_by_pod_id(self, pod_id, load_relationships=True) -> ListAirtablePartnerResponse:
-        formula = formulas.INCLUDE(formulas.STR_VALUE(pod_id), formulas.FIELD("Pod Record ID"))
-
-        raw = self.client_api.table(base_id=BASE_ID, table_name=PARTNERS_TABLE_NAME).all(formula=formula)
-        response = ListAirtablePartnerResponse.model_validate(raw)
-        if load_relationships:
-            response.load_relationships()
-
-        return response
+    # @cached(cache=TTLCache(maxsize=32, ttl=600))
+    # def get_partners_by_pod_id(self, pod_id, load_relationships=True) -> ListAirtablePartnerResponse:
+    #     formula = formulas.INCLUDE(formulas.STR_VALUE(pod_id), formulas.FIELD("Pod Record ID"))
+    #
+    #     raw = self.client_api.table(base_id=BASE_ID, table_name=PARTNERS_TABLE_NAME).all(formula=formula)
+    #     response = ListAirtablePartnerResponse.model_validate(raw)
+    #     if load_relationships:
+    #         response.load_relationships()
+    #
+    #     return response
 
     @cached(cache=TTLCache(maxsize=1024, ttl=600))
     def get_partners_by_educator_id(self, educator_id, load_relationships=True) -> ListAirtablePartnerResponse:

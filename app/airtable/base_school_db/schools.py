@@ -29,8 +29,8 @@ class AirtableSchoolFields(BaseModel):
 
     hub: Optional[str] = Field(None, alias="Hub")
     hub_name: Optional[str] = Field(None, alias="Hub Name")
-    pod: Optional[str] = Field(None, alias="Pod")
-    pod_name: Optional[str] = Field(None, alias="Pod Name")
+    # pod: Optional[str] = Field(None, alias="Pod")
+    # pod_name: Optional[str] = Field(None, alias="Pod Name")
     guides_entrepreneurs: Optional[list[str]] = Field(None, alias="Guides and Entrepreneurs")
     primary_contacts: Optional[list[str]] = Field(None, alias="Primary Contacts")
     all_educators: Optional[list[str]] = Field(None, alias="All Educator Record IDs")
@@ -52,7 +52,7 @@ class AirtableSchoolFields(BaseModel):
     left_network_reason: Optional[str] = Field(None, alias="Left Network Reason")
     left_network_date: Optional[date] = Field(None, alias="Left Network Date")
 
-    @field_validator("hub", "hub_name", "pod", "pod_name", "address", "latitude", "longitude", mode="before")
+    @field_validator("hub", "hub_name", "address", "latitude", "longitude", mode="before")
     def _get_first_or_default_none(cls, v: Union[str, int, float]) -> Optional[Union[str, int, float]]:
         return get_first_or_default_none(v)
 

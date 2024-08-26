@@ -7,7 +7,8 @@ from . import response as response_models
 from . import educators as educator_models
 from . import hubs as hub_models
 from . import partners as partner_models
-from . import pods as pod_models
+
+# from . import pods as pod_models
 from ..airtable.base_school_db import schools as airtable_school_models
 
 
@@ -27,7 +28,7 @@ class APISchoolData(schools.APISchoolData):
             longitude=airtable_school.fields.longitude,
             organizational_unit=airtable_school.fields.organizational_unit,
             hub_name=airtable_school.fields.hub_name,
-            pod_name=airtable_school.fields.pod_name,
+            # pod_name=airtable_school.fields.pod_name,
             ages_served=airtable_school.fields.ages_served,
             school_calendar=airtable_school.fields.school_calendar,
             school_schedule=airtable_school.fields.school_schedule,
@@ -53,9 +54,9 @@ class APISchoolData(schools.APISchoolData):
         if airtable_school.fields.hub:
             hub_data = response_models.APIDataBase(id=airtable_school.fields.hub, type=hub_models.MODEL_TYPE)
 
-        pod_data = None
-        if airtable_school.fields.pod:
-            pod_data = response_models.APIDataBase(id=airtable_school.fields.pod, type=pod_models.MODEL_TYPE)
+        # pod_data = None
+        # if airtable_school.fields.pod:
+        #     pod_data = response_models.APIDataBase(id=airtable_school.fields.pod, type=pod_models.MODEL_TYPE)
 
         guides_and_entrepreneurs_data = []
         if airtable_school.fields.guides_entrepreneurs is not None:
@@ -93,9 +94,9 @@ class APISchoolData(schools.APISchoolData):
             hub=response_models.APILinksAndData(
                 links={"self": url_path_for("get_school_hub", school_id=airtable_school.id)}, data=hub_data
             ),
-            pod=response_models.APILinksAndData(
-                links={"self": url_path_for("get_school_pod", school_id=airtable_school.id)}, data=pod_data
-            ),
+            # pod=response_models.APILinksAndData(
+            #     links={"self": url_path_for("get_school_pod", school_id=airtable_school.id)}, data=pod_data
+            # ),
             guides_and_entrepreneurs=response_models.APILinksAndData(
                 links={"self": url_path_for("get_school_guides_and_entrepreneurs", school_id=airtable_school.id)},
                 data=guides_and_entrepreneurs_data,

@@ -4,7 +4,8 @@ from fastapi import APIRouter, Depends, Request, HTTPException
 from .airtable.client import AirtableClient
 from .models import hubs as hub_models
 from .models import partners as partner_models
-from .models import pods as pod_models
+
+# from .models import pods as pod_models
 from .models import schools as school_models
 from . import auth
 from .utils.utils import get_airtable_client
@@ -70,19 +71,19 @@ async def get_hub_site_entrepreneurs(hub_id, request: Request):
     )
 
 
-@router.get("/{hub_id}/pods", response_model=pod_models.ListAPIPodResponse)
-async def get_hub_pods(hub_id, request: Request):
-    airtable_client = get_airtable_client(request)
-    fetch_hub_wrapper(hub_id, airtable_client)
-    airtable_pods = airtable_client.get_pods_by_hub_id(hub_id)
-
-    data = pod_models.ListAPIPodData.from_airtable_pods(
-        airtable_pods=airtable_pods, url_path_for=request.app.url_path_for
-    ).root
-
-    return pod_models.ListAPIPodResponse(
-        data=data, links={"self": request.app.url_path_for("get_hub_pods", hub_id=hub_id)}
-    )
+# @router.get("/{hub_id}/pods", response_model=pod_models.ListAPIPodResponse)
+# async def get_hub_pods(hub_id, request: Request):
+#     airtable_client = get_airtable_client(request)
+#     fetch_hub_wrapper(hub_id, airtable_client)
+#     airtable_pods = airtable_client.get_pods_by_hub_id(hub_id)
+#
+#     data = pod_models.ListAPIPodData.from_airtable_pods(
+#         airtable_pods=airtable_pods, url_path_for=request.app.url_path_for
+#     ).root
+#
+#     return pod_models.ListAPIPodResponse(
+#         data=data, links={"self": request.app.url_path_for("get_hub_pods", hub_id=hub_id)}
+#     )
 
 
 @router.get("/{hub_id}/schools", response_model=school_models.ListAPISchoolResponse)

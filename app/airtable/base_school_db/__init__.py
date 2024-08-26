@@ -10,7 +10,8 @@ from .languages import *
 from .montessori_certifications import *
 from .newsletters import *
 from .partners import *
-from .pods import *
+
+# from .pods import *
 from .schools import *
 from .socio_economic_backgrounds import *
 from .typeform_start_a_school import *

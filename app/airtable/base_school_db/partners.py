@@ -15,7 +15,7 @@ class AirtablePartnerFields(BaseModel):
     active_stint: Optional[list[str]] = Field(None, alias="Active stint")
     roles: Optional[list[str]] = Field(None, alias="Roles")
     hubs: Optional[list[str]] = Field(None, alias="Hubs")
-    pods: Optional[list[str]] = Field(None, alias="Pods")
+    # pods: Optional[list[str]] = Field(None, alias="Pods")
     schools_partner_guiding: Optional[
         list[Union[str, airtable_guides_schools_models.AirtableGuidesSchoolsResponse]]
     ] = Field(None, alias="Guides x Schools")

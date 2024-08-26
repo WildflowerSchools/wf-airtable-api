@@ -10,7 +10,8 @@ from .airtable.base_school_db import schools as airtable_school_models
 from .models import educators as educator_models
 from .models import hubs as hub_models
 from .models import partners as partner_models
-from .models import pods as pod_models
+
+# from .models import pods as pod_models
 from .models import schools as school_models
 from . import auth
 from .utils.utils import get_airtable_client
@@ -125,20 +126,20 @@ async def get_school_hub(school_id, request: Request):
     )
 
 
-@router.get("/{school_id}/pod", response_model=pod_models.APIPodResponse)
-async def get_school_pod(school_id, request: Request):
-    airtable_client = request.state.airtable_client
-    fetch_school_wrapper(school_id, airtable_client)
-    airtable_pod = airtable_client.get_pod_by_school_id(school_id)
-
-    if airtable_pod is None:
-        raise HTTPException(status_code=404, detail="School Pod not found")
-
-    data = pod_models.APIPodData.from_airtable_pod(airtable_pod=airtable_pod, url_path_for=request.app.url_path_for)
-
-    return pod_models.APIPodResponse(
-        data=data, links={"self": request.app.url_path_for("get_school_pod", school_id=school_id)}
-    )
+# @router.get("/{school_id}/pod", response_model=pod_models.APIPodResponse)
+# async def get_school_pod(school_id, request: Request):
+#     airtable_client = request.state.airtable_client
+#     fetch_school_wrapper(school_id, airtable_client)
+#     airtable_pod = airtable_client.get_pod_by_school_id(school_id)
+#
+#     if airtable_pod is None:
+#         raise HTTPException(status_code=404, detail="School Pod not found")
+#
+#     data = pod_models.APIPodData.from_airtable_pod(airtable_pod=airtable_pod, url_path_for=request.app.url_path_for)
+#
+#     return pod_models.APIPodResponse(
+#         data=data, links={"self": request.app.url_path_for("get_school_pod", school_id=school_id)}
+#     )
 
 
 @router.get("/{school_id}/guides_and_entrepreneurs", response_model=partner_models.ListAPIPartnerResponse)

@@ -129,7 +129,8 @@ add_routers(
 
 
 # Raise errors to the Serverless platform
-def capture_serverless_exception(request, ex):
+def log_exception(request, ex):
+    logger.exception(ex)
     if "aws.context" in request.scope:
         context = request.scope["aws.context"]
         if context and hasattr(context, "serverless_sdk"):
@@ -143,7 +144,7 @@ async def hola_mundo():
 
 @app.exception_handler(status.HTTP_404_NOT_FOUND)
 async def resource_not_found(request, ex):
-    capture_serverless_exception(request, ex)
+    log_exception(request, ex)
     return JSONResponse(
         status_code=status.HTTP_404_NOT_FOUND, content={"detail": ex.detail if hasattr(ex, "detail") else "Not Found"}
     )
@@ -151,7 +152,7 @@ async def resource_not_found(request, ex):
 
 @app.exception_handler(requests.exceptions.HTTPError)
 async def airtable_resource_not_found(request, ex):
-    capture_serverless_exception(request, ex)
+    log_exception(request, ex)
     if ex.response.status_code == status.HTTP_404_NOT_FOUND:
         return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"detail": "Airtable resource not found"})
     else:
@@ -161,7 +162,7 @@ async def airtable_resource_not_found(request, ex):
 
 @app.exception_handler(auth.AuthError)
 async def handle_auth_error(request, ex):
-    capture_serverless_exception(request, ex)
+    log_exception(request, ex)
     return JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, content=jsonable_encoder({"detail": ex.error})
     )
@@ -169,7 +170,7 @@ async def handle_auth_error(request, ex):
 
 @app.exception_handler(fastapiExceptions.RequestValidationError)
 async def handle_request_validation_error(request, ex):
-    capture_serverless_exception(request, ex)
+    log_exception(request, ex)
     return JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         content=jsonable_encoder({"detail": ex.errors(), "body": ex.body}),
@@ -178,7 +179,7 @@ async def handle_request_validation_error(request, ex):
 
 @app.exception_handler(Exception)
 async def handle_general_exception(request, ex):
-    capture_serverless_exception(request, ex)
+    log_exception(request, ex)
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         content=jsonable_encoder({"detail": "Unexpected server error"}),

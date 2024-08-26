@@ -173,10 +173,7 @@ async def list_geo_area_contacts(request: Request) -> geo_area_contact_models.Li
 
 
 @geo_area_contacts_router.get("/for_address", response_model=geo_area_contact_models.APIGeoAreaContactResponse)
-async def get_geo_area_contact_given_address(
-        request: Request,
-        address: str,
-        marketing_source: Union[str, None] = None):
+async def get_geo_area_contact_given_address(request: Request, address: str, marketing_source: Union[str, None] = None):
     gmaps_client = GoogleMapsAPI()
     place = gmaps_client.geocode_address(address)
 
@@ -185,9 +182,8 @@ async def get_geo_area_contact_given_address(
 
     geo_area_contacts = await list_geo_area_contacts(request)
     geo_area_contact = geocode_utils.get_geo_area_nearest_to_place(
-        place=place,
-        geo_areas=geo_area_contacts.data,
-        marketing_source=marketing_source)
+        place=place, geo_areas=geo_area_contacts.data, marketing_source=marketing_source
+    )
 
     return geo_area_contact_models.APIGeoAreaContactResponse(
         data=geo_area_contact,

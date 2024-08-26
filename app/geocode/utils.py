@@ -52,7 +52,7 @@ def is_place_within_country(a: Place, country: Place):
 def get_geo_area_nearest_to_place(
     place: Optional[Place],
     geo_areas: Union[list[APIGeoAreaContactData], list[APIGeoAreaTargetCommunityData]],
-    marketing_source: Union[str, None] = None
+    marketing_source: Union[str, None] = None,
 ):
     default_geo_area_marketing_source_specific = None
     default_international_geo_area_marketing_source_specific = None
@@ -66,12 +66,16 @@ def get_geo_area_nearest_to_place(
 
     for ga in geo_areas:
         if marketing_source is not None and isinstance(ga, APIGeoAreaContactData):
-            if (ga.fields.marketing_source == marketing_source and
-                ga.fields.area_type == AirtableGeographicAreaTypes.AREA_TYPE_DEFAULT_US):
+            if (
+                ga.fields.marketing_source == marketing_source
+                and ga.fields.area_type == AirtableGeographicAreaTypes.AREA_TYPE_DEFAULT_US
+            ):
                 default_geo_area_marketing_source_specific = ga
 
-            elif (ga.fields.marketing_source == marketing_source and
-                  ga.fields.area_type == AirtableGeographicAreaTypes.AREA_TYPE_DEFAULT_INTERNATIONAL):
+            elif (
+                ga.fields.marketing_source == marketing_source
+                and ga.fields.area_type == AirtableGeographicAreaTypes.AREA_TYPE_DEFAULT_INTERNATIONAL
+            ):
                 default_international_geo_area_marketing_source_specific = ga
 
         if ga.fields.area_type == AirtableGeographicAreaTypes.AREA_TYPE_DEFAULT_US:
@@ -186,9 +190,8 @@ def get_geo_area_nearest_to_place(
                 break
 
     if geo_area is None:
-        if (default_geo_area_marketing_source_specific is not None and
-                place.get_country_component().short_name == "US"):
-                geo_area = default_geo_area_marketing_source_specific
+        if default_geo_area_marketing_source_specific is not None and place.get_country_component().short_name == "US":
+            geo_area = default_geo_area_marketing_source_specific
 
     if geo_area is None:
         if default_international_geo_area_marketing_source_specific is not None:
