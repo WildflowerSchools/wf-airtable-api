@@ -2,14 +2,14 @@ from app import const
 
 BASE_ID = const.AIRTABLE_SCHOOL_DB_BASE_ID
 
-HUBS_TABLE_NAME = "Growth Initiatives"
+HUBS_TABLE_NAME = "Growth inits"
 # PODS_TABLE_NAME = "Pods"
 SCHOOLS_TABLE_NAME = "Schools"
 EDUCATORS_TABLE_NAME = "Educators"
 PARTNERS_TABLE_NAME = "Partners"
 GUIDES_SCHOOLS_TABLE_NAME = "Guides x Schools"
 EDUCATORS_SCHOOLS_TABLE_NAME = "Educators x Schools"
-MONTESSORI_CERTIFICATIONS_TABLE_NAME = "Montessori Certifications"
+MONTESSORI_CERTIFICATIONS_TABLE_NAME = "Montessori Certs"
 LANGUAGES_TABLE_NAME = "Languages"
 CONTACT_INFO_TABLE_NAME = "Contact Info"
 SOCIO_ECONOMIC_BACKGROUNDS_TABLE_NAME = "SocioEconomic Background"
