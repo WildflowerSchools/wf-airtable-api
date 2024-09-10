@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "wf-airtable-api"
-version = "1.11.3"
+version = "1.12.0"
 description = "Wildflower API serving to simplify Airtable interface"
 authors = ["Benjamin Jaffe-Talberg <ben.talberg@gmail.com>"]
 license = "MIT"
